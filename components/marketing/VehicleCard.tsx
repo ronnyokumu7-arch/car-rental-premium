@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import {
   Users,
   Fuel,
@@ -10,17 +9,19 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import {
-  type Vehicle,
-  formatPrice,
-} from '../../lib/vehicles';
+import { type Vehicle, formatPrice } from '../../lib/vehicles';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
   index?: number;
+  onViewDetails?: () => void;
 }
 
-export function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
+export function VehicleCard({
+  vehicle,
+  index = 0,
+  onViewDetails,
+}: VehicleCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -31,19 +32,19 @@ export function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
         delay: index * 0.1,
         ease: [0.25, 0.1, 0.25, 1],
       }}
-      className="group relative flex flex-col bg-porcelain border border-charcoal-300/20 rounded-sm overflow-hidden transition-all duration-500 hover:border-accent-500/40 hover:shadow-2xl hover:-translate-y-1"
+      onClick={onViewDetails}
+      className={`group relative flex flex-col bg-porcelain border border-charcoal-300/20 rounded-sm overflow-hidden transition-all duration-500 hover:border-accent-500/40 hover:shadow-2xl hover:-translate-y-1 ${
+        onViewDetails ? 'cursor-pointer' : ''
+      }`}
     >
       {/* ── Visual panel with silhouette ── */}
       <div className="relative aspect-[16/10] overflow-hidden">
-        {/* Gradient base */}
         <div
           className="absolute inset-0"
           style={{
             background: `linear-gradient(135deg, ${vehicle.accentFrom} 0%, ${vehicle.accentTo} 100%)`,
           }}
         />
-
-        {/* Radial accent glow */}
         <div
           className="absolute inset-0 opacity-50"
           style={{
@@ -51,11 +52,8 @@ export function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
               'radial-gradient(ellipse at 70% 40%, rgba(201, 162, 39, 0.35) 0%, transparent 60%)',
           }}
         />
-
-        {/* Grain overlay */}
         <div className="grain-overlay absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none" />
 
-        {/* Vehicle silhouette (SVG path) */}
         <svg
           viewBox="0 0 200 100"
           className="absolute inset-0 w-full h-full p-8 text-porcelain/40 transition-all duration-700 group-hover:text-porcelain/70 group-hover:scale-105"
@@ -93,17 +91,12 @@ export function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
 
       {/* ── Content ── */}
       <div className="flex flex-col flex-1 p-6">
-        {/* Name */}
-        <h3 className="type-h3 text-primary-900 mb-3">
-          {vehicle.name}
-        </h3>
+        <h3 className="type-h3 text-primary-900 mb-3">{vehicle.name}</h3>
 
-        {/* Description */}
         <p className="text-sm text-charcoal-500 leading-relaxed line-clamp-2 mb-6">
           {vehicle.description}
         </p>
 
-        {/* Specs Grid */}
         <div className="grid grid-cols-3 gap-3 mb-6 pb-6 border-b border-charcoal-300/20">
           <Spec
             icon={<Users size={16} />}
@@ -122,7 +115,6 @@ export function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
           />
         </div>
 
-        {/* Mode badges */}
         <div className="flex flex-wrap gap-2 mb-6">
           {(vehicle.mode === 'Self-Drive' || vehicle.mode === 'Both') && (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-900/5 text-primary-900 text-[10px] font-medium uppercase tracking-widest rounded-sm border border-primary-900/10">
@@ -151,13 +143,18 @@ export function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
               </span>
             </p>
           </div>
-          <Link
-            href={`/vehicles/${vehicle.id}`}
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewDetails?.();
+            }}
             className="flex items-center justify-center w-11 h-11 rounded-full bg-primary-900 text-porcelain transition-all duration-300 hover:bg-accent-500 hover:text-primary-900 group-hover:rotate-45"
             aria-label={`View ${vehicle.name}`}
           >
             <ArrowUpRight size={18} />
-          </Link>
+          </button>
         </div>
       </div>
     </motion.div>
@@ -180,9 +177,7 @@ function Spec({
       <span className="text-[9px] uppercase tracking-widest text-charcoal-500">
         {label}
       </span>
-      <span className="text-sm font-medium text-primary-900">
-        {value}
-      </span>
+      <span className="text-sm font-medium text-primary-900">{value}</span>
     </div>
   );
 }
