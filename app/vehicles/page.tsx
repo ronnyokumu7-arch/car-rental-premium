@@ -23,7 +23,8 @@ export default function VehiclesPage() {
         <div className="relative max-w-7xl mx-auto">
           <p className="type-caption text-accent-500 mb-4">Our Fleet</p>
           <h1 className="type-display text-porcelain mb-6 max-w-3xl">
-            Every Vehicle, <span className="italic font-light">Ready</span> for the Road
+            Every Vehicle,{' '}
+            <span className="italic font-light">Ready</span> for the Road
           </h1>
           <p className="type-lead text-porcelain/60 max-w-2xl">
             Handpicked, fully serviced, and available for self-drive or
@@ -44,14 +45,14 @@ export default function VehiclesPage() {
       <section className="bg-primary-900 py-20 px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center">
           <p className="type-caption text-accent-500 mb-4">
-            Can't Find What You Need?
+            Can&apos;t Find What You Need?
           </p>
           <h2 className="type-h2 text-porcelain mb-6">
-            We'll Source It For You
+            We&apos;ll Source It For You
           </h2>
           <p className="type-lead text-porcelain/60 mb-8">
             Need a specific model, a longer rental, or a corporate fleet
-            arrangement? Tell us what you need — we'll make it happen.
+            arrangement? Tell us what you need — we&apos;ll make it happen.
           </p>
           <a href="/contact" className="btn-primary inline-block">
             Request a Custom Vehicle
