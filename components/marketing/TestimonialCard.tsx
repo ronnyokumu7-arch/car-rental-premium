@@ -76,7 +76,7 @@ export function TestimonialCard({
           <p className="text-sm font-medium text-porcelain truncate">
             {testimonial.name}
           </p>
-          <p className="text-[10px] uppercase tracking-widest text-porcelain/50 truncate">
+<p className="text-[10px] uppercase tracking-widest text-porcelain/50 truncate" title={testimonial.location ? `${testimonial.role} · ${testimonial.location}` : testimonial.role}>
             {testimonial.role}
             {testimonial.location && ` · ${testimonial.location}`}
           </p>
