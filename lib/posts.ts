@@ -40,9 +40,11 @@ export const POSTS: Post[] = [
     excerpt:
       "We've added three new Toyota Prado J150s to our fleet, ready for executive travel, safari escapes, and long-distance road trips. Here's what makes the Prado the definitive Nairobi SUV.",
     content: `
-The Toyota Prado J150 has always been the definitive Nairobi SUV — commanding presence on the road, all-terrain capability, and comfort for seven. We're excited to announce that three new Prados have joined our fleet, ready for hire immediately.
+We're excited to announce that three new Prados have joined our fleet, ready for hire immediately.
 
 ## Why the Prado
+
+The Toyota Prado J150 has always been the definitive Nairobi SUV — commanding presence on the road, all-terrain capability, and comfort for seven. 
 
 If you've ever driven the Prado, you know. It handles everything from the highway between Nairobi and Naivasha to the rough roads of the Mara. With a 4WD system and a diesel engine built for long distances, it's the vehicle our customers keep requesting.
 
