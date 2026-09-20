@@ -61,11 +61,7 @@ export function ContactInfo() {
           <p className="text-primary-900 font-medium text-base">
             Royride Car Hire Ltd.
           </p>
-          <p className="text-primary-900 font-medium">Kibiku Road</p>
-          <p className="text-primary-900 font-medium">
-            Off Eastern Bypass, Utawala
-          </p>
-          <p className="text-charcoal-700 text-sm">Near The Bus Bistro</p>
+          <p className="text-charcoal-700 text-sm">Kibiku Road, Utawala</p>
           <p className="text-charcoal-700 text-sm">Nairobi, Kenya</p>
         </div>
         <a

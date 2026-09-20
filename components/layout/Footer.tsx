@@ -69,7 +69,6 @@ export function Footer() {
                   <p className="text-porcelain/90">
                     {CONTACT.address.line1}
                   </p>
-                  <p>{CONTACT.address.line2}</p>
                   <p className="text-porcelain/50 text-xs mt-1">
                     {CONTACT.address.landmark}
                   </p>

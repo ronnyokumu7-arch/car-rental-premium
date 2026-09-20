@@ -82,9 +82,6 @@ export default function ContactPage() {
                   {CONTACT.address.line1}
                 </p>
                 <p className="text-charcoal-700">
-                  {CONTACT.address.line2}
-                </p>
-                <p className="text-charcoal-700">
                   {CONTACT.address.city}
                 </p>
               </div>
@@ -94,7 +91,7 @@ export default function ContactPage() {
                   Landmark
                 </p>
                 <p className="text-sm text-charcoal-700">
-                  {CONTACT.address.landmark}, Utawala
+                  {CONTACT.address.landmark}
                 </p>
               </div>
 
