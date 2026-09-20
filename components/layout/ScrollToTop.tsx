@@ -28,7 +28,7 @@ export function ScrollToTop() {
           transition={{ duration: 0.25 }}
           onClick={handleClick}
           aria-label="Scroll back to top"
-          className="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-primary-900 text-porcelain shadow-lg hover:bg-accent-500 hover:text-primary-900 transition-all duration-300 hover:-translate-y-0.5 group"
+          className="fixed bottom-6 right-6 z-[90] w-12 h-12 rounded-full bg-primary-900 text-porcelain shadow-lg hover:bg-accent-500 hover:text-primary-900 transition-all duration-300 hover:-translate-y-0.5 group"
         >
           <ArrowUp
             size={18}

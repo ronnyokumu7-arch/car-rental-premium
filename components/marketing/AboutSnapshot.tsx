@@ -19,9 +19,9 @@ export function AboutSnapshot() {
           >
             <p className="type-caption text-accent-600 mb-3">About Royride</p>
             <h2 className="font-display text-4xl lg:text-5xl text-primary-900 leading-tight mb-6">
-              Built on Trust.
+              Built on trust.
               <br />
-              <span className="italic font-light">Driven by Detail.</span>
+              <span className="font-light">Driven by detail.</span>
             </h2>
           </motion.div>
 

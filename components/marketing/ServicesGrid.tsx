@@ -19,7 +19,7 @@ export function ServicesGrid() {
         >
           <p className="type-caption text-accent-500 mb-3">Our Services</p>
           <h2 className="font-display text-4xl lg:text-5xl text-porcelain leading-tight">
-            Two Ways to Drive
+            Two ways to drive
           </h2>
         </motion.div>
 

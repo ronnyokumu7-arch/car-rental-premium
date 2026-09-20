@@ -117,7 +117,7 @@ export default function RootLayout({
       <body className="font-sans bg-porcelain text-charcoal-700 antialiased">
         <LocalBusinessSchema />
         <Navbar />
-        <main>{children}</main>
+        <main className="relative z-0">{children}</main>
         <Footer />
         <FloatingWidgets />
       </body>

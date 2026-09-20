@@ -35,8 +35,8 @@ export default function VehiclesPage() {
         <div className="relative max-w-7xl mx-auto">
           <p className="type-caption text-accent-500 mb-4">Our Fleet</p>
           <h1 className="type-display text-porcelain mb-6 max-w-3xl">
-            Every Vehicle,{' '}
-            <span className="italic font-light">Ready</span> for the Road
+            Every vehicle,{' '}
+            <span className="font-light">ready</span> for the Road
           </h1>
           <p className="type-lead text-porcelain/60 max-w-2xl">
             Handpicked, fully serviced, and available for self-drive or

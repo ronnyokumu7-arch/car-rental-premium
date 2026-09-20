@@ -62,7 +62,7 @@ export function GoogleReviewsWidget() {
             transition={{ duration: 0.3 }}
             onClick={() => setOpen(true)}
             aria-label="See Google reviews"
-            className="group fixed bottom-6 left-6 z-40 flex items-center gap-3 pl-2 pr-4 py-2 bg-primary-900 border border-porcelain/15 rounded-full shadow-2xl hover:border-accent-500/60 hover:bg-primary-700 transition-all duration-300"
+            className="group fixed bottom-6 left-6 z-[90] flex items-center gap-3 pl-2 pr-4 py-2 bg-primary-900 border border-porcelain/15 rounded-full shadow-2xl hover:border-accent-500/60 hover:bg-primary-700 transition-all duration-300"
           >
             {/* Pulsing gold ring — draws eye without being intrusive */}
             <span className="absolute inset-0 rounded-full pointer-events-none">
@@ -132,7 +132,7 @@ export function GoogleReviewsWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-            className="fixed bottom-6 left-6 right-6 sm:right-auto z-50 w-auto sm:w-[340px] max-h-[80vh] overflow-hidden bg-porcelain border border-charcoal-300/40 rounded-sm shadow-2xl"
+            className="fixed bottom-6 left-6 right-6 sm:right-auto z-[90] w-auto sm:w-[340px] max-h-[80vh] overflow-hidden bg-porcelain border border-charcoal-300/40 rounded-sm shadow-2xl"
           >
             {/* Navy header */}
             <div className="relative bg-primary-900 px-5 py-4">

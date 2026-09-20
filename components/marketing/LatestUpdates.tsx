@@ -31,7 +31,7 @@ export function LatestUpdates() {
             </p>
             <h2 className="font-display text-3xl lg:text-4xl text-primary-900 leading-tight mb-4">
               News & Insights from the{' '}
-              <span className="italic font-light">Road</span>
+              <span className="font-light">Road</span>
             </h2>
             <p className="type-lead">
               Fleet additions, travel guides, seasonal offers — and the
