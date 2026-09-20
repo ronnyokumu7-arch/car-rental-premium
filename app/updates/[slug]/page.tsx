@@ -196,7 +196,7 @@ export default function PostPage({ params }: PageProps) {
                   Keep Reading
                 </p>
                 <h2 className="font-display text-3xl lg:text-4xl text-porcelain leading-tight">
-                  More from the Updates
+                  Read more from the Updates
                 </h2>
               </div>
               <Link

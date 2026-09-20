@@ -43,7 +43,7 @@ export function AboutSnapshot() {
             </p>
             <p>
               From economy saloons to executive SUVs — including the Toyota
-              Prado, Mazda CX-5, and Honda Stepwgn (7 seater) — every
+              Prado, Mazda CX-5, Nissan X-Trail, and Honda Stepwgn (7 seater van) — every
               vehicle is vetted, insured, and maintained to a standard
               we&apos;d want for our own family.
             </p>
