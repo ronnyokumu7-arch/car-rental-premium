@@ -178,7 +178,7 @@ export function BookingBar() {
           {/* Card footer strip */}
           <div className="bg-primary-900/5 border-t border-charcoal-300/20 px-6 lg:px-10 py-3 flex flex-wrap items-center gap-x-6 gap-y-1">
             <p className="type-caption text-charcoal-500">
-              ✓ Free cancellation up to 24h before pickup
+              ✓ Free cancellation
             </p>
             <p className="type-caption text-charcoal-500">
               ✓ Airport delivery included
