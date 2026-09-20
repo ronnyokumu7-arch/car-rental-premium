@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { BRAND, NAV_LINKS } from '../../lib/constants';
 import { CONTACT } from '../../lib/contact';
+import { SocialLinks } from '../ui/SocialLinks';
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -28,14 +29,23 @@ export function Footer() {
               anywhere in Kenya.
             </p>
 
+            {/* WhatsApp */}
             <a
               href={`https://wa.me/${CONTACT.whatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-500 hover:text-porcelain transition-colors"
+              className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-500 hover:text-porcelain transition-colors mb-8"
             >
               Chat on WhatsApp →
             </a>
+
+            {/* Social links */}
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.15em] text-porcelain/40 mb-3 font-medium">
+                Follow Us
+              </p>
+              <SocialLinks size="sm" variant="dark" />
+            </div>
           </div>
 
           {/* ── Explore ── */}

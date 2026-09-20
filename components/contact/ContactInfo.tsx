@@ -1,6 +1,14 @@
-import { Phone, Mail, MapPin, Clock, MessageCircle } from 'lucide-react';
+import {
+  Phone,
+  Mail,
+  MapPin,
+  Clock,
+  MessageCircle,
+  Share2,
+} from 'lucide-react';
 import { BRAND } from '../../lib/constants';
 import { CONTACT } from '../../lib/contact';
+import { SocialLinks } from '../ui/SocialLinks';
 
 export function ContactInfo() {
   const whatsappUrl = `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(
@@ -48,10 +56,10 @@ export function ContactInfo() {
       {/* Email */}
       <InfoCard icon={<Mail size={18} />} label="Email">
         <a
-          href="mailto:sales@royride.com"
+          href={`mailto:${CONTACT.email}`}
           className="text-primary-900 font-medium hover:text-accent-600 transition-colors break-all"
         >
-          sales@royride.com
+          {CONTACT.email}
         </a>
       </InfoCard>
 
@@ -61,8 +69,15 @@ export function ContactInfo() {
           <p className="text-primary-900 font-medium text-base">
             Royride Car Hire Ltd.
           </p>
-          <p className="text-charcoal-700 text-sm">Kibiku Road, Utawala</p>
-          <p className="text-charcoal-700 text-sm">Nairobi, Kenya</p>
+          <p className="text-charcoal-700 text-sm">
+            {CONTACT.address.line1}
+          </p>
+          <p className="text-charcoal-700 text-sm">
+            {CONTACT.address.city}
+          </p>
+          <p className="text-charcoal-500 text-xs pt-1">
+            {CONTACT.address.landmark}
+          </p>
         </div>
         <a
           href={CONTACT.directionsUrl}
@@ -89,6 +104,11 @@ export function ContactInfo() {
             </li>
           ))}
         </ul>
+      </InfoCard>
+
+      {/* Social links */}
+      <InfoCard icon={<Share2 size={18} />} label="Follow Us">
+        <SocialLinks size="sm" variant="light" />
       </InfoCard>
     </div>
   );

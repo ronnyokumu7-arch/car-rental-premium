@@ -7,7 +7,6 @@ import { FleetPreview } from '../components/marketing/FleetPreview';
 import { ServicesGrid } from '../components/marketing/ServicesGrid';
 import { AirportTransferBand } from '../components/marketing/AirportTransferBand';
 import { Testimonials } from '../components/marketing/Testimonials';
-import { BrandsWeHire } from '../components/marketing/BrandsWeHire';
 import { FinalCTA } from '../components/marketing/FinalCTA';
 
 export default function Home() {
@@ -22,7 +21,6 @@ export default function Home() {
       <ServicesGrid />
       <AirportTransferBand />
       <Testimonials />
-      <BrandsWeHire />
       <FinalCTA />
     </>
   );
