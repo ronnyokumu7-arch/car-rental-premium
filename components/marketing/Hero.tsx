@@ -49,7 +49,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
           className="type-display text-porcelain mb-8"
         >
-          Private cars for hire {' '}
+          Private, clean, & reliable cars for hire {' '}
           <span className="font-light">in Nairobi</span>
         </motion.h1>
 
