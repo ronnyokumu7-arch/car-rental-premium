@@ -26,8 +26,8 @@ export function FinalCTA() {
           Ready When You Are
         </p>
         <h2 className="font-display text-4xl lg:text-5xl text-porcelain leading-tight mb-6">
-          Let&apos;s Get You on the{' '}
-          <span className="italic font-light">Road</span>
+          Let&apos;s get you on the{' '}
+          <span className="font-light">road</span>
         </h2>
         <p className="text-porcelain/60 text-lg leading-relaxed mb-10 max-w-xl mx-auto">
           Browse the fleet, book a chauffeur, or send us an enquiry. We

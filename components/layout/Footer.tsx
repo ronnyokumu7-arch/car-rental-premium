@@ -12,12 +12,16 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12">
           {/* ── Brand ── */}
           <div className="lg:col-span-5">
-            <Link
-              href="/"
-              className="font-display text-3xl tracking-[0.3em] text-porcelain inline-block mb-6"
-            >
-              {BRAND.name}
+            {/* Logo lockup — ROYRIDE + tagline */}
+            <Link href="/" className="inline-flex flex-col leading-none mb-6">
+              <span className="font-display text-3xl tracking-[0.3em] text-porcelain">
+                {BRAND.name}
+              </span>
+              <span className="text-[9px] uppercase tracking-[0.3em] text-porcelain/50 mt-2">
+                Self-Drive &amp; Chauffeur Hire
+              </span>
             </Link>
+
             <p className="text-sm leading-relaxed max-w-md mb-6">
               Premium car hire in Nairobi. Concierge service, airport
               transfers, and a curated fleet of luxury vehicles — delivered
@@ -59,7 +63,7 @@ export function Footer() {
               Contact
             </h3>
             <ul className="space-y-4 text-sm">
-              {/* Address — sourced from CONTACT.address */}
+              {/* Address */}
               <li className="flex items-start gap-3">
                 <MapPin
                   size={14}
@@ -92,7 +96,7 @@ export function Footer() {
                 </li>
               ))}
 
-              {/* Email — sourced from CONTACT.email */}
+              {/* Email */}
               <li className="flex items-start gap-3">
                 <Mail
                   size={14}
