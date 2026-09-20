@@ -96,7 +96,7 @@ export function AboutContent() {
               </p>
               <p className="font-display text-xl text-primary-900 italic pt-4">
                 The result: a fleet you can rely on, at prices you can
-                trust, with service that keeps people coming back.
+                trust, with service and experience that keeps people coming back.
               </p>
             </motion.div>
           </div>
