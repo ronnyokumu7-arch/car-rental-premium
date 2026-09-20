@@ -17,14 +17,25 @@ export interface Post {
   accentTo: string;
 }
 
+/**
+ * Accent color palette — keep gradients in the DARK spectrum.
+ * Bright colors break the premium dark-card aesthetic.
+ *
+ * Reference:
+ *   Navy:     #081529 → #1a365d
+ *   Charcoal: #1a1a1a → #3d3d3d
+ *   Amber:    #2a1f08 → #5c4410
+ *   Burgundy: #2a0a0a → #5c1a1a   ← Used for Offers
+ */
+
 export const POSTS: Post[] = [
-{
-  id: 'new-prado-fleet',
-  slug: 'new-prado-fleet',
-  title: 'Our Fleet Just Got Bigger — Three New Prados Arrive',
-  excerpt:
-    "We've added three new Toyota Prado J150s to our fleet, ready for executive travel, safari escapes, and long-distance road trips. Here's what makes the Prado the definitive Nairobi SUV.",
-  content: `
+  {
+    id: 'new-prado-fleet',
+    slug: 'new-prado-fleet',
+    title: 'Our Fleet Just Got Bigger — Three New Prados Arrive',
+    excerpt:
+      "We've added three new Toyota Prado J150s to our fleet, ready for executive travel, safari escapes, and long-distance road trips. Here's what makes the Prado the definitive Nairobi SUV.",
+    content: `
 The Toyota Prado J150 has always been the definitive Nairobi SUV — commanding presence on the road, all-terrain capability, and comfort for seven. We're excited to announce that three new Prados have joined our fleet, ready for hire immediately.
 
 ## Why the Prado
@@ -54,20 +65,20 @@ The new Prados are available now at **KES 14,000 per day** — the same rate as 
 
 Ready to book? [Get in touch](/contact) with your dates and pickup location.
   `.trim(),
-  category: 'Fleet',
-  publishedAt: '2026-09-15',
-  readTime: '4 min read',
-  author: { name: 'Royride Team' },
-  featured: true,
-  accentFrom: '#0f2440',
-  accentTo: '#1a365d',
-},
+    category: 'Fleet',
+    publishedAt: '2026-09-15',
+    readTime: '4 min read',
+    author: { name: 'Royride Team' },
+    featured: true,
+    accentFrom: '#0f2440',
+    accentTo: '#1a365d',
+  },
   {
     id: 'jkia-pickup-guide',
     slug: 'jkia-pickup-guide',
     title: 'The Complete Guide to Smooth JKIA Pickups',
     excerpt:
-      'Landing at JKIA after a long flight? Here\'s how our airport transfer service works, why real-time flight tracking matters, and what to expect when you step out of arrivals.',
+      "Landing at JKIA after a long flight? Here's how our airport transfer service works, why real-time flight tracking matters, and what to expect when you step out of arrivals.",
     category: 'Guides',
     publishedAt: '2026-09-08',
     updatedAt: '2026-09-12',
@@ -120,8 +131,8 @@ Ready to book? [Get in touch](/contact) with your dates and pickup location.
     author: {
       name: 'Royride Team',
     },
-    accentFrom: '#a8861f',
-    accentTo: '#c9a227',
+    accentFrom: '#2a0a0a',
+    accentTo: '#5c1a1a',
   },
   {
     id: 'royride-since-2016',

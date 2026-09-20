@@ -4,12 +4,15 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { type Post, formatDate } from '../../lib/posts';
+import { getCategoryIcon } from '../../lib/postIcons';
 
 interface FeaturedPostProps {
   post: Post;
 }
 
 export function FeaturedPost({ post }: FeaturedPostProps) {
+  const Icon = getCategoryIcon(post.category);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -23,7 +26,7 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
       >
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Visual */}
-          <div className="relative aspect-[4/3] lg:aspect-auto lg:min-h-[440px] overflow-hidden">
+          <div className="relative aspect-[4/3] lg:aspect-auto lg:min-h-[440px] overflow-hidden flex items-center justify-center">
             <div
               className="absolute inset-0 transition-transform duration-700 group-hover:scale-105"
               style={{
@@ -31,21 +34,30 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
               }}
             />
             <div
-              className="absolute inset-0 opacity-50 pointer-events-none"
+              className="absolute inset-0 opacity-60 pointer-events-none"
               style={{
                 background:
-                  'radial-gradient(ellipse at 30% 40%, rgba(201, 162, 39, 0.35) 0%, transparent 60%)',
+                  'radial-gradient(ellipse at 50% 50%, rgba(201, 162, 39, 0.35) 0%, transparent 65%)',
               }}
             />
             <div className="grain-overlay absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none" />
 
-            {/* Featured badge */}
-            <div className="absolute top-6 left-6 flex items-center gap-2">
+            {/* Centered icon + category */}
+            <div className="relative flex flex-col items-center gap-4">
+              <Icon
+                size={56}
+                strokeWidth={1}
+                className="text-accent-500 transition-transform duration-700 group-hover:scale-110"
+              />
+              <span className="text-[11px] uppercase tracking-[0.25em] text-porcelain/80 font-medium">
+                {post.category}
+              </span>
+            </div>
+
+            {/* Featured badge — top left */}
+            <div className="absolute top-6 left-6">
               <span className="px-3 py-1 bg-accent-500 text-primary-900 rounded-sm text-[10px] font-bold uppercase tracking-widest">
                 Featured
-              </span>
-              <span className="px-3 py-1 bg-porcelain/10 backdrop-blur-sm border border-porcelain/20 rounded-sm text-[10px] font-medium uppercase tracking-widest text-porcelain">
-                {post.category}
               </span>
             </div>
           </div>

@@ -1,24 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import {
-  ArrowUpRight,
-  Newspaper,
-  Compass,
-  Tag,
-  Car,
-  type LucideIcon,
-} from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { type Post, formatDate } from '../../lib/posts';
-
-/* ── Category → Icon mapping ── */
-const CATEGORY_ICONS: Record<string, LucideIcon> = {
-  News: Newspaper,
-  Guides: Compass,
-  Offers: Tag,
-  Fleet: Car,
-};
+import { getCategoryIcon } from '../../lib/postIcons';
 
 interface CompactPostCardProps {
   post: Post;
@@ -26,7 +12,7 @@ interface CompactPostCardProps {
 }
 
 export function CompactPostCard({ post, index = 0 }: CompactPostCardProps) {
-  const Icon = CATEGORY_ICONS[post.category] ?? Newspaper;
+  const Icon = getCategoryIcon(post.category);
 
   return (
     <motion.div
@@ -47,15 +33,12 @@ export function CompactPostCard({ post, index = 0 }: CompactPostCardProps) {
         <div className="flex flex-row sm:flex-col flex-1">
           {/* ── Typographic Icon Tile ── */}
           <div className="relative shrink-0 w-[140px] sm:w-full sm:aspect-[16/10] aspect-[4/3] overflow-hidden flex items-center justify-center">
-            {/* Gradient background — same accent colors per post */}
             <div
               className="absolute inset-0"
               style={{
                 background: `linear-gradient(135deg, ${post.accentFrom} 0%, ${post.accentTo} 100%)`,
               }}
             />
-
-            {/* Radial glow */}
             <div
               className="absolute inset-0 opacity-60 pointer-events-none"
               style={{
@@ -63,11 +46,8 @@ export function CompactPostCard({ post, index = 0 }: CompactPostCardProps) {
                   'radial-gradient(ellipse at 50% 50%, rgba(201, 162, 39, 0.3) 0%, transparent 65%)',
               }}
             />
-
-            {/* Grain overlay */}
             <div className="grain-overlay absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none" />
 
-            {/* Icon + category — centered */}
             <div className="relative flex flex-col items-center gap-2 sm:gap-3">
               <Icon
                 size={28}
@@ -79,7 +59,7 @@ export function CompactPostCard({ post, index = 0 }: CompactPostCardProps) {
               </span>
             </div>
 
-            {/* Arrow — tablet/desktop only, on hover */}
+            {/* Arrow — tablet/desktop only */}
             <div className="hidden sm:block absolute top-3 right-3">
               <div className="w-9 h-9 rounded-full bg-porcelain/10 backdrop-blur-sm border border-porcelain/20 flex items-center justify-center text-porcelain opacity-0 group-hover:opacity-100 group-hover:rotate-45 transition-all duration-500">
                 <ArrowUpRight size={14} />
@@ -89,17 +69,14 @@ export function CompactPostCard({ post, index = 0 }: CompactPostCardProps) {
 
           {/* ── Content ── */}
           <div className="flex flex-col flex-1 p-4 sm:p-5 min-w-0">
-            {/* Title */}
             <h3 className="font-display text-base sm:text-lg lg:text-xl text-primary-900 leading-snug mb-2 sm:mb-3 group-hover:text-accent-600 transition-colors line-clamp-2">
               {post.title}
             </h3>
 
-            {/* Excerpt */}
             <p className="text-xs text-charcoal-500 leading-relaxed line-clamp-2 sm:line-clamp-3 mb-3 sm:mb-4">
               {post.excerpt}
             </p>
 
-            {/* Bottom provenance line */}
             <div className="mt-auto pt-3 border-t border-charcoal-300/20">
               {/* Mobile */}
               <div className="sm:hidden flex items-center flex-wrap gap-x-2 gap-y-1 text-[10px] uppercase tracking-widest">
