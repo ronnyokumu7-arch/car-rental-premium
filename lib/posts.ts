@@ -18,22 +18,50 @@ export interface Post {
 }
 
 export const POSTS: Post[] = [
-  {
-    id: 'new-prado-fleet',
-    slug: 'new-prado-fleet',
-    title: 'Our Fleet Just Got Bigger — Three New Prados Arrive',
-    excerpt:
-      "We've added three new Toyota Prado J150s to our fleet, ready for executive travel, safari escapes, and long-distance road trips. Here's what makes the Prado the definitive Nairobi SUV.",
-    category: 'Fleet',
-    publishedAt: '2026-09-15',
-    readTime: '4 min read',
-    author: {
-      name: 'Royride Team',
-    },
-    featured: true,
-    accentFrom: '#0f2440',
-    accentTo: '#1a365d',
-  },
+{
+  id: 'new-prado-fleet',
+  slug: 'new-prado-fleet',
+  title: 'Our Fleet Just Got Bigger — Three New Prados Arrive',
+  excerpt:
+    "We've added three new Toyota Prado J150s to our fleet, ready for executive travel, safari escapes, and long-distance road trips. Here's what makes the Prado the definitive Nairobi SUV.",
+  content: `
+The Toyota Prado J150 has always been the definitive Nairobi SUV — commanding presence on the road, all-terrain capability, and comfort for seven. We're excited to announce that three new Prados have joined our fleet, ready for hire immediately.
+
+## Why the Prado
+
+If you've ever driven the Prado, you know. It handles everything from the highway between Nairobi and Naivasha to the rough roads of the Mara. With a 4WD system and a diesel engine built for long distances, it's the vehicle our customers keep requesting.
+
+Some of the highlights:
+
+- 7-seat capacity with leather interior
+- 4WD with differential lock
+- Full AC and Bluetooth connectivity
+- Reverse camera and roof rails
+
+## Who It's For
+
+The Prado works for:
+
+**Executive travel.** Nothing says "arrived" quite like stepping out of a Prado at a business meeting.
+
+**Family safaris.** Seven seats means the whole family, plus luggage, without compromise.
+
+**Long-distance trips.** From Nairobi to Mombasa or Kisumu, the Prado makes the journey comfortable.
+
+## Booking
+
+The new Prados are available now at **KES 14,000 per day** — the same rate as our existing fleet. Self-drive and chauffeured options are both available.
+
+Ready to book? [Get in touch](/contact) with your dates and pickup location.
+  `.trim(),
+  category: 'Fleet',
+  publishedAt: '2026-09-15',
+  readTime: '4 min read',
+  author: { name: 'Royride Team' },
+  featured: true,
+  accentFrom: '#0f2440',
+  accentTo: '#1a365d',
+},
   {
     id: 'jkia-pickup-guide',
     slug: 'jkia-pickup-guide',
