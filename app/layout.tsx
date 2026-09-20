@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Playfair_Display, Inter } from 'next/font/google';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
+import { FloatingWidgets } from '../components/layout/FloatingWidgets';
 import { BRAND } from '../lib/constants';
 import './globals.css';
 
@@ -13,7 +14,7 @@ import './globals.css';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],  // explicit weights — smaller payload
+  weight: ['400', '500', '600', '700'],
   variable: '--font-playfair',
   display: 'swap',
   preload: true,
@@ -22,7 +23,7 @@ const playfair = Playfair_Display({
 
 const inter = Inter({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],  // explicit weights
+  weight: ['300', '400', '500', '600', '700'],
   variable: '--font-inter',
   display: 'swap',
   preload: true,
@@ -35,8 +36,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: `${BRAND.fullName} — ${BRAND.tagline}`,
-    template: `%s — ${BRAND.fullName}`,
+    default: `Royride — Rental Cars for Short-Term Use`,
+    template: `%s — Royride`,
   },
   description: `${BRAND.tagline}. Concierge service, airport transfers, and a curated fleet of luxury vehicles.`,
   metadataBase: new URL('https://royride.com'),
@@ -45,6 +46,8 @@ export const metadata: Metadata = {
   keywords: [
     'car hire Nairobi',
     'car rental Kenya',
+    'rental cars Nairobi',
+    'short-term car hire',
     'luxury car hire',
     'airport transfers Nairobi',
     'self-drive car hire',
@@ -56,13 +59,13 @@ export const metadata: Metadata = {
     locale: 'en_KE',
     url: 'https://royride.com',
     siteName: BRAND.fullName,
-    title: `${BRAND.fullName} — ${BRAND.tagline}`,
+    title: 'Royride — Rental Cars for Short-Term Use',
     description:
       'Concierge service, airport transfers, and a curated fleet of luxury vehicles — delivered anywhere in Kenya.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${BRAND.fullName} — ${BRAND.tagline}`,
+    title: 'Royride — Rental Cars for Short-Term Use',
     description:
       'Concierge service, airport transfers, and a curated fleet of luxury vehicles — delivered anywhere in Kenya.',
   },
@@ -90,6 +93,7 @@ export default function RootLayout({
         <Navbar />
         <main>{children}</main>
         <Footer />
+        <FloatingWidgets />
       </body>
     </html>
   );

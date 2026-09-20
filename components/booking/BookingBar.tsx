@@ -96,7 +96,7 @@ export function BookingBar() {
 
               {/* Pickup Time */}
               <FieldWrapper
-                label="Pickup Time"
+                label="Time"
                 icon={<Clock size={14} />}
                 className="lg:col-span-1"
                 error={state.errors?.pickupTime?.[0]}
@@ -129,7 +129,7 @@ export function BookingBar() {
 
               {/* Dropoff Time */}
               <FieldWrapper
-                label="Dropoff Time"
+                label="Time"
                 icon={<Clock size={14} />}
                 className="lg:col-span-1"
                 error={state.errors?.dropoffTime?.[0]}

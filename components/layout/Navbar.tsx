@@ -36,12 +36,14 @@ useEffect(() => {
       <nav className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link
-            href="/"
-            className="text-porcelain font-display text-2xl tracking-[0.3em] font-normal"
-          >
-            {BRAND.name}
-          </Link>
+<Link href="/" className="flex flex-col leading-none">
+  <span className="text-porcelain font-display text-2xl tracking-[0.3em] font-normal">
+    {BRAND.name}
+  </span>
+  <span className="text-[9px] uppercase tracking-[0.3em] text-porcelain/50 mt-1">
+    Self-drive & chauffeur hire
+  </span>
+</Link>
 
           {/* Desktop Nav */}
           <ul className="hidden lg:flex items-center gap-10">

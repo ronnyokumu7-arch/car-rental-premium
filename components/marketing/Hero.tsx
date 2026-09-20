@@ -49,8 +49,8 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
           className="type-display text-porcelain mb-8"
         >
-          Drive the{' '}
-          <span className="italic font-light">Extraordinary</span>
+          Private cars for hire {' '}
+          <span className="font-light">in Nairobi</span>
         </motion.h1>
 
         {/* Lead paragraph */}
@@ -60,7 +60,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           className="type-lead text-porcelain/70 max-w-xl mx-auto mb-12"
         >
-          Curated vehicles. Concierge service. Delivered to your door.
+          Rent private cars in Nairobi, available for short-term and long-term rental.
         </motion.p>
 
         {/* CTAs */}
