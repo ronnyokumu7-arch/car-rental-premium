@@ -201,3 +201,57 @@
     display: none;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE TEXT SELECTION UX
+   Prevents accidental text selection while scrolling on mobile,
+   while keeping copy-paste working for real intent (long-press).
+   ───────────────────────────────────────────────────────────── */
+
+@layer base {
+  /* Remove the blue flash on tap (mobile) */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Buttons, links, nav, icons — no selection at all */
+  button,
+  a,
+  nav,
+  header,
+  footer,
+  svg,
+  [role='button'],
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Hero, decorative bands, and preview sections — 
+     no selection so scrolling doesn't highlight */
+  section[data-scroll='true'],
+  .grain-overlay,
+  [data-decorative] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Paragraphs and article content — text selection 
+     works only with intent (long-press on mobile, 
+     click-drag on desktop) */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  li,
+  blockquote,
+  article,
+  .selectable {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+}

@@ -10,7 +10,10 @@ export function Testimonials() {
   const featured = TESTIMONIALS.filter((t) => t.featured);
 
   return (
-<section className="relative bg-charcoal-900 py-24 lg:py-32 px-6 lg:px-8 overflow-hidden">
+<section
+  data-scroll="true"
+  className="relative bg-charcoal-900 py-24 lg:py-32 px-6 lg:px-8 overflow-hidden"
+>
       <div
         className="absolute inset-0 opacity-40 pointer-events-none"
         style={{

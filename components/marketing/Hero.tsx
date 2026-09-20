@@ -14,7 +14,10 @@ export function Hero() {
   };
 
   return (
-    <section className="relative min-h-screen w-full overflow-hidden bg-primary-900 flex items-center justify-center">
+    <section
+  data-scroll="true"
+  className="relative min-h-screen w-full overflow-hidden bg-primary-900 flex items-center justify-center"
+>
       {/* Layered gradient background — mimics a dark cinematic image */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-700 to-charcoal-900" />
 

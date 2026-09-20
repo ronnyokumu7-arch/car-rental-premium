@@ -1,15 +1,25 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { ContactForm } from '../../components/contact/ContactForm';
 import { ContactInfo } from '../../components/contact/ContactInfo';
 import { ContactMap } from '../../components/contact/ContactMap';
 import { BRAND } from '../../lib/constants';
 import { CONTACT } from '../../lib/contact';
+import { buildPageMetadata } from '../../lib/metadata';
 
-export const metadata = {
-  title: 'Contact Us — Royride Car Hire',
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Contact Us',
   description:
-    'Get in touch with Royride Car Hire in Nairobi. Call, WhatsApp, or send us an enquiry — we respond within 2 hours during business hours.',
-};
+    'Get in touch with Royride Car Hire in Utawala, Nairobi. Call, WhatsApp, or send an enquiry — we respond within 2 hours during business hours.',
+  path: '/contact',
+  keywords: [
+    'contact Royride car hire',
+    'car hire Nairobi contact',
+    'rent a car Nairobi phone',
+    'Royride Utawala location',
+    'WhatsApp car hire Nairobi',
+  ],
+});
 
 export default function ContactPage() {
   return (

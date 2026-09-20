@@ -1,10 +1,22 @@
+import type { Metadata } from 'next';
 import { VehicleGrid } from '../../components/marketing/VehicleGrid';
+import { buildPageMetadata } from '../../lib/metadata';
 
-export const metadata = {
-  title: 'Our Fleet — Royride Car Hire',
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Our Fleet',
   description:
-    'Browse our curated fleet of SUVs, crossovers, and vans for hire in Nairobi. Self-drive and chauffeured options available.',
-};
+    'Browse our curated fleet — Toyota Prado, Mazda CX-5, Honda Stepwgn, and more. Self-drive or chauffeured, from KES 6,500 per day. Delivered anywhere in Nairobi.',
+  path: '/vehicles',
+  keywords: [
+    'car hire fleet Nairobi',
+    'Toyota Prado hire Kenya',
+    'Mazda CX-5 hire Nairobi',
+    'Honda Stepwgn rental',
+    'self-drive cars Nairobi',
+    'chauffeur car hire Kenya',
+    'car rental prices Nairobi',
+  ],
+});
 
 export default function VehiclesPage() {
   return (
