@@ -40,7 +40,7 @@ export default function PostPage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-porcelain">
       {/* ══════════════════════════════════════════════════════
-          Hero — visual banner with category badge
+          Hero — visual banner with category badge + pull-quote hook
           ══════════════════════════════════════════════════════ */}
       <section className="relative bg-primary-900 pt-28 pb-20 lg:pt-32 lg:pb-28 px-6 lg:px-8 overflow-hidden">
         {/* Background layers */}
@@ -80,9 +80,16 @@ export default function PostPage({ params }: PageProps) {
           </div>
 
           {/* Title */}
-          <h1 className="font-display text-4xl lg:text-5xl xl:text-6xl text-porcelain leading-tight mb-8">
+          <h1 className="font-display text-4xl lg:text-5xl xl:text-6xl text-porcelain leading-tight mb-6">
             {post.title}
           </h1>
+
+          {/* Hero hook — editorial pull-quote */}
+          {post.heroHook && (
+            <p className="font-display text-lg lg:text-xl text-porcelain/80 italic leading-relaxed max-w-2xl mb-8 border-l-2 border-accent-500/50 pl-5">
+              {post.heroHook}
+            </p>
+          )}
 
           {/* Meta row */}
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-xs uppercase tracking-widest text-porcelain/60">

@@ -2,6 +2,8 @@ export interface Post {
   id: string;
   slug: string;
   title: string;
+  /** Short punchy line for the hero — appears under the title on detail pages */
+  heroHook?: string;
   excerpt: string;
   content?: string;              // full body (markdown or plain text) — for detail pages
   category: 'News' | 'Guides' | 'Offers' | 'Fleet';
@@ -33,6 +35,8 @@ export const POSTS: Post[] = [
     id: 'new-prado-fleet',
     slug: 'new-prado-fleet',
     title: 'Our Fleet Just Got Bigger — Three New Prados Arrive',
+    heroHook:
+      'Commanding presence on the road, all-terrain capability, and comfort for seven.',
     excerpt:
       "We've added three new Toyota Prado J150s to our fleet, ready for executive travel, safari escapes, and long-distance road trips. Here's what makes the Prado the definitive Nairobi SUV.",
     content: `
@@ -77,6 +81,8 @@ Ready to book? [Get in touch](/contact) with your dates and pickup location.
     id: 'jkia-pickup-guide',
     slug: 'jkia-pickup-guide',
     title: 'The Complete Guide to Smooth JKIA Pickups',
+    heroHook:
+      'Real-time flight tracking, punctual pickups, and what to expect the moment you step out of arrivals.',
     excerpt:
       "Landing at JKIA after a long flight? Here's how our airport transfer service works, why real-time flight tracking matters, and what to expect when you step out of arrivals.",
     category: 'Guides',
@@ -93,6 +99,8 @@ Ready to book? [Get in touch](/contact) with your dates and pickup location.
     id: 'weekend-escapes-nairobi',
     slug: 'weekend-escapes-nairobi',
     title: 'Five Weekend Escapes Within Three Hours of Nairobi',
+    heroHook:
+      'From Naivasha to Nanyuki — the drives worth taking, and the vehicles best suited for each.',
     excerpt:
       'From Naivasha to Nanyuki, these are the drives worth taking — and the vehicles best suited for each. Our team shares their favourite routes.',
     category: 'Guides',
@@ -108,6 +116,8 @@ Ready to book? [Get in touch](/contact) with your dates and pickup location.
     id: 'self-drive-vs-chauffeured',
     slug: 'self-drive-vs-chauffeured',
     title: 'Self-Drive vs. Chauffeured: Which Is Right for You?',
+    heroHook:
+      'An honest breakdown of when self-drive saves you money, and when a chauffeur is worth every shilling.',
     excerpt:
       "Both have their place. Here's an honest breakdown of when self-drive saves you money, and when a chauffeur is worth every shilling.",
     category: 'Guides',
@@ -123,6 +133,8 @@ Ready to book? [Get in touch](/contact) with your dates and pickup location.
     id: 'long-term-rental-offer',
     slug: 'long-term-rental-offer',
     title: 'Save 15% on Monthly Car Hire',
+    heroHook:
+      'Long-term rental rates, now 15% lower — ideal for expats, contractors, and corporate assignments.',
     excerpt:
       'Need a vehicle for a month or more? Our long-term rental rates now start 15% lower than our standard daily rate. Ideal for expats, contractors, and corporate assignments.',
     category: 'Offers',
@@ -138,6 +150,8 @@ Ready to book? [Get in touch](/contact) with your dates and pickup location.
     id: 'royride-since-2016',
     slug: 'royride-since-2016',
     title: 'Nine Years On: Reflections from the Royride Team',
+    heroHook:
+      'From one car to a fleet of 46 — a short look back at what we have learned, and what is next.',
     excerpt:
       "Since 2016, we've grown from one car to a fleet of 46. A short look back at what we've learned, and what's next for Royride Car Hire.",
     category: 'News',
