@@ -34,7 +34,7 @@ export const POSTS: Post[] = [
   {
     id: 'new-prado-fleet',
     slug: 'new-prado-fleet',
-    title: 'Our Fleet Just Got Bigger — Three New Prados Arrive',
+    title: 'Our Fleet Just Got Bigger — 3 New Prados Arrive',
     heroHook:
       'Commanding presence on the road, all-terrain capability, and comfort for seven.',
     excerpt:
