@@ -21,7 +21,10 @@ export function BookingBar() {
   const today = new Date().toISOString().split('T')[0];
 
   return (
-    <section className="relative z-20 -mt-24 lg:-mt-28 mb-16 lg:mb-24 px-6 lg:px-8">
+    <section
+      id="booking-widget"
+      className="relative z-20 -mt-24 lg:-mt-28 mb-16 lg:mb-24 px-6 lg:px-8 scroll-mt-24"
+    >
       <div className="max-w-6xl mx-auto">
         {/* Success / Error Banner */}
         {(state.success || state.message) && (

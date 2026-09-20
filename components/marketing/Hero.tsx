@@ -4,6 +4,15 @@ import { motion } from 'motion/react';
 import Link from 'next/link';
 
 export function Hero() {
+  const handleScrollToBooking = () => {
+    const target = document.getElementById('booking-widget');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-primary-900 flex items-center justify-center">
       {/* Layered gradient background — mimics a dark cinematic image */}
@@ -49,7 +58,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
           className="type-display text-porcelain mb-8"
         >
-          Private, clean, & reliable cars for hire {' '}
+          Private, clean, & reliable cars for hire{' '}
           <span className="font-light">in Nairobi</span>
         </motion.h1>
 
@@ -82,22 +91,26 @@ export function Hero() {
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
-      <motion.div
+      {/* Scroll indicator — tappable, scrolls to booking widget */}
+      <motion.button
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+        onClick={handleScrollToBooking}
+        aria-label="Scroll to booking form"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 group flex flex-col items-center gap-3 text-porcelain/50 hover:text-porcelain transition-colors cursor-pointer"
       >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
+        <span className="text-[10px] uppercase tracking-[0.2em] font-medium">
+          Book a Car
+        </span>
+        <motion.span
+          animate={{ y: [0, 6, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="flex flex-col items-center gap-2 text-porcelain/40"
+          className="flex items-center justify-center w-10 h-10 rounded-full border border-porcelain/25 group-hover:border-accent-500/70 group-hover:bg-accent-500/10 transition-all duration-300"
         >
-          <span className="type-caption text-porcelain/40">Scroll</span>
           <svg
             width="14"
-            height="20"
+            height="18"
             viewBox="0 0 14 20"
             fill="none"
             stroke="currentColor"
@@ -107,8 +120,8 @@ export function Hero() {
           >
             <path d="M7 2v16M1 12l6 6 6-6" />
           </svg>
-        </motion.div>
-      </motion.div>
+        </motion.span>
+      </motion.button>
     </section>
   );
 }
