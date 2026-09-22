@@ -63,7 +63,7 @@ export function PostBody({ content }: PostBodyProps) {
   );
 }
 
-/* ── Inline text renderer: handles **bold**, *italic*, [link](url) ── */
+/* ── Inline text renderer: handles **bold**, **, [link](url) ── */
 function InlineText({ text }: { text: string }) {
   // Split on markdown tokens, preserving delimiters
   const parts: React.ReactNode[] = [];
@@ -72,7 +72,7 @@ function InlineText({ text }: { text: string }) {
 
   const patterns = [
     { regex: /\*\*(.+?)\*\*/, type: 'bold' },
-    { regex: /\*(.+?)\*/, type: 'italic' },
+    { regex: /\*(.+?)\*/, type: '' },
     { regex: /\[(.+?)\]\((.+?)\)/, type: 'link' },
   ];
 
@@ -115,9 +115,9 @@ function InlineText({ text }: { text: string }) {
           {earliestMatch.groups[0]}
         </strong>
       );
-    } else if (earliestMatch.type === 'italic') {
+    } else if (earliestMatch.type === '') {
       parts.push(
-        <em key={key++} className="italic">
+        <em key={key++} className="">
           {earliestMatch.groups[0]}
         </em>
       );

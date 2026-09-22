@@ -8,47 +8,65 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-primary-900 text-porcelain/70">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12">
-          {/* ── Brand ── */}
-          <div className="lg:col-span-5">
-            {/* Logo lockup — ROYRIDE + tagline */}
-            <Link href="/" className="inline-flex flex-col leading-none mb-6">
-              <span className="font-display text-3xl tracking-[0.3em] text-porcelain">
-                {BRAND.name}
-              </span>
-              <span className="text-[9px] uppercase tracking-[0.3em] text-porcelain/50 mt-2">
-                Self-Drive &amp; Chauffeur Hire
-              </span>
-            </Link>
+    <footer className="bg-primary-900 text-porcelain/70 relative overflow-hidden">
+      {/* Subtle warm glow for depth */}
+      <div
+        className="absolute inset-0 opacity-30 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse at 20% 0%, rgba(201, 162, 39, 0.15) 0%, transparent 50%)',
+        }}
+      />
+      <div className="grain-overlay absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none" />
 
-            <p className="text-sm leading-relaxed max-w-md mb-6">
-              Premium car hire in Nairobi. Concierge service, airport
-              transfers, and a curated fleet of luxury vehicles — delivered
-              anywhere in Kenya.
-            </p>
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
+        {/* ══════════════════════════════════════════════════
+            TOP — Brand statement + WhatsApp CTA
+            ══════════════════════════════════════════════════ */}
+        <div className="pt-16 lg:pt-24 pb-12 lg:pb-16 border-b border-porcelain/10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+            {/* Left — Brand statement */}
+            <div className="lg:col-span-7">
+              <Link href="/" className="inline-flex flex-col leading-none">
+                <span className="font-display text-3xl lg:text-4xl tracking-[0.3em] text-porcelain">
+                  {BRAND.name}
+                </span>
+                <span className="text-[9px] uppercase tracking-[0.3em] text-porcelain/50 mt-2">
+                  Self-Drive &amp; Chauffeur Hire
+                </span>
+              </Link>
 
-            {/* WhatsApp */}
-            <a
-              href={`https://wa.me/${CONTACT.whatsapp}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-500 hover:text-porcelain transition-colors mb-8"
-            >
-              Chat on WhatsApp →
-            </a>
-
-            {/* Social links */}
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.15em] text-porcelain/40 mb-3 font-medium">
-                Follow Us
+              <p className="text-porcelain/85 leading-relaxed mt-8 max-w-md text-base lg:text-lg">
+                Premium car hire in Nairobi — concierge service, airport
+                transfers, and a curated fleet delivered anywhere in Kenya.
               </p>
-              <SocialLinks size="sm" variant="dark" />
+            </div>
+
+            {/* Right — WhatsApp CTA */}
+            <div className="lg:col-span-5 lg:text-right">
+              <p className="text-[10px] uppercase tracking-[0.15em] text-porcelain/40 mb-4 font-medium">
+                Fastest Response
+              </p>
+              <a
+                href={`https://wa.me/${CONTACT.whatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 text-sm font-medium tracking-widest uppercase text-porcelain hover:text-accent-500 transition-colors group"
+              >
+                <span>Chat on WhatsApp</span>
+                <span className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-porcelain/25 group-hover:border-accent-500/70 group-hover:bg-accent-500/10 transition-all">
+                  →
+                </span>
+              </a>
             </div>
           </div>
+        </div>
 
-          {/* ── Explore ── */}
+        {/* ══════════════════════════════════════════════════
+            MIDDLE — Three-column navigation + contact
+            ══════════════════════════════════════════════════ */}
+        <div className="py-12 lg:py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12">
+          {/* Explore */}
           <div className="lg:col-span-3">
             <h3 className="text-[10px] uppercase tracking-[0.15em] text-accent-500 mb-6 font-medium">
               Explore
@@ -67,13 +85,12 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* ── Contact ── */}
-          <div className="lg:col-span-4">
+          {/* Contact */}
+          <div className="lg:col-span-5">
             <h3 className="text-[10px] uppercase tracking-[0.15em] text-accent-500 mb-6 font-medium">
               Contact
             </h3>
             <ul className="space-y-4 text-sm">
-              {/* Address */}
               <li className="flex items-start gap-3">
                 <MapPin
                   size={14}
@@ -90,7 +107,6 @@ export function Footer() {
                 </div>
               </li>
 
-              {/* Phones */}
               {BRAND.phones.map((phone) => (
                 <li key={phone} className="flex items-start gap-3">
                   <Phone
@@ -106,7 +122,6 @@ export function Footer() {
                 </li>
               ))}
 
-              {/* Email */}
               <li className="flex items-start gap-3">
                 <Mail
                   size={14}
@@ -121,16 +136,42 @@ export function Footer() {
               </li>
             </ul>
           </div>
+
+          {/* Social */}
+          <div className="lg:col-span-4">
+            <h3 className="text-[10px] uppercase tracking-[0.15em] text-accent-500 mb-6 font-medium">
+              Follow Us
+            </h3>
+            <SocialLinks size="sm" variant="dark" />
+            <p className="text-xs text-porcelain/40 mt-6 leading-relaxed max-w-xs">
+              Behind-the-scenes fleet updates, driving routes, and stories
+              from the road.
+            </p>
+          </div>
         </div>
 
-        {/* ── Bottom strip ── */}
-        <div className="mt-16 pt-8 border-t border-porcelain/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-[10px] uppercase tracking-[0.15em] text-porcelain/50">
+        {/* ══════════════════════════════════════════════════
+            BOTTOM — Minimal signature strip
+            ══════════════════════════════════════════════════ */}
+        <div className="py-8 border-t border-porcelain/10 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-[10px] uppercase tracking-[0.15em] text-porcelain/40">
             © {year} {BRAND.fullName} · All rights reserved
           </p>
-          <p className="text-[10px] uppercase tracking-[0.15em] text-porcelain/50">
+          <p className="text-[10px] uppercase tracking-[0.15em] text-porcelain/40">
             Nairobi · Kenya
           </p>
+        </div>
+
+        {/* ══════════════════════════════════════════════════
+            SIGNATURE — Brand domain as closing mark
+            ══════════════════════════════════════════════════ */}
+        <div className="pb-12 lg:pb-16 text-center">
+          <Link
+            href="/"
+            className="inline-block font-display text-4xl lg:text-6xl tracking-[0.15em] text-porcelain/15 hover:text-accent-500/40 transition-colors duration-500"
+          >
+            royride.com
+          </Link>
         </div>
       </div>
     </footer>

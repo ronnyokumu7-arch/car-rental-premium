@@ -43,7 +43,7 @@ export function UpdatesContent() {
           <p className="type-caption text-accent-500 mb-4">Updates</p>
           <h1 className="type-display text-porcelain mb-6 max-w-3xl">
             News & Insights from the{' '}
-            <span className="italic font-light">Road</span>
+            <span className=" font-light">Road</span>
           </h1>
           <p className="type-lead text-porcelain/60 max-w-2xl">
             Fleet additions, travel guides, seasonal offers, and the

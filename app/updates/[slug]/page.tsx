@@ -86,7 +86,7 @@ export default function PostPage({ params }: PageProps) {
 
           {/* Hero hook — editorial pull-quote */}
           {post.heroHook && (
-            <p className="font-display text-lg lg:text-xl text-porcelain/80 italic leading-relaxed max-w-2xl mb-8 border-l-2 border-accent-500/50 pl-5">
+            <p className="font-display text-lg lg:text-xl text-porcelain/80  leading-relaxed max-w-2xl mb-8 border-l-2 border-accent-500/50 pl-5">
               {post.heroHook}
             </p>
           )}

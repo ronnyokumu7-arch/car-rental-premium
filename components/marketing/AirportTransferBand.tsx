@@ -37,7 +37,7 @@ export function AirportTransferBand() {
             </p>
             <h2 className="font-display text-4xl lg:text-5xl text-porcelain leading-tight mb-6">
               Arriving Soon at{' '}
-              <span className="italic font-light">JKIA?</span>
+              <span className=" font-light">JKIA?</span>
             </h2>
             <p className="text-porcelain/70 leading-relaxed mb-6">
               Your chauffeur will meet you on arrival, help with the
@@ -80,10 +80,13 @@ export function AirportTransferBand() {
             </p>
             <Link
               href="/contact?service=Airport+Transfer"
-              className="btn-primary inline-flex items-center justify-center gap-2 w-full"
+              className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-500 hover:text-porcelain transition-colors group"
             >
               Schedule a Transfer
-              <ArrowRight size={16} />
+              <ArrowRight
+                size={14}
+                className="transition-transform group-hover:translate-x-1"
+              />
             </Link>
           </motion.div>
         </div>

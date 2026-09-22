@@ -8,7 +8,7 @@ import { VEHICLES } from '../../lib/vehicles';
 
 export function FleetPreview() {
   return (
-    <section className="bg-porcelain py-24 lg:py-32 px-6 lg:px-8">
+    <section className="bg-porcelain pt-20 lg:pt-28 pb-8 lg:pb-12 px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* ── Section header ── */}
         <motion.div
@@ -26,14 +26,14 @@ export function FleetPreview() {
               Curated for Every Journey
             </h2>
             <p className="type-lead">
-              From executive SUVs to family vans — every vehicle maintained, 
+              From executive SUVs to family vans — every vehicle maintained,
               inspected, and delivered ready.
             </p>
           </div>
 
           <Link
             href="/vehicles"
-            className="hidden md:inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-primary-900 hover:text-accent-500 transition-colors group"
+            className="hidden md:inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-primary-900 hover:text-accent-600 transition-colors group"
           >
             View Full Fleet
             <ArrowRight
@@ -50,14 +50,17 @@ export function FleetPreview() {
           ))}
         </div>
 
-        {/* ── Mobile CTA ── */}
-        <div className="mt-12 md:hidden text-center">
+        {/* ── Mobile CTA — text link style, left-aligned ── */}
+        <div className="mt-10 md:hidden">
           <Link
             href="/vehicles"
-            className="inline-flex items-center gap-2 btn-primary"
+            className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-600 hover:text-primary-900 transition-colors group"
           >
             View Full Fleet
-            <ArrowRight size={16} />
+            <ArrowRight
+              size={14}
+              className="transition-transform group-hover:translate-x-1"
+            />
           </Link>
         </div>
       </div>

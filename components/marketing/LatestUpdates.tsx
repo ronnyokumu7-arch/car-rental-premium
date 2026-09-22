@@ -7,7 +7,7 @@ import { POSTS } from '../../lib/posts';
 import { CompactPostCard } from './CompactPostCard';
 
 export function LatestUpdates() {
-  // 3 most recent posts by publishedAt (excluding featured, but fall back if too few)
+  // 3 most recent posts by publishedAt
   const sorted = [...POSTS].sort(
     (a, b) =>
       new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
@@ -15,7 +15,7 @@ export function LatestUpdates() {
   const latest = sorted.slice(0, 3);
 
   return (
-    <section className="bg-porcelain py-20 lg:py-28 px-6 lg:px-8 border-t border-charcoal-300/20">
+    <section className="bg-porcelain pt-20 lg:pt-28 pb-8 lg:pb-12 px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -29,9 +29,9 @@ export function LatestUpdates() {
             <p className="type-caption text-accent-600 mb-3">
               Latest Updates
             </p>
-            <h2 className="font-display text-3xl lg:text-4xl text-primary-900 leading-tight mb-4">
-              News & Insights from the{' '}
-              <span className="font-light">Road</span>
+            <h2 className="font-display text-4xl lg:text-5xl text-primary-900 leading-tight mb-4">
+              News &amp; Insights from the{' '}
+              <span className=" font-light">Road</span>
             </h2>
             <p className="type-lead">
               Fleet additions, travel guides, seasonal offers — and the
@@ -41,7 +41,7 @@ export function LatestUpdates() {
 
           <Link
             href="/updates"
-            className="hidden md:inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-primary-900 hover:text-accent-500 transition-colors group whitespace-nowrap"
+            className="hidden md:inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-primary-900 hover:text-accent-600 transition-colors group whitespace-nowrap"
           >
             View All Updates
             <ArrowRight
@@ -68,14 +68,17 @@ export function LatestUpdates() {
           ))}
         </div>
 
-        {/* Mobile CTA — shown below carousel */}
-        <div className="md:hidden mt-10 text-center">
+        {/* Mobile CTA — text + arrow, left-aligned */}
+        <div className="md:hidden mt-10">
           <Link
             href="/updates"
-            className="inline-flex items-center gap-2 btn-primary"
+            className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-600 hover:text-primary-900 transition-colors group"
           >
             View All Updates
-            <ArrowRight size={16} />
+            <ArrowRight
+              size={14}
+              className="transition-transform group-hover:translate-x-1"
+            />
           </Link>
         </div>
       </div>

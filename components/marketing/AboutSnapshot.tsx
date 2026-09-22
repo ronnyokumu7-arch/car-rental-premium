@@ -6,9 +6,9 @@ import { ArrowRight } from 'lucide-react';
 
 export function AboutSnapshot() {
   return (
-    <section className="bg-porcelain py-20 lg:py-28 px-6 lg:px-8">
+    <section className="bg-porcelain pt-20 lg:pt-28 pb-8 lg:pb-12 px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-start">
           {/* Left heading */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -18,7 +18,7 @@ export function AboutSnapshot() {
             className="lg:col-span-5"
           >
             <p className="type-caption text-accent-600 mb-3">About Royride</p>
-            <h2 className="font-display text-4xl lg:text-5xl text-primary-900 leading-tight mb-6">
+            <h2 className="font-display text-4xl lg:text-5xl text-primary-900 leading-tight mb-0 lg:mb-6">
               Built on trust.
               <br />
               <span className="font-light">Driven by detail.</span>
@@ -43,9 +43,9 @@ export function AboutSnapshot() {
             </p>
             <p>
               From economy saloons to executive SUVs — including the Toyota
-              Prado, Mazda CX-5, Nissan X-Trail, and Honda Stepwgn (7 seater van) — every
-              vehicle is vetted, insured, and maintained to a standard
-              we&apos;d want for our own family.
+              Prado, Mazda CX-5, Nissan X-Trail, and Honda Stepwgn (7 seater
+              van) — every vehicle is vetted, insured, and maintained to a
+              standard we&apos;d want for our own family.
             </p>
 
             <Link

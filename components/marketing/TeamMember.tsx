@@ -66,7 +66,7 @@ export function TeamMember({
         </h3>
 
         <blockquote className="relative border-l-2 border-accent-500 pl-6 mb-6">
-          <p className="font-display text-xl lg:text-2xl leading-relaxed text-charcoal-700 italic">
+          <p className="font-display text-xl lg:text-2xl leading-relaxed text-charcoal-700 ">
             &ldquo;{quote}&rdquo;
           </p>
         </blockquote>

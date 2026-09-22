@@ -39,7 +39,7 @@ export default function ContactPage() {
           <p className="type-caption text-accent-500 mb-4">Get in Touch</p>
           <h1 className="type-display text-porcelain mb-6 max-w-3xl">
             Let&apos;s Get You{' '}
-            <span className="italic font-light">Moving</span>
+            <span className="font-light">Moving</span>
           </h1>
           <p className="type-lead text-porcelain/60 max-w-2xl">
             Call, WhatsApp, or send us an enquiry. We respond within two

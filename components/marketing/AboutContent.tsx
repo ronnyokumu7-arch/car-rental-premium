@@ -35,7 +35,7 @@ export function AboutContent() {
           <p className="type-caption text-accent-500 mb-4">About Us</p>
           <h1 className="type-display text-porcelain mb-8 max-w-4xl">
             Nairobi&apos;s Trusted Fleet{' '}
-            <span className="Italic font-light">Since 2016</span>
+            <span className=" font-light">Since 2016</span>
           </h1>
           <p className="type-lead text-porcelain/60 max-w-2xl">
             Reliable, cost-effective car hire for individuals, businesses,
@@ -94,7 +94,7 @@ export function AboutContent() {
                 our fleet is vetted, insured, and maintained to the same
                 standard we&apos;d want for our own family.
               </p>
-              <p className="font-display text-xl text-primary-900 italic pt-4">
+              <p className="font-display text-xl text-primary-900  pt-4">
                 The result: a fleet you can rely on, at prices you can
                 trust, with service and experience that keeps people coming back.
               </p>
@@ -343,7 +343,7 @@ export function AboutContent() {
               </p>
               <h2 className="font-display text-4xl lg:text-5xl text-porcelain leading-tight mb-6">
                 Land. Ride.{' '}
-                <span className="italic font-light">Arrive.</span>
+                <span className=" font-light">Arrive.</span>
               </h2>
               <p className="text-porcelain/70 leading-relaxed mb-6">
                 Real-time flight tracking. Punctual pickups. Executive
@@ -455,7 +455,7 @@ export function AboutContent() {
           </p>
           <h2 className="font-display text-4xl lg:text-5xl text-porcelain leading-tight mb-6">
             Let&apos;s Get You on the{' '}
-            <span className="italic font-light">Road</span>
+            <span className=" font-light">Road</span>
           </h2>
           <p className="text-porcelain/60 text-lg leading-relaxed mb-10 max-w-xl mx-auto">
             Browse the fleet, book a chauffeur, or send us an enquiry. We
