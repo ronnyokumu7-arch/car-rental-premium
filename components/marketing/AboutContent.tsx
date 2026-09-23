@@ -35,7 +35,7 @@ export function AboutContent() {
           <p className="type-caption text-accent-500 mb-4">About Us</p>
           <h1 className="type-display text-porcelain mb-8 max-w-4xl">
             Nairobi&apos;s Trusted Fleet{' '}
-            <span className=" font-light">Since 2016</span>
+            <span className=" font-light">Since 2019</span>
           </h1>
           <p className="type-lead text-porcelain/60 max-w-2xl">
             Reliable, cost-effective car hire for individuals, businesses,
@@ -46,9 +46,9 @@ export function AboutContent() {
       </section>
 
       {/* SECTION 2 — Our Story */}
-      <section className="py-24 lg:py-32 px-6 lg:px-8">
+      <section className="pt-20 lg:pt-28 pb-8 lg:pb-12 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-start">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -57,10 +57,10 @@ export function AboutContent() {
               className="lg:col-span-4 lg:sticky lg:top-32"
             >
               <p className="type-caption text-accent-600 mb-3">Our Story</p>
-              <h2 className="font-display text-4xl lg:text-5xl text-primary-900 leading-tight mb-6">
+              <h2 className="font-display text-4xl lg:text-5xl text-primary-900 leading-tight mb-0 lg:mb-6">
                 Built on Trust.
                 <br />
-                <span className="font-light">Driven by Detail.</span>
+                <span className=" font-light">Driven by Detail.</span>
               </h2>
             </motion.div>
 
@@ -72,7 +72,7 @@ export function AboutContent() {
               className="lg:col-span-8 space-y-6 text-charcoal-700 leading-relaxed text-lg"
             >
               <p>
-                Royride Car Hire began in 2016 with a simple promise: give
+                Royride Car Hire began in 2019 with a simple promise: give
                 people in Nairobi a car hire experience they could actually
                 trust. No hidden fees. No last-minute surprises. Just
                 reliable vehicles and honest service.
@@ -96,7 +96,8 @@ export function AboutContent() {
               </p>
               <p className="font-display text-xl text-primary-900  pt-4">
                 The result: a fleet you can rely on, at prices you can
-                trust, with service and experience that keeps people coming back.
+                trust, with service and experience that keeps people coming
+                back.
               </p>
             </motion.div>
           </div>
@@ -132,7 +133,7 @@ export function AboutContent() {
       </section>
 
       {/* SECTION 4 — What Sets Us Apart */}
-      <section className="py-24 lg:py-32 px-6 lg:px-8">
+      <section className="pt-20 lg:pt-28 pb-8 lg:pb-12 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -175,7 +176,7 @@ export function AboutContent() {
             />
             <Differentiator
               icon={<Award size={22} />}
-              title="Since 2016"
+              title="Since 2019"
               description="Nearly a decade of trust built on repeat customers and referrals."
               index={3}
             />
@@ -184,9 +185,7 @@ export function AboutContent() {
       </section>
 
       {/* SECTION 5 — Services */}
-      <section className="bg-charcoal-900 py-24 lg:py-32 px-6 lg:px-8 relative overflow-hidden">
-        <div className="grain-overlay absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none" />
-
+      <section className="bg-porcelain pt-20 lg:pt-28 pb-8 lg:pb-12 px-6 lg:px-8 relative overflow-hidden">
         <div className="relative max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -195,84 +194,110 @@ export function AboutContent() {
             transition={{ duration: 0.6 }}
             className="max-w-3xl mb-16"
           >
-            <p className="type-caption text-accent-500 mb-3">Our Services</p>
-            <h2 className="font-display text-4xl lg:text-5xl text-porcelain leading-tight">
+            <p className="type-caption text-accent-600 mb-3">Our Services</p>
+            <h2 className="font-display text-4xl lg:text-5xl text-primary-900 leading-tight">
               Two Ways to Drive
             </h2>
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Self-Drive card */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.6 }}
-              className="bg-primary-900/50 backdrop-blur-sm border border-porcelain/10 rounded-sm p-8 lg:p-10 hover:border-accent-500/40 transition-all duration-500"
+              className="group relative bg-primary-900 rounded-sm p-8 lg:p-10 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-500"
             >
-              <div className="w-14 h-14 rounded-full bg-accent-500/15 border border-accent-500/30 flex items-center justify-center mb-6">
-                <Car size={22} className="text-accent-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-900 to-charcoal-900" />
+              <div
+                className="absolute inset-0 opacity-40 pointer-events-none"
+                style={{
+                  background:
+                    'radial-gradient(ellipse at 80% 20%, rgba(201, 162, 39, 0.2) 0%, transparent 60%)',
+                }}
+              />
+              <div className="grain-overlay absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none" />
+
+              <div className="relative">
+                <div className="w-14 h-14 rounded-full bg-accent-500/15 border border-accent-500/30 flex items-center justify-center mb-6">
+                  <Car size={22} className="text-accent-500" />
+                </div>
+                <p className="type-caption text-accent-500 mb-3">
+                  Self-Drive Hire
+                </p>
+                <h3 className="font-display text-2xl lg:text-3xl text-porcelain mb-4">
+                  Drive Around on Your Own Terms
+                </h3>
+                <p className="text-porcelain/80 leading-relaxed mb-8">
+                  Running errands, attending an event, or just need a car for
+                  the weekend? We&apos;ve made self-drive hire simple,
+                  affordable, and available anytime.
+                </p>
+                <Link
+                  href="/vehicles"
+                  className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-500 hover:text-porcelain transition-colors group/link"
+                >
+                  Browse the Fleet
+                  <ArrowRight
+                    size={14}
+                    className="transition-transform group-hover/link:translate-x-1"
+                  />
+                </Link>
               </div>
-              <p className="type-caption text-accent-500 mb-3">
-                Self-Drive Hire
-              </p>
-              <h3 className="font-display text-2xl lg:text-3xl text-porcelain mb-4">
-                Drive Around on Your Own Terms
-              </h3>
-              <p className="text-porcelain/70 leading-relaxed mb-8">
-                Running errands, attending an event, or just need a car for
-                the weekend? We&apos;ve made self-drive hire simple,
-                affordable, and available anytime.
-              </p>
-              <Link
-                href="/vehicles"
-                className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-500 hover:text-porcelain transition-colors group"
-              >
-                Browse the Fleet
-                <ArrowRight
-                  size={14}
-                  className="transition-transform group-hover:translate-x-1"
-                />
-              </Link>
             </motion.div>
 
+            {/* Chauffeured card */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="bg-primary-900/50 backdrop-blur-sm border border-porcelain/10 rounded-sm p-8 lg:p-10 hover:border-accent-500/40 transition-all duration-500"
+              className="group relative bg-primary-900 rounded-sm p-8 lg:p-10 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-500"
             >
-              <div className="w-14 h-14 rounded-full bg-accent-500/15 border border-accent-500/30 flex items-center justify-center mb-6">
-                <Users size={22} className="text-accent-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-900 to-charcoal-900" />
+              <div
+                className="absolute inset-0 opacity-40 pointer-events-none"
+                style={{
+                  background:
+                    'radial-gradient(ellipse at 80% 20%, rgba(201, 162, 39, 0.2) 0%, transparent 60%)',
+                }}
+              />
+              <div className="grain-overlay absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none" />
+
+              <div className="relative">
+                <div className="w-14 h-14 rounded-full bg-accent-500/15 border border-accent-500/30 flex items-center justify-center mb-6">
+                  <Users size={22} className="text-accent-500" />
+                </div>
+                <p className="type-caption text-accent-500 mb-3">
+                  Chauffeured Hire
+                </p>
+                <h3 className="font-display text-2xl lg:text-3xl text-porcelain mb-4">
+                  You Rent. We Drive.
+                </h3>
+                <p className="text-porcelain/80 leading-relaxed mb-8">
+                  0% liability, 100% peace of mind. From weddings and galas to
+                  airport pickups and drop-offs, we ensure every ride feels
+                  first-class.
+                </p>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-500 hover:text-porcelain transition-colors group/link"
+                >
+                  Book a Chauffeur
+                  <ArrowRight
+                    size={14}
+                    className="transition-transform group-hover/link:translate-x-1"
+                  />
+                </Link>
               </div>
-              <p className="type-caption text-accent-500 mb-3">
-                Chauffeured Hire
-              </p>
-              <h3 className="font-display text-2xl lg:text-3xl text-porcelain mb-4">
-                You Rent. We Drive.
-              </h3>
-              <p className="text-porcelain/70 leading-relaxed mb-8">
-                0% liability, 100% peace of mind. From weddings and galas to
-                airport pickups and drop-offs, we ensure every ride feels
-                first-class.
-              </p>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-500 hover:text-porcelain transition-colors group"
-              >
-                Book a Chauffeur
-                <ArrowRight
-                  size={14}
-                  className="transition-transform group-hover:translate-x-1"
-                />
-              </Link>
             </motion.div>
           </div>
         </div>
       </section>
 
       {/* SECTION 6 — By the Numbers */}
-      <section className="py-24 lg:py-32 px-6 lg:px-8">
+      <section className="pt-20 lg:pt-28 pb-8 lg:pb-12 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -310,7 +335,7 @@ export function AboutContent() {
               index={2}
             />
             <Stat
-              value="2016"
+              value="2019"
               label="Operating Since"
               sublabel="Nearly a decade"
               index={3}
@@ -388,11 +413,14 @@ export function AboutContent() {
                 from USD 50.
               </p>
               <Link
-                href="/contact"
-                className="btn-primary inline-flex items-center justify-center gap-2 w-full"
+                href="/contact?service=Airport+Transfer"
+                className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-500 hover:text-porcelain transition-colors group"
               >
                 Schedule a Transfer
-                <ArrowRight size={16} />
+                <ArrowRight
+                  size={14}
+                  className="transition-transform group-hover:translate-x-1"
+                />
               </Link>
             </motion.div>
           </div>
@@ -400,7 +428,7 @@ export function AboutContent() {
       </section>
 
       {/* SECTION 8 — Meet the Team */}
-      <section className="py-24 lg:py-32 px-6 lg:px-8">
+      <section className="pt-20 lg:pt-28 pb-8 lg:pb-12 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -433,7 +461,7 @@ export function AboutContent() {
       </section>
 
       {/* SECTION 9 — Final CTA */}
-      <section className="bg-charcoal-900 py-24 lg:py-32 px-6 lg:px-8 relative overflow-hidden">
+      <section className="bg-primary-900 py-24 lg:py-32 px-6 lg:px-8 relative overflow-hidden">
         <div className="grain-overlay absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none" />
         <div
           className="absolute inset-0 opacity-40 pointer-events-none"

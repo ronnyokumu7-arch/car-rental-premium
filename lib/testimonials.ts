@@ -23,7 +23,7 @@ export const TESTIMONIALS: Testimonial[] = [
   {
     id: 'simon-kariuki',
     quote:
-      "A beautiful experience with this car hire company!! Car was sparkling clean, had ac so when it was pouring, we didn't have any issues with windscreen. I took a seven - seater van, drove from Nairobi to Nakuru and back, and my family loved it! I highly recommend Roy ride Car Hire Ltd!",
+      "A beautiful experience with this car hire company!! Car was sparkling clean, had ac so when it was pouring, we didn't have any issues with windscreen. I took a seven - seater van, drove from Nairobi to Nakuru and back, and my family loved it! I highly recommend Royride Car Hire Ltd!",
     name: 'Simon Kariuki',
     role: 'Family Road Trip',
     location: 'Nairobi → Nakuru',

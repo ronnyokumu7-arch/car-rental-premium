@@ -41,7 +41,7 @@ const SITE_URL =
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `Royride — Rental Cars for Short-Term Use`,
+    default: `Royride Car Hire — Car Rental in Nairobi`,
     template: `%s — Royride`,
   },
   description: `${BRAND.tagline}. Concierge service, airport transfers, and a curated fleet of luxury vehicles.`,

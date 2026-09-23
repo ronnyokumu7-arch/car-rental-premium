@@ -6,7 +6,7 @@ const ITEMS = [
   { value: '4.9★', label: 'Google Rating' },
   { value: '46', label: 'Vehicles' },
   { value: '17', label: 'Partner Owners' },
-  { value: '2016', label: 'Operating Since' },
+  { value: '2019', label: 'Operating Since' },
   { value: 'JKIA', label: 'Airport Transfers' },
 ];
 

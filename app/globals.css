@@ -255,3 +255,38 @@
     user-select: text;
   }
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   GLOBAL TYPOGRAPHY RHYTHM
+   One source of truth for line-height across the entire site.
+   Body text: 1.65 (comfortable reading)
+   Headings:  1.15 (tight, editorial)
+   ───────────────────────────────────────────────────────────── */
+
+@layer base {
+  body {
+    line-height: 1.65;
+  }
+
+  p {
+    line-height: 1.65;
+    margin-bottom: 0;
+  }
+
+  h1, h2 {
+    line-height: 1.15;
+  }
+
+  h3, h4, h5, h6 {
+    line-height: 1.3;
+  }
+
+  li {
+    line-height: 1.65;
+  }
+
+  blockquote {
+    line-height: 1.6;
+  }
+}

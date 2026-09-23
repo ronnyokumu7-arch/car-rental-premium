@@ -149,13 +149,13 @@ Ready to book? [Get in touch](/contact) with your dates and pickup location.
     accentTo: '#5c1a1a',
   },
   {
-    id: 'royride-since-2016',
-    slug: 'royride-since-2016',
+    id: 'royride-since-2019',
+    slug: 'royride-since-2019',
     title: 'Nine Years On: Reflections from the Royride Team',
     heroHook:
       'From one car to a fleet of 46 — a short look back at what we have learned, and what is next.',
     excerpt:
-      "Since 2016, we've grown from one car to a fleet of 46. A short look back at what we've learned, and what's next for Royride Car Hire.",
+      "Since 2019, we've grown from one car to a fleet of 46. A short look back at what we've learned, and what's next for Royride Car Hire.",
     category: 'News',
     publishedAt: '2026-08-01',
     readTime: '4 min read',

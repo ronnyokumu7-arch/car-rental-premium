@@ -85,7 +85,7 @@ export default async function Image() {
               letterSpacing: '0.05em',
             }}
           >
-            Nairobi · Kenya · Since 2016
+            Nairobi · Kenya · Since 2019
           </div>
 
           {/* CTA badge */}
