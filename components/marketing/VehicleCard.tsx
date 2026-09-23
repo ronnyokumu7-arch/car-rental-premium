@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import {
   Users,
   Fuel,
@@ -37,39 +38,58 @@ export function VehicleCard({
         onViewDetails ? 'cursor-pointer' : ''
       }`}
     >
-      {/* ── Visual panel with silhouette ── */}
+      {/* ── Visual panel ── */}
       <div className="relative aspect-[16/10] overflow-hidden">
+        {/* Base gradient — always visible as fallback layer */}
         <div
           className="absolute inset-0"
           style={{
             background: `linear-gradient(135deg, ${vehicle.accentFrom} 0%, ${vehicle.accentTo} 100%)`,
           }}
         />
-        <div
-          className="absolute inset-0 opacity-50"
-          style={{
-            background:
-              'radial-gradient(ellipse at 70% 40%, rgba(201, 162, 39, 0.35) 0%, transparent 60%)',
-          }}
-        />
-        <div className="grain-overlay absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none" />
 
-        <svg
-          viewBox="0 0 200 100"
-          className="absolute inset-0 w-full h-full p-8 text-porcelain/40 transition-all duration-700 group-hover:text-porcelain/70 group-hover:scale-105"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          <path
-            d={vehicle.silhouettePath}
-            fill="currentColor"
-            stroke="currentColor"
-            strokeWidth="0.5"
-            strokeLinejoin="round"
-          />
-        </svg>
+        {/* Vehicle image (if provided) OR SVG silhouette */}
+        {vehicle.image ? (
+          <>
+            <Image
+              src={vehicle.image}
+              alt={vehicle.name}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              priority={index < 3}
+            />
+            {/* Subtle bottom gradient so badges/SKU stay readable on any photo */}
+            <div className="absolute inset-0 bg-gradient-to-t from-primary-900/70 via-transparent to-primary-900/20 pointer-events-none" />
+          </>
+        ) : (
+          <>
+            <div
+              className="absolute inset-0 opacity-50"
+              style={{
+                background:
+                  'radial-gradient(ellipse at 70% 40%, rgba(201, 162, 39, 0.35) 0%, transparent 60%)',
+              }}
+            />
+            <div className="grain-overlay absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none" />
+            <svg
+              viewBox="0 0 200 100"
+              className="absolute inset-0 w-full h-full p-8 text-porcelain/40 transition-all duration-700 group-hover:text-porcelain/70 group-hover:scale-105"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <path
+                d={vehicle.silhouettePath}
+                fill="currentColor"
+                stroke="currentColor"
+                strokeWidth="0.5"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </>
+        )}
 
         {/* Top-left: Category + Popular badge */}
-        <div className="absolute top-4 left-4 flex items-center gap-2">
+        <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
           <span className="px-3 py-1 bg-porcelain/10 backdrop-blur-sm border border-porcelain/20 rounded-sm text-[10px] font-medium uppercase tracking-widest text-porcelain">
             {vehicle.category}
           </span>
@@ -82,8 +102,8 @@ export function VehicleCard({
         </div>
 
         {/* Bottom-left: SKU */}
-        <div className="absolute bottom-4 left-4">
-          <span className="text-[10px] font-mono uppercase tracking-widest text-porcelain/50">
+        <div className="absolute bottom-4 left-4 z-10">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-porcelain/70">
             {vehicle.sku}
           </span>
         </div>

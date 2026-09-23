@@ -6,7 +6,7 @@ export interface Vehicle {
   sku: string;
   name: string;
   category: string;
-  dailyRate: number;         // KES
+  dailyRate: number; // KES
   seats: number;
   fuel: FuelType;
   mode: RentalMode;
@@ -14,9 +14,10 @@ export interface Vehicle {
   transmission: 'Automatic' | 'Manual';
   description: string;
   features: string[];
-  accentFrom: string;        // gradient start (used for SVG panel)
-  accentTo: string;          // gradient end
-  silhouettePath: string;    // SVG path for the vehicle outline
+  image?: string;
+  accentFrom: string; // gradient start (used for SVG panel)
+  accentTo: string; // gradient end
+  silhouettePath: string; // SVG path for the vehicle outline
 }
 
 export const VEHICLES: Vehicle[] = [
@@ -33,7 +34,14 @@ export const VEHICLES: Vehicle[] = [
     transmission: 'Automatic',
     description:
       'The definitive Nairobi SUV. Commanding presence, all-terrain capability, and comfort for seven — built for executive travel and weekend escapes alike.',
-    features: ['4WD', 'Leather Interior', 'Bluetooth', 'Reverse Camera', 'Roof Rails'],
+    features: [
+      '4WD',
+      'Leather Interior',
+      'Bluetooth',
+      'Reverse Camera',
+      'Roof Rails',
+    ],
+    image: '/images/fleet/prado.jpg',
     accentFrom: '#0f2440',
     accentTo: '#1a365d',
     silhouettePath:
@@ -51,7 +59,14 @@ export const VEHICLES: Vehicle[] = [
     transmission: 'Automatic',
     description:
       'Refined, quiet, and effortlessly smooth. The CX-5 pairs premium Japanese engineering with an elegant cabin — ideal for city driving and coastal road trips.',
-    features: ['Sunroof', 'Leather Interior', 'Apple CarPlay', 'Reverse Camera', 'Cruise Control'],
+    features: [
+      'Sunroof',
+      'Leather Interior',
+      'Apple CarPlay',
+      'Reverse Camera',
+      'Cruise Control',
+    ],
+    image: '/images/fleet/cx5.jpg',
     accentFrom: '#3d3d3d',
     accentTo: '#6b6b6b',
     silhouettePath:
@@ -69,7 +84,14 @@ export const VEHICLES: Vehicle[] = [
     transmission: 'Automatic',
     description:
       'Spacious, practical, and economical. Eight seats, sliding doors, and generous luggage capacity — perfect for family trips and group airport transfers.',
-    features: ['8 Seats', 'Sliding Doors', 'AC', 'Bluetooth', 'USB Charging'],
+    features: [
+      '8 Seats',
+      'Sliding Doors',
+      'AC',
+      'Bluetooth',
+      'USB Charging',
+    ],
+    image: '/images/fleet/stepwgn.jpg',
     accentFrom: '#1a1a1a',
     accentTo: '#3d3d3d',
     silhouettePath:
