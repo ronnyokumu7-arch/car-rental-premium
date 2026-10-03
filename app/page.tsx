@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Hero } from '../components/marketing/Hero';
 import { BookingBar } from '../components/booking/BookingBar';
 import { TrustBar } from '../components/marketing/TrustBar';
+import { CategoryGrid } from '../components/marketing/CategoryGrid';
 import { AboutSnapshot } from '../components/marketing/AboutSnapshot';
 import { LatestUpdates } from '../components/marketing/LatestUpdates';
 import { FleetPreview } from '../components/marketing/FleetPreview';
@@ -34,6 +35,7 @@ export default function Home() {
       <Hero />
       <BookingBar />
       <TrustBar />
+      <CategoryGrid />
       <AboutSnapshot />
       <LatestUpdates />
       <FleetPreview />

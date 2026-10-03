@@ -316,7 +316,7 @@ export function BookingBar() {
                 <p className="text-[11px] font-medium uppercase tracking-wider text-charcoal-500 mb-4">
                   Choose a body type
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                   {bodyTypes.map((opt) => (
                     <button
                       key={opt.value}
@@ -328,7 +328,7 @@ export function BookingBar() {
                         if (select) select.value = opt.value;
                         setActiveTab('search');
                       }}
-                      className="seat-pill !min-w-fit !px-5"
+                      className="seat-pill !min-w-0 !px-3 text-[13px] sm:text-sm"
                     >
                       {opt.label}
                     </button>
@@ -342,13 +342,13 @@ export function BookingBar() {
                 <p className="text-[11px] font-medium uppercase tracking-wider text-charcoal-500 mb-4">
                   Choose a fuel type
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                   {fuelTypes.map((opt) => (
                     <button
                       key={opt.value}
                       type="button"
                       onClick={() => setActiveTab('search')}
-                      className="seat-pill !min-w-fit !px-5"
+                      className="seat-pill !min-w-0 !px-3 text-[13px] sm:text-sm"
                     >
                       {opt.label}
                     </button>
