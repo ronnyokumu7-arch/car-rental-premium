@@ -25,21 +25,21 @@ export function VehicleCard({
 }: VehicleCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
+      viewport={{ once: true, margin: '-40px' }}
       transition={{
-        duration: 0.6,
-        delay: index * 0.1,
+        duration: 0.4,
+        delay: index * 0.05,
         ease: [0.25, 0.1, 0.25, 1],
       }}
       onClick={onViewDetails}
-      className={`group relative flex flex-col bg-porcelain border border-charcoal-300/20 rounded-sm overflow-hidden transition-all duration-500 hover:border-accent-500/40 hover:shadow-2xl hover:-translate-y-1 ${
+      className={`group relative flex flex-col bg-porcelain border border-charcoal-300/20 rounded-sm overflow-hidden transition-[border-color,box-shadow,transform] duration-300 hover:border-accent-500/40 hover:shadow-lg hover:-translate-y-0.5 ${
         onViewDetails ? 'cursor-pointer' : ''
       }`}
     >
       {/* ── Visual panel ── */}
-      <div className="relative aspect-[16/10] overflow-hidden">
+      <div className="relative aspect-[16/10] overflow-hidden transform-gpu">
         {/* Base gradient — always visible as fallback layer */}
         <div
           className="absolute inset-0"
@@ -56,8 +56,10 @@ export function VehicleCard({
               alt={vehicle.name}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-              priority={index < 3}
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              priority={index === 0}
+              loading={index === 0 ? 'eager' : 'lazy'}
+              quality={75}
             />
             {/* Subtle bottom gradient so badges/SKU stay readable on any photo */}
             <div className="absolute inset-0 bg-gradient-to-t from-primary-900/70 via-transparent to-primary-900/20 pointer-events-none" />
@@ -74,7 +76,7 @@ export function VehicleCard({
             <div className="grain-overlay absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none" />
             <svg
               viewBox="0 0 200 100"
-              className="absolute inset-0 w-full h-full p-8 text-porcelain/40 transition-all duration-700 group-hover:text-porcelain/70 group-hover:scale-105"
+              className="absolute inset-0 w-full h-full p-8 text-porcelain/40 transition-all duration-500 group-hover:text-porcelain/70 group-hover:scale-105"
               preserveAspectRatio="xMidYMid meet"
             >
               <path
