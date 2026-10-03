@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { HeroCarousel } from './HeroCarousel';
 
 export function Hero() {
   const handleScrollToBooking = () => {
@@ -38,40 +39,50 @@ export function Hero() {
       {/* Grain texture overlay */}
       <div className="grain-overlay absolute inset-0 opacity-[0.15] mix-blend-overlay pointer-events-none" />
 
-      {/* Hero content — static, no animations */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-8 text-center pt-24 pb-32">
-        <p className="type-caption text-accent-500 mb-6">
-          Premium Car Hire · Nairobi
-        </p>
+      {/* Hero content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 pt-32 pb-24 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+          {/* Left — Copy */}
+          <div className="lg:col-span-7 text-center lg:text-left">
+            <p className="type-caption text-accent-500 mb-6">
+              Premium Car Hire · Nairobi
+            </p>
 
-        <h1 className="type-display text-porcelain mb-8">
-          Private, clean, &amp; reliable cars for hire{' '}
-          <span className="italic font-light">in Nairobi</span>
-        </h1>
+            <h1 className="type-display text-porcelain mb-8">
+              Private, clean, &amp; reliable cars for hire{' '}
+              <span className="italic font-light">in Nairobi</span>
+            </h1>
 
-        <p className="type-lead text-porcelain/70 max-w-xl mx-auto mb-12">
-          Rent private cars in Nairobi, available for short-term and long-term
-          rental.
-        </p>
+            <p className="type-lead text-porcelain/70 max-w-xl mx-auto lg:mx-0 mb-12">
+              Rent private cars in Nairobi, available for short-term and
+              long-term rental.
+            </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link href="/vehicles" className="btn-primary">
-            Explore the Fleet
-          </Link>
-          <Link
-            href="/contact"
-            className="btn-secondary border-porcelain text-porcelain hover:bg-porcelain hover:text-primary-900"
-          >
-            Book a Consultation
-          </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
+              <Link href="/vehicles" className="btn-primary">
+                Explore the Fleet
+              </Link>
+              <Link
+                href="/contact"
+                className="btn-secondary border-porcelain text-porcelain hover:bg-porcelain hover:text-primary-900"
+              >
+                Book a Consultation
+              </Link>
+            </div>
+          </div>
+
+          {/* Right — Vehicle carousel (hidden on mobile) */}
+          <div className="hidden lg:block lg:col-span-5">
+            <HeroCarousel />
+          </div>
         </div>
       </div>
 
-      {/* Scroll indicator — CSS-only bounce */}
+      {/* Scroll indicator — hidden on mobile since carousel is hidden there too */}
       <button
         onClick={handleScrollToBooking}
         aria-label="Scroll to booking form"
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 group flex flex-col items-center gap-3 text-porcelain/50 hover:text-porcelain transition-colors cursor-pointer"
+        className="hidden lg:flex absolute bottom-8 left-1/2 -translate-x-1/2 z-10 group flex-col items-center gap-3 text-porcelain/50 hover:text-porcelain transition-colors cursor-pointer"
       >
         <span className="text-[10px] uppercase tracking-[0.2em] font-medium">
           Book a Car
