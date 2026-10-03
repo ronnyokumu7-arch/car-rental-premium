@@ -1,37 +1,100 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { SlidersHorizontal, X } from 'lucide-react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { VEHICLES, type Vehicle } from '../../lib/vehicles';
-import { VehicleCard } from './VehicleCard';
+import { VehicleCardCompact } from './VehicleCardCompact';
 import { VehicleModal } from './VehicleModal';
+import {
+  FleetFilters,
+  type FilterState,
+  type SortOption,
+} from './FleetFilters';
 
-type SortOption = 'popular' | 'price-asc' | 'price-desc';
+const PRICE_MIN = 3500;
+const PRICE_MAX = 55000;
 
-const CATEGORIES = ['All', 'SUV', 'Crossover', 'Van'] as const;
-const MODES = ['All', 'Self-Drive', 'Chauffeured'] as const;
+const DEFAULT_FILTERS: FilterState = {
+  category: 'All',
+  seats: 'any',
+  mode: 'All',
+  transmission: 'All',
+  minPrice: PRICE_MIN,
+  maxPrice: PRICE_MAX,
+  sort: 'popular',
+};
 
 export function VehicleGrid() {
-  const [category, setCategory] = useState<string>('All');
-  const [mode, setMode] = useState<string>('All');
-  const [sort, setSort] = useState<SortOption>('popular');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [filters, setFilters] = useState<FilterState>(() => ({
+    category: searchParams.get('category') ?? DEFAULT_FILTERS.category,
+    seats: searchParams.get('seats') ?? DEFAULT_FILTERS.seats,
+    mode: searchParams.get('mode') ?? DEFAULT_FILTERS.mode,
+    transmission:
+      searchParams.get('transmission') ?? DEFAULT_FILTERS.transmission,
+    minPrice: Number(searchParams.get('minPrice')) || DEFAULT_FILTERS.minPrice,
+    maxPrice: Number(searchParams.get('maxPrice')) || DEFAULT_FILTERS.maxPrice,
+    sort: (searchParams.get('sort') as SortOption) ?? DEFAULT_FILTERS.sort,
+  }));
+
   const [activeVehicle, setActiveVehicle] = useState<Vehicle | null>(null);
-  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const updateFilters = useCallback(
+    (newFilters: FilterState) => {
+      setFilters(newFilters);
+
+      const params = new URLSearchParams();
+      if (newFilters.category !== 'All')
+        params.set('category', newFilters.category);
+      if (newFilters.seats !== 'any') params.set('seats', newFilters.seats);
+      if (newFilters.mode !== 'All') params.set('mode', newFilters.mode);
+      if (newFilters.transmission !== 'All')
+        params.set('transmission', newFilters.transmission);
+      if (newFilters.minPrice !== PRICE_MIN)
+        params.set('minPrice', newFilters.minPrice.toString());
+      if (newFilters.maxPrice !== PRICE_MAX)
+        params.set('maxPrice', newFilters.maxPrice.toString());
+      if (newFilters.sort !== 'popular') params.set('sort', newFilters.sort);
+
+      const queryString = params.toString();
+      router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+        scroll: false,
+      });
+    },
+    [pathname, router]
+  );
 
   const filtered = useMemo(() => {
     let list = [...VEHICLES];
 
-    if (category !== 'All') {
-      list = list.filter((v) => v.category === category);
+    if (filters.category !== 'All') {
+      list = list.filter((v) => v.category === filters.category);
     }
 
-    if (mode !== 'All') {
+    if (filters.seats !== 'any') {
+      const targetSeats = Number(filters.seats);
+      list = list.filter((v) => v.seats >= targetSeats);
+    }
+
+    if (filters.mode !== 'All') {
       list = list.filter(
-        (v) => v.mode === mode || v.mode === 'Both'
+        (v) => v.mode === filters.mode || v.mode === 'Both'
       );
     }
 
-    switch (sort) {
+    if (filters.transmission !== 'All') {
+      list = list.filter((v) => v.transmission === filters.transmission);
+    }
+
+    list = list.filter(
+      (v) =>
+        v.dailyRate >= filters.minPrice && v.dailyRate <= filters.maxPrice
+    );
+
+    switch (filters.sort) {
       case 'price-asc':
         list.sort((a, b) => a.dailyRate - b.dailyRate);
         break;
@@ -44,110 +107,41 @@ export function VehicleGrid() {
     }
 
     return list;
-  }, [category, mode, sort]);
+  }, [filters]);
 
-  const hasActiveFilters = category !== 'All' || mode !== 'All';
-
-  const clearFilters = () => {
-    setCategory('All');
-    setMode('All');
-  };
+  useEffect(() => {
+    const gridAnchor = document.getElementById('fleet-grid-anchor');
+    if (gridAnchor) {
+      const rect = gridAnchor.getBoundingClientRect();
+      if (rect.top < -100) {
+        gridAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }, [filters.category]);
 
   return (
     <>
-      {/* ── Filter bar ── */}
-      <div className="mb-12">
-        {/* Mobile filter toggle */}
-        <button
-          onClick={() => setFiltersOpen((v) => !v)}
-          className="lg:hidden w-full flex items-center justify-between px-5 py-4 bg-porcelain border border-charcoal-300/30 rounded-sm mb-4"
-        >
-          <span className="flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-primary-900">
-            <SlidersHorizontal size={16} />
-            Filters
-            {hasActiveFilters && (
-              <span className="ml-1 w-5 h-5 flex items-center justify-center bg-accent-500 text-primary-900 text-[10px] font-bold rounded-full">
-                {(category !== 'All' ? 1 : 0) + (mode !== 'All' ? 1 : 0)}
-              </span>
-            )}
-          </span>
-          {filtersOpen ? <X size={18} /> : null}
-        </button>
+      <FleetFilters
+        filters={filters}
+        onFiltersChange={updateFilters}
+        resultCount={filtered.length}
+      />
 
-        {/* Filter controls */}
-        <div
-          className={`lg:flex lg:items-center lg:justify-between gap-6 bg-porcelain border border-charcoal-300/30 rounded-sm px-6 py-5 ${
-            filtersOpen ? 'block' : 'hidden lg:flex'
-          }`}
-        >
-          {/* Left: filters */}
-          <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
-            <FilterGroup
-              label="Category"
-              options={CATEGORIES as unknown as string[]}
-              value={category}
-              onChange={setCategory}
-            />
-            <FilterGroup
-              label="Rental Mode"
-              options={MODES as unknown as string[]}
-              value={mode}
-              onChange={setMode}
-            />
-            {hasActiveFilters && (
-              <button
-                onClick={clearFilters}
-                className="text-[11px] uppercase tracking-widest text-charcoal-500 hover:text-accent-600 transition-colors flex items-center gap-1"
-              >
-                <X size={12} />
-                Clear
-              </button>
-            )}
-          </div>
+      <div id="fleet-grid-anchor" className="scroll-mt-24" />
 
-          {/* Right: sort + count */}
-          <div className="flex items-center gap-4 mt-4 lg:mt-0">
-            <div className="flex items-center gap-2">
-              <label className="text-[11px] uppercase tracking-widest text-charcoal-500">
-                Sort
-              </label>
-              <select
-                value={sort}
-                onChange={(e) => setSort(e.target.value as SortOption)}
-                className="text-xs bg-transparent border border-charcoal-300/40 rounded-sm px-3 py-1.5 text-primary-900 focus:outline-none focus:border-accent-500"
-              >
-                <option value="popular">Popular</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Result count */}
-        <p className="mt-4 text-[11px] uppercase tracking-widest text-charcoal-500">
-          Showing{' '}
-          <span className="text-primary-900 font-semibold">
-            {filtered.length}
-          </span>{' '}
-          {filtered.length === 1 ? 'vehicle' : 'vehicles'}
-        </p>
-      </div>
-
-      {/* ── Grid ── */}
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {filtered.map((vehicle, index) => (
-            <VehicleCard
+          {filtered.map((vehicle) => (
+            <VehicleCardCompact
               key={vehicle.id}
               vehicle={vehicle}
-              index={index}
               onViewDetails={() => setActiveVehicle(vehicle)}
+              showDescription
             />
           ))}
         </div>
       ) : (
-        <div className="py-20 text-center">
+        <div className="py-20 text-center bg-porcelain border border-charcoal-300/30 rounded-sm">
           <p className="font-display text-2xl text-primary-900 mb-3">
             No vehicles match your filters
           </p>
@@ -155,55 +149,19 @@ export function VehicleGrid() {
             Try adjusting your selection, or contact us for custom requests.
           </p>
           <button
-            onClick={clearFilters}
+            type="button"
+            onClick={() => updateFilters(DEFAULT_FILTERS)}
             className="btn-primary"
           >
-            Clear Filters
+            Clear All Filters
           </button>
         </div>
       )}
 
-      {/* ── Detail modal ── */}
       <VehicleModal
         vehicle={activeVehicle}
         onClose={() => setActiveVehicle(null)}
       />
     </>
-  );
-}
-
-/* ─────────────────────────────────────────────── */
-function FilterGroup({
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  label: string;
-  options: string[];
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div>
-      <p className="text-[10px] uppercase tracking-widest text-charcoal-500 mb-2">
-        {label}
-      </p>
-      <div className="flex flex-wrap gap-2">
-        {options.map((opt) => (
-          <button
-            key={opt}
-            onClick={() => onChange(opt)}
-            className={`px-3 py-1.5 text-[11px] font-medium uppercase tracking-wider rounded-sm border transition-all duration-200 ${
-              value === opt
-                ? 'bg-primary-900 text-porcelain border-primary-900'
-                : 'bg-transparent text-charcoal-700 border-charcoal-300/40 hover:border-primary-900/50'
-            }`}
-          >
-            {opt}
-          </button>
-        ))}
-      </div>
-    </div>
   );
 }

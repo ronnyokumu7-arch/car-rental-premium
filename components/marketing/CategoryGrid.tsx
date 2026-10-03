@@ -15,21 +15,21 @@ const CATEGORIES = [
     label: 'SUV',
     description: 'Executive & family 4x4s',
     icon: Truck,
-    href: '/vehicles',
+    href: '/vehicles?category=SUV',
   },
   {
-    id: 'sedan',
-    label: 'Sedan',
-    description: 'Executive comfort',
+    id: 'crossover',
+    label: 'Crossover',
+    description: 'Refined & versatile',
     icon: CarFront,
-    href: '/vehicles',
+    href: '/vehicles?category=Crossover',
   },
   {
     id: 'van',
     label: 'Van',
     description: 'Group transfers & families',
     icon: Bus,
-    href: '/vehicles',
+    href: '/vehicles?category=Van',
   },
   {
     id: 'long-term',
@@ -99,17 +99,14 @@ export function CategoryGrid() {
 
                 {/* Content */}
                 <div className="flex flex-col min-w-0 flex-1 lg:flex-none">
-                  {/* Label */}
                   <p className="text-[12px] font-semibold uppercase tracking-[0.15em] text-primary-900 mb-1">
                     {category.label}
                   </p>
 
-                  {/* Description */}
                   <p className="text-xs text-charcoal-500 leading-relaxed mb-2 lg:mb-4 lg:flex-1">
                     {category.description}
                   </p>
 
-                  {/* Arrow */}
                   <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-[0.15em] text-accent-600 transition-all duration-300 group-hover:gap-2">
                     View
                     <ArrowRight size={12} />
