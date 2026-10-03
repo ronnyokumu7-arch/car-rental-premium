@@ -7,7 +7,6 @@ import {
   MapPin,
   Calendar,
   Car,
-  Users,
   ArrowRight,
   Check,
   SlidersHorizontal,
@@ -227,22 +226,37 @@ export function BookingBar() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                   <div>
                     <label className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-charcoal-500 mb-3">
-                      <Users size={14} className="text-charcoal-400" />
+                      <CarSeatsIcon size={16} className="text-charcoal-400" />
                       Seats
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {SEAT_OPTIONS.map((opt) => (
-                        <button
-                          key={opt.value}
-                          type="button"
-                          onClick={() => setSeats(opt.value)}
-                          className={`seat-pill ${
-                            seats === opt.value ? 'seat-pill-active' : ''
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
+                      {SEAT_OPTIONS.map((opt) => {
+                        const isActive = seats === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => setSeats(opt.value)}
+                            aria-pressed={isActive}
+                            className={`
+                              inline-flex items-center justify-center
+                              min-w-[48px] h-[46px] px-4
+                              text-sm font-medium
+                              rounded-sm
+                              border
+                              transition-colors duration-200
+                              focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2
+                              ${
+                                isActive
+                                  ? 'bg-primary-900 border-primary-900 text-porcelain'
+                                  : 'bg-white border-charcoal-300/50 text-charcoal-700 hover:border-primary-900/50 hover:text-primary-900'
+                              }
+                            `}
+                          >
+                            {opt.label}
+                          </button>
+                        );
+                      })}
                     </div>
                     <input type="hidden" name="seats" value={seats} />
                   </div>
@@ -328,7 +342,16 @@ export function BookingBar() {
                         if (select) select.value = opt.value;
                         setActiveTab('search');
                       }}
-                      className="seat-pill !min-w-0 !px-3 text-[13px] sm:text-sm"
+                      className={`
+                        inline-flex items-center justify-center
+                        h-[46px] px-3
+                        text-[13px] sm:text-sm font-medium
+                        rounded-sm
+                        border
+                        transition-colors duration-200
+                        focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2
+                        bg-white border-charcoal-300/50 text-charcoal-700 hover:border-primary-900/50 hover:text-primary-900
+                      `}
                     >
                       {opt.label}
                     </button>
@@ -348,7 +371,16 @@ export function BookingBar() {
                       key={opt.value}
                       type="button"
                       onClick={() => setActiveTab('search')}
-                      className="seat-pill !min-w-0 !px-3 text-[13px] sm:text-sm"
+                      className={`
+                        inline-flex items-center justify-center
+                        h-[46px] px-3
+                        text-[13px] sm:text-sm font-medium
+                        rounded-sm
+                        border
+                        transition-colors duration-200
+                        focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2
+                        bg-white border-charcoal-300/50 text-charcoal-700 hover:border-primary-900/50 hover:text-primary-900
+                      `}
                     >
                       {opt.label}
                     </button>
@@ -379,6 +411,43 @@ export function BookingBar() {
         <TrustStrip />
       </div>
     </section>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────── */
+/* Custom dual-car-seat icon (side profile)                    */
+/* ─────────────────────────────────────────────────────────── */
+function CarSeatsIcon({
+  size = 16,
+  className = '',
+}: {
+  size?: number;
+  className?: string;
+}) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      {/* Front seat — side profile */}
+      <path d="M5.5 18.5c-.8 0-1.5-.7-1.5-1.5 0-.6.3-1.1.8-1.4L6 14.5V6c0-1.1.9-2 2-2s2 .9 2 2v6.5l-.5 1.5" />
+      <path d="M5.5 18.5H8" />
+      <path d="M10 12.5c.8.3 1.5 1 1.5 2s-.7 1.7-1.5 2" />
+
+      {/* Rear seat — side profile */}
+      <path d="M14.5 18.5c-.8 0-1.5-.7-1.5-1.5 0-.6.3-1.1.8-1.4L15 14.5V6c0-1.1.9-2 2-2s2 .9 2 2v6.5l-.5 1.5" />
+      <path d="M14.5 18.5H17" />
+      <path d="M19 12.5c.8.3 1.5 1 1.5 2s-.7 1.7-1.5 2" />
+    </svg>
   );
 }
 

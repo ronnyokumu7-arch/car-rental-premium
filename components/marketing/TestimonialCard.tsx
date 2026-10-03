@@ -9,6 +9,27 @@ interface TestimonialCardProps {
   index?: number;
 }
 
+const CARD_VARIANTS = [
+  // Variant 0 — default navy → teal-charcoal
+  {
+    gradient:
+      'linear-gradient(135deg, #081529 0%, #0f2440 55%, #0f2b2b 100%)',
+    glow: 'rgba(201, 162, 39, 0.18)',
+  },
+  // Variant 1 — charcoal → warm bronze-charcoal
+  {
+    gradient:
+      'linear-gradient(135deg, #1a1a1a 0%, #2a1f1a 55%, #3d2a1a 100%)',
+    glow: 'rgba(201, 162, 39, 0.22)',
+  },
+  // Variant 2 — navy → cool indigo-charcoal
+  {
+    gradient:
+      'linear-gradient(135deg, #081529 0%, #1a1a3d 55%, #1a2433 100%)',
+    glow: 'rgba(201, 162, 39, 0.16)',
+  },
+];
+
 export function TestimonialCard({
   testimonial,
   index = 0,
@@ -20,6 +41,8 @@ export function TestimonialCard({
     .slice(0, 2)
     .toUpperCase();
 
+  const variant = CARD_VARIANTS[index % CARD_VARIANTS.length];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -30,17 +53,27 @@ export function TestimonialCard({
         delay: index * 0.12,
         ease: [0.25, 0.1, 0.25, 1],
       }}
-      className="relative flex flex-col bg-primary-900 rounded-sm overflow-hidden p-8 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1"
+      className="
+        relative flex flex-col
+        rounded-sm overflow-hidden p-8
+        transition-all duration-500
+        hover:shadow-2xl hover:-translate-y-1
+        shrink-0
+        w-full md:w-auto
+        snap-center md:snap-align-none
+      "
     >
-      {/* Navy → charcoal gradient for depth */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-900 to-charcoal-900" />
+      {/* Unique gradient per card */}
+      <div
+        className="absolute inset-0"
+        style={{ background: variant.gradient }}
+      />
 
-      {/* Warm accent glow */}
+      {/* Warm accent glow — varies per card */}
       <div
         className="absolute inset-0 opacity-40 pointer-events-none"
         style={{
-          background:
-            'radial-gradient(ellipse at 80% 20%, rgba(201, 162, 39, 0.18) 0%, transparent 60%)',
+          background: `radial-gradient(ellipse at 80% 20%, ${variant.glow} 0%, transparent 60%)`,
         }}
       />
 
@@ -57,7 +90,7 @@ export function TestimonialCard({
         <path d="M10 6C5 6 2 10 2 15c0 5 3 9 8 9 1 0 2 0 3-1v-4c-1 1-2 1-3 1-2 0-3-2-3-4h6V6zm16 0c-5 0-8 4-8 9 0 5 3 9 8 9 1 0 2 0 3-1v-4c-1 1-2 1-3 1-2 0-3-2-3-4h6V6z" />
       </svg>
 
-      {/* Content — sits above gradient layers */}
+      {/* Content */}
       <div className="relative flex flex-col flex-1">
         {/* Stars */}
         <div className="flex items-center gap-1 mb-6">
