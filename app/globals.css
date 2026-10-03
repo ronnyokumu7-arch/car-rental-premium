@@ -218,17 +218,13 @@
 
 /* ─────────────────────────────────────────────────────────────
    MOBILE TEXT SELECTION UX
-   Prevents accidental text selection while scrolling on mobile,
-   while keeping copy-paste working for real intent (long-press).
    ───────────────────────────────────────────────────────────── */
 
 @layer base {
-  /* Remove the blue flash on tap (mobile) */
   * {
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Buttons, links, nav, icons — no selection at all */
   button,
   a,
   nav,
@@ -242,8 +238,6 @@
     -webkit-touch-callout: none;
   }
 
-  /* Hero, decorative bands, and preview sections —
-     no selection so scrolling doesn't highlight */
   section[data-scroll='true'],
   .grain-overlay,
   [data-decorative] {
@@ -251,9 +245,6 @@
     user-select: none;
   }
 
-  /* Paragraphs and article content — text selection
-     works only with intent (long-press on mobile,
-     click-drag on desktop) */
   p,
   h1,
   h2,
@@ -272,9 +263,6 @@
 
 /* ─────────────────────────────────────────────────────────────
    GLOBAL TYPOGRAPHY RHYTHM
-   One source of truth for line-height across the entire site.
-   Body text: 1.65 (comfortable reading)
-   Headings:  1.15 (tight, editorial)
    ───────────────────────────────────────────────────────────── */
 
 @layer base {
@@ -301,5 +289,82 @@
 
   blockquote {
     line-height: 1.6;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BOOKING WIDGET — UPGRADED COMPONENT STYLES
+   Tabs, seat toggles, price range slider, running total.
+   ───────────────────────────────────────────────────────────── */
+
+@layer components {
+  /* ── Tab navigation ── */
+  .booking-tab {
+    @apply relative px-4 py-3 text-[11px] font-medium uppercase tracking-[0.1em] text-charcoal-500 transition-colors duration-200;
+  }
+
+  .booking-tab:hover {
+    @apply text-primary-900;
+  }
+
+  .booking-tab-active {
+    @apply text-primary-900;
+  }
+
+  .booking-tab-active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background-color: #c9a227;
+  }
+
+  /* ── Seat toggle pills ── */
+  .seat-pill {
+    @apply inline-flex items-center justify-center min-w-[44px] h-[46px] px-3 text-sm font-medium text-charcoal-700 bg-white border border-charcoal-300/50 rounded-sm transition-all duration-200 cursor-pointer;
+  }
+
+  .seat-pill:hover {
+    @apply border-primary-900/50 text-primary-900;
+  }
+
+  .seat-pill-active {
+    @apply bg-primary-900 text-porcelain border-primary-900;
+  }
+
+  /* ── Price range slider (react-range) ── */
+  .price-range-track {
+    height: 4px;
+    background-color: rgba(8, 21, 41, 0.08);
+    border-radius: 9999px;
+  }
+
+  .price-range-track-active {
+    background-color: #c9a227;
+  }
+
+  .price-range-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: #081529;
+    border: 3px solid #faf9f7;
+    border-radius: 9999px;
+    box-shadow: 0 2px 8px rgba(8, 21, 41, 0.2);
+    cursor: grab;
+    outline: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .price-range-thumb:hover,
+  .price-range-thumb:focus {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(8, 21, 41, 0.3), 0 0 0 3px rgba(201, 162, 39, 0.2);
+  }
+
+  .price-range-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.15);
   }
 }

@@ -63,10 +63,10 @@ export function Hero() {
                 Explore the Fleet
               </Link>
               <Link
-                href="/contact"
+                href="/rental-calendar"
                 className="btn-secondary border-porcelain text-porcelain hover:bg-porcelain hover:text-primary-900"
               >
-                Book a Consultation
+                Rental Calendar
               </Link>
             </div>
           </div>

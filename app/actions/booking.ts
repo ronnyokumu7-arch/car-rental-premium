@@ -1,36 +1,46 @@
 'use server';
 
 import { z } from 'zod';
+import {
+  LOCATIONS,
+  getPickupFee,
+  getReturnFee,
+  formatFee,
+  requiresQuote,
+} from '../../lib/locations';
 
 const bookingSchema = z
   .object({
     pickupLocation: z
       .string()
-      .min(2, 'Please enter a pickup location'),
+      .min(1, 'Please select a pickup location'),
+    returnLocation: z
+      .string()
+      .min(1, 'Please select a return location'),
     pickupDate: z
       .string()
       .min(1, 'Please select a pickup date'),
-    pickupTime: z
-      .string()
-      .min(1, 'Please select a pickup time'),
     dropoffDate: z
       .string()
       .min(1, 'Please select a dropoff date'),
-    dropoffTime: z
-      .string()
-      .min(1, 'Please select a dropoff time'),
     vehicleType: z
       .string()
       .min(1, 'Please select a vehicle type'),
+    seats: z
+      .string()
+      .optional()
+      .default('any'),
+    minPrice: z.coerce.number().min(0).max(100000).optional(),
+    maxPrice: z.coerce.number().min(0).max(100000).optional(),
   })
   .refine(
     (data) => {
-      const pickup = new Date(`${data.pickupDate}T${data.pickupTime}`);
-      const dropoff = new Date(`${data.dropoffDate}T${data.dropoffTime}`);
-      return dropoff > pickup;
+      const pickup = new Date(data.pickupDate);
+      const dropoff = new Date(data.dropoffDate);
+      return dropoff >= pickup;
     },
     {
-      message: 'Dropoff must be after pickup',
+      message: 'Dropoff date must be on or after pickup date',
       path: ['dropoffDate'],
     }
   );
@@ -48,11 +58,13 @@ export async function submitBooking(
 ): Promise<BookingState> {
   const raw = {
     pickupLocation: formData.get('pickupLocation') as string,
+    returnLocation: formData.get('returnLocation') as string,
     pickupDate: formData.get('pickupDate') as string,
-    pickupTime: formData.get('pickupTime') as string,
     dropoffDate: formData.get('dropoffDate') as string,
-    dropoffTime: formData.get('dropoffTime') as string,
     vehicleType: formData.get('vehicleType') as string,
+    seats: (formData.get('seats') as string) || 'any',
+    minPrice: formData.get('minPrice') as string,
+    maxPrice: formData.get('maxPrice') as string,
   };
 
   const parsed = bookingSchema.safeParse(raw);
@@ -65,6 +77,26 @@ export async function submitBooking(
     };
   }
 
+  const data = parsed.data;
+
+  // Look up human-readable location labels + fees
+  const pickupLocationLabel =
+    LOCATIONS.find((l) => l.value === data.pickupLocation)?.label ??
+    data.pickupLocation;
+
+  const returnLocationLabel =
+    data.returnLocation === 'same-as-pickup'
+      ? 'Same as pickup'
+      : LOCATIONS.find((l) => l.value === data.returnLocation)?.label ??
+        data.returnLocation;
+
+  const pickupFee = getPickupFee(data.pickupLocation);
+  const returnFee = getReturnFee(data.returnLocation, data.pickupLocation);
+  const quoteRequired = requiresQuote(
+    data.pickupLocation,
+    data.returnLocation
+  );
+
   // ─────────────────────────────────────────────────────────────
   // TODO: Wire to real backend
   //   - Save to database (Supabase / Postgres)
@@ -75,9 +107,17 @@ export async function submitBooking(
   // Simulate network latency for realistic UX
   await new Promise((resolve) => setTimeout(resolve, 900));
 
+  // Compose the success message with details
+  const feeLine = quoteRequired
+    ? 'Delivery fee: quote on request.'
+    : `Delivery: ${formatFee(pickupFee)}${returnFee > 0 ? ` + collection: ${formatFee(returnFee)}` : ''}.`;
+
+  const seatLine =
+    data.seats && data.seats !== 'any' ? ` · ${data.seats} seats` : '';
+
   return {
     success: true,
-    message: `Thank you. We have received your request for a ${parsed.data.vehicleType.toLowerCase()} in ${parsed.data.pickupLocation}. Our team will call you within 2 hours to confirm.`,
+    message: `Thank you. We've received your request for a ${data.vehicleType.toLowerCase()}${seatLine}. Pickup from ${pickupLocationLabel}, return to ${returnLocationLabel}. ${feeLine} Our team will call you within 2 hours to confirm.`,
     fields: raw,
   };
 }
