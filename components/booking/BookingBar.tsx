@@ -12,17 +12,22 @@ import {
   Check,
   SlidersHorizontal,
   Tag,
+  ShieldCheck,
+  Plane,
+  Clock,
 } from 'lucide-react';
 import { submitBooking, type BookingState } from '../../app/actions/booking';
 import {
   LOCATIONS,
-  RETURN_OPTIONS,
   DEFAULT_PICKUP_LOCATION,
   DEFAULT_RETURN_LOCATION,
   getPickupFee,
   getReturnFee,
-  formatFee,
   requiresQuote,
+  buildReturnOptions,
+  getPickupLabel,
+  getPickupFeeLabel,
+  getReturnFeeLabel,
 } from '../../lib/locations';
 
 const initialState: BookingState = {};
@@ -64,33 +69,31 @@ export function BookingBar() {
 
   const today = new Date().toISOString().split('T')[0];
 
+  const returnOptions = useMemo(
+    () => buildReturnOptions(pickupLocation),
+    [pickupLocation]
+  );
+
   const pickupFee = getPickupFee(pickupLocation);
   const returnFee = getReturnFee(returnLocation, pickupLocation);
   const needsQuote = requiresQuote(pickupLocation, returnLocation);
   const totalFees = pickupFee + returnFee;
 
-  // Body-type tab quick filter maps to vehicle types
-  const bodyTypes = useMemo(
-    () => [
-      { label: 'Any', value: '' },
-      { label: 'SUV', value: 'SUV' },
-      { label: 'Crossover', value: 'Crossover' },
-      { label: 'Van', value: 'Van' },
-      { label: 'Sedan', value: 'Sedan' },
-    ],
-    []
-  );
+  const bodyTypes = [
+    { label: 'Any', value: '' },
+    { label: 'SUV', value: 'SUV' },
+    { label: 'Crossover', value: 'Crossover' },
+    { label: 'Van', value: 'Van' },
+    { label: 'Sedan', value: 'Sedan' },
+  ];
 
-  const fuelTypes = useMemo(
-    () => [
-      { label: 'Any', value: '' },
-      { label: 'Petrol', value: 'Petrol' },
-      { label: 'Diesel', value: 'Diesel' },
-      { label: 'Hybrid', value: 'Hybrid' },
-      { label: 'Electric', value: 'Electric' },
-    ],
-    []
-  );
+  const fuelTypes = [
+    { label: 'Any', value: '' },
+    { label: 'Petrol', value: 'Petrol' },
+    { label: 'Diesel', value: 'Diesel' },
+    { label: 'Hybrid', value: 'Hybrid' },
+    { label: 'Electric', value: 'Electric' },
+  ];
 
   return (
     <section
@@ -98,7 +101,6 @@ export function BookingBar() {
       className="relative z-20 -mt-24 lg:-mt-28 mb-16 lg:mb-24 px-6 lg:px-8 scroll-mt-24"
     >
       <div className="max-w-6xl mx-auto">
-        {/* Success / Error banner */}
         {(state.success || state.message) && (
           <div
             className={`mb-4 px-6 py-4 rounded-sm text-sm flex items-start gap-3 ${
@@ -112,7 +114,6 @@ export function BookingBar() {
           </div>
         )}
 
-        {/* Main card */}
         <form
           action={formAction}
           className="bg-porcelain shadow-2xl rounded-sm overflow-hidden"
@@ -155,35 +156,34 @@ export function BookingBar() {
 
           {/* ── Card body ── */}
           <div className="px-6 lg:px-10 py-6 lg:py-8">
-            {/* Tab: Car Search (main form) */}
             {activeTab === 'search' && (
               <>
-                {/* Pickup + Return locations */}
+                {/* Locations */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 mb-5">
                   <LocationField
-                    label="Pickup Location"
+                    label={getPickupLabel(pickupLocation)}
+                    subLabel={getPickupFeeLabel(pickupLocation)}
+                    name="pickupLocation"
                     value={pickupLocation}
                     onChange={setPickupLocation}
                     options={LOCATIONS}
-                    fee={pickupFee}
-                    showFee
                   />
                   <LocationField
                     label="Return Location"
+                    subLabel={getReturnFeeLabel(
+                      returnLocation,
+                      pickupLocation
+                    )}
+                    name="returnLocation"
                     value={returnLocation}
                     onChange={setReturnLocation}
-                    options={RETURN_OPTIONS}
-                    fee={returnFee}
-                    showFee
+                    options={returnOptions}
                   />
                 </div>
 
                 {/* Dates + Vehicle type */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 mb-5">
-                  <FieldWrapper
-                    label="Pickup Date"
-                    icon={<Calendar size={14} />}
-                  >
+                  <FieldWrapper label="Pickup Date" icon={<Calendar size={14} />}>
                     <input
                       name="pickupDate"
                       type="date"
@@ -193,10 +193,7 @@ export function BookingBar() {
                     />
                   </FieldWrapper>
 
-                  <FieldWrapper
-                    label="Return Date"
-                    icon={<Calendar size={14} />}
-                  >
+                  <FieldWrapper label="Return Date" icon={<Calendar size={14} />}>
                     <input
                       name="dropoffDate"
                       type="date"
@@ -225,9 +222,8 @@ export function BookingBar() {
                   </FieldWrapper>
                 </div>
 
-                {/* Seats + Price slider */}
+                {/* Seats + Price */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                  {/* Seats */}
                   <div>
                     <label className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-charcoal-500 mb-3">
                       <Users size={14} className="text-charcoal-400" />
@@ -250,7 +246,6 @@ export function BookingBar() {
                     <input type="hidden" name="seats" value={seats} />
                   </div>
 
-                  {/* Price range */}
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <label className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-charcoal-500">
@@ -308,22 +303,13 @@ export function BookingBar() {
                         )}
                       />
                     </div>
-                    <input
-                      type="hidden"
-                      name="minPrice"
-                      value={priceRange[0]}
-                    />
-                    <input
-                      type="hidden"
-                      name="maxPrice"
-                      value={priceRange[1]}
-                    />
+                    <input type="hidden" name="minPrice" value={priceRange[0]} />
+                    <input type="hidden" name="maxPrice" value={priceRange[1]} />
                   </div>
                 </div>
               </>
             )}
 
-            {/* Tab: Body Types */}
             {activeTab === 'body' && (
               <div className="py-4">
                 <p className="text-[11px] font-medium uppercase tracking-wider text-charcoal-500 mb-4">
@@ -335,7 +321,6 @@ export function BookingBar() {
                       key={opt.value}
                       type="button"
                       onClick={() => {
-                        // Set the vehicle type and switch to Search tab
                         const select = document.querySelector(
                           'select[name="vehicleType"]'
                         ) as HTMLSelectElement | null;
@@ -351,7 +336,6 @@ export function BookingBar() {
               </div>
             )}
 
-            {/* Tab: Fuel Types */}
             {activeTab === 'fuel' && (
               <div className="py-4">
                 <p className="text-[11px] font-medium uppercase tracking-wider text-charcoal-500 mb-4">
@@ -375,7 +359,6 @@ export function BookingBar() {
 
           {/* ── Footer strip ── */}
           <div className="bg-primary-900/5 border-t border-charcoal-300/20 px-6 lg:px-10 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            {/* Running total */}
             <div className="flex items-center gap-4 text-[11px] uppercase tracking-widest text-charcoal-500">
               <span>Pickup &amp; return</span>
               <span className="text-primary-900 font-semibold text-sm normal-case tracking-normal">
@@ -387,45 +370,34 @@ export function BookingBar() {
               </span>
             </div>
 
-            {/* Submit */}
             <SubmitButton />
           </div>
         </form>
 
-        {/* Trust strip */}
-        <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1">
-          <p className="type-caption text-charcoal-500">
-            ✓ Free cancellation up to 24h before pickup
-          </p>
-          <p className="type-caption text-charcoal-500">
-            ✓ Airport delivery included
-          </p>
-          <p className="type-caption text-charcoal-500">
-            ✓ All vehicles fully insured
-          </p>
-        </div>
+        {/* ── Premium trust strip ── */}
+        <TrustStrip />
       </div>
     </section>
   );
 }
 
 /* ─────────────────────────────────────────────────────────── */
-/* Location select with fee display                            */
+/* Location select with smart label + subtext                  */
 /* ─────────────────────────────────────────────────────────── */
 function LocationField({
   label,
+  subLabel,
+  name,
   value,
   onChange,
   options,
-  fee,
-  showFee,
 }: {
   label: string;
+  subLabel: string;
+  name: string;
   value: string;
   onChange: (v: string) => void;
   options: { value: string; label: string; fee: number }[];
-  fee: number;
-  showFee?: boolean;
 }) {
   return (
     <div>
@@ -434,7 +406,7 @@ function LocationField({
         {label}
       </label>
       <select
-        name={label.toLowerCase().includes('pickup') ? 'pickupLocation' : 'returnLocation'}
+        name={name}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="booking-input"
@@ -442,19 +414,15 @@ function LocationField({
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
-            {opt.fee > 0 ? ` (+ KES ${opt.fee.toLocaleString('en-KE')})` : ''}
+            {opt.fee > 0 && !opt.label.includes('KES')
+              ? ` (+ KES ${opt.fee.toLocaleString('en-KE')})`
+              : ''}
           </option>
         ))}
       </select>
-      {showFee && (
-        <p className="mt-1.5 text-[10px] uppercase tracking-widest text-charcoal-500">
-          {fee === -1
-            ? 'Delivery fee: quote on request'
-            : fee === 0
-              ? 'No delivery fee'
-              : `Delivery fee: KES ${fee.toLocaleString('en-KE')}`}
-        </p>
-      )}
+      <p className="mt-1.5 text-[10px] uppercase tracking-widest text-charcoal-500">
+        {subLabel}
+      </p>
     </div>
   );
 }
@@ -506,5 +474,67 @@ function SubmitButton() {
         </>
       )}
     </button>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────── */
+/* Trust strip — carousel on mobile, grid on desktop           */
+/* ─────────────────────────────────────────────────────────── */
+function TrustStrip() {
+  const items = [
+    {
+      icon: <ShieldCheck size={18} />,
+      title: 'Fully Insured',
+      description: 'All vehicles comprehensively covered',
+    },
+    {
+      icon: <Plane size={18} />,
+      title: 'Airport Delivery',
+      description: 'Free drop-off and pickup at JKIA',
+    },
+    {
+      icon: <Clock size={18} />,
+      title: 'Free Cancellation',
+      description: 'Up to 24 hours before pickup',
+    },
+  ];
+
+  return (
+    <div
+      className="
+        mt-6
+        flex sm:grid sm:grid-cols-3 gap-4
+        overflow-x-auto sm:overflow-visible
+        snap-x snap-mandatory sm:snap-none
+        -mx-6 sm:mx-0
+        px-6 sm:px-0
+        pb-2 sm:pb-0
+        scrollbar-hide
+      "
+    >
+      {items.map((item) => (
+        <div
+          key={item.title}
+          className="
+            snap-start shrink-0
+            w-[85%] sm:w-auto
+            flex items-start gap-3 p-4 sm:p-5
+            bg-porcelain border border-charcoal-300/30 rounded-sm
+          "
+        >
+          <div className="w-10 h-10 rounded-full bg-accent-500/10 border border-accent-500/30 flex items-center justify-center shrink-0 text-accent-600">
+            {item.icon}
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-primary-900 mb-1">
+              {item.title}
+            </p>
+            <p className="text-xs text-charcoal-500 leading-relaxed">
+              {item.description}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
