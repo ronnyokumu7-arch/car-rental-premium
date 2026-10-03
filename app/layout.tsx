@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Playfair_Display, Inter } from 'next/font/google';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
@@ -30,6 +30,19 @@ const inter = Inter({
   preload: true,
   fallback: ['system-ui', 'Segoe UI', 'Roboto', 'sans-serif'],
 });
+
+/* ─────────────────────────────────────────────────────────────
+   VIEWPORT — controls browser chrome color (mobile)
+   Renders as <meta name="theme-color"> in <head>.
+   Matches the brand's primary-900 navy.
+   ───────────────────────────────────────────────────────────── */
+
+export const viewport: Viewport = {
+  themeColor: '#081529',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 /* ─────────────────────────────────────────────────────────────
    METADATA — brand defaults for every page
