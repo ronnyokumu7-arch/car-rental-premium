@@ -35,10 +35,10 @@ export function Hero() {
         }}
       />
 
-      {/* Grain texture */}
+      {/* Grain texture overlay */}
       <div className="grain-overlay absolute inset-0 opacity-[0.15] mix-blend-overlay pointer-events-none" />
 
-      {/* Hero content — static, no motion */}
+      {/* Hero content — static, no animations */}
       <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-8 text-center pt-24 pb-32">
         <p className="type-caption text-accent-500 mb-6">
           Premium Car Hire · Nairobi
@@ -67,7 +67,7 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Scroll indicator — static, CSS-only bounce */}
+      {/* Scroll indicator — CSS-only bounce */}
       <button
         onClick={handleScrollToBooking}
         aria-label="Scroll to booking form"
