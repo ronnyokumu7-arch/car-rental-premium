@@ -150,6 +150,20 @@
     80% { transform: translate(-10%, 0%); }
     90% { transform: translate(5%, 5%); }
   }
+
+  /* === SOFT BOUNCE (used for hero scroll arrow) === */
+  @keyframes bounce-soft {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(6px);
+    }
+  }
+
+  .animate-bounce-soft {
+    animation: bounce-soft 2s ease-in-out infinite;
+  }
 }
 
 @layer components {
@@ -228,7 +242,7 @@
     -webkit-touch-callout: none;
   }
 
-  /* Hero, decorative bands, and preview sections — 
+  /* Hero, decorative bands, and preview sections —
      no selection so scrolling doesn't highlight */
   section[data-scroll='true'],
   .grain-overlay,
@@ -237,8 +251,8 @@
     user-select: none;
   }
 
-  /* Paragraphs and article content — text selection 
-     works only with intent (long-press on mobile, 
+  /* Paragraphs and article content — text selection
+     works only with intent (long-press on mobile,
      click-drag on desktop) */
   p,
   h1,
@@ -255,7 +269,6 @@
     user-select: text;
   }
 }
-
 
 /* ─────────────────────────────────────────────────────────────
    GLOBAL TYPOGRAPHY RHYTHM

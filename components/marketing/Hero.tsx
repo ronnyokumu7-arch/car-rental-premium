@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'motion/react';
 import Link from 'next/link';
 
 export function Hero() {
@@ -15,10 +14,10 @@ export function Hero() {
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-primary-900 flex items-center justify-center">
-      {/* Layered gradient background — mimics a dark cinematic image */}
+      {/* Layered gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-primary-700 to-charcoal-900" />
 
-      {/* Radial glow — warm accent light source top-right */}
+      {/* Radial glow */}
       <div
         className="absolute inset-0 opacity-40"
         style={{
@@ -27,7 +26,7 @@ export function Hero() {
         }}
       />
 
-      {/* Radial vignette — darkens edges for depth */}
+      {/* Radial vignette */}
       <div
         className="absolute inset-0"
         style={{
@@ -36,49 +35,26 @@ export function Hero() {
         }}
       />
 
-      {/* Grain texture overlay */}
+      {/* Grain texture */}
       <div className="grain-overlay absolute inset-0 opacity-[0.15] mix-blend-overlay pointer-events-none" />
 
-      {/* Hero content */}
+      {/* Hero content — static, no motion */}
       <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-8 text-center pt-24 pb-32">
-        {/* Eyebrow */}
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-          className="type-caption text-accent-500 mb-6"
-        >
+        <p className="type-caption text-accent-500 mb-6">
           Premium Car Hire · Nairobi
-        </motion.p>
+        </p>
 
-        {/* Headline */}
-        <motion.h1
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-          className="type-display text-porcelain mb-8"
-        >
-          Private, clean, & reliable cars for hire{' '}
-          <span className="font-light">in Nairobi</span>
-        </motion.h1>
+        <h1 className="type-display text-porcelain mb-8">
+          Private, clean, &amp; reliable cars for hire{' '}
+          <span className="italic font-light">in Nairobi</span>
+        </h1>
 
-        {/* Lead paragraph */}
-        <motion.p
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-          className="type-lead text-porcelain/70 max-w-xl mx-auto mb-12"
-        >
-          Rent private cars in Nairobi, available for short-term and long-term rental.
-        </motion.p>
+        <p className="type-lead text-porcelain/70 max-w-xl mx-auto mb-12">
+          Rent private cars in Nairobi, available for short-term and long-term
+          rental.
+        </p>
 
-        {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.65, ease: [0.25, 0.1, 0.25, 1] }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-        >
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link href="/vehicles" className="btn-primary">
             Explore the Fleet
           </Link>
@@ -88,14 +64,11 @@ export function Hero() {
           >
             Book a Consultation
           </Link>
-        </motion.div>
+        </div>
       </div>
 
-      {/* Scroll indicator — tappable, scrolls to booking widget */}
-      <motion.button
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.2 }}
+      {/* Scroll indicator — static, CSS-only bounce */}
+      <button
         onClick={handleScrollToBooking}
         aria-label="Scroll to booking form"
         className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 group flex flex-col items-center gap-3 text-porcelain/50 hover:text-porcelain transition-colors cursor-pointer"
@@ -103,11 +76,7 @@ export function Hero() {
         <span className="text-[10px] uppercase tracking-[0.2em] font-medium">
           Book a Car
         </span>
-        <motion.span
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="flex items-center justify-center w-10 h-10 rounded-full border border-porcelain/25 group-hover:border-accent-500/70 group-hover:bg-accent-500/10 transition-all duration-300"
-        >
+        <span className="flex items-center justify-center w-10 h-10 rounded-full border border-porcelain/25 group-hover:border-accent-500/70 group-hover:bg-accent-500/10 transition-all duration-300 animate-bounce-soft">
           <svg
             width="14"
             height="18"
@@ -120,8 +89,8 @@ export function Hero() {
           >
             <path d="M7 2v16M1 12l6 6 6-6" />
           </svg>
-        </motion.span>
-      </motion.button>
+        </span>
+      </button>
     </section>
   );
 }
