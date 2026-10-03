@@ -17,7 +17,7 @@ export interface Location {
 export const LOCATIONS: Location[] = [
   {
     value: 'utawala-office',
-    label: 'Utawala Office — Self-Collect',
+    label: 'Utawala Office — Free',
     fee: 0,
     region: 'Eastern Bypass',
     popular: true,

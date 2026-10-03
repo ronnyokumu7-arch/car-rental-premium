@@ -119,37 +119,37 @@ export function BookingBar() {
           className="bg-porcelain shadow-2xl rounded-sm overflow-hidden"
         >
           {/* ── Tabs ── */}
-          <div className="border-b border-charcoal-300/30 px-6 lg:px-10">
-            <div className="flex items-center gap-1 -mb-px">
+          <div className="border-b border-charcoal-300/30 px-4 sm:px-6 lg:px-10">
+            <div className="flex items-stretch -mb-px">
               <button
                 type="button"
                 onClick={() => setActiveTab('search')}
-                className={`booking-tab flex items-center gap-2 ${
+                className={`booking-tab ${
                   activeTab === 'search' ? 'booking-tab-active' : ''
                 }`}
               >
                 <SlidersHorizontal size={14} />
-                Car Search
+                <span>Car Search</span>
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab('body')}
-                className={`booking-tab flex items-center gap-2 ${
+                className={`booking-tab ${
                   activeTab === 'body' ? 'booking-tab-active' : ''
                 }`}
               >
                 <Car size={14} />
-                Body Types
+                <span>Body Types</span>
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab('fuel')}
-                className={`booking-tab flex items-center gap-2 ${
+                className={`booking-tab ${
                   activeTab === 'fuel' ? 'booking-tab-active' : ''
                 }`}
               >
                 <Tag size={14} />
-                Fuel Types
+                <span>Fuel Types</span>
               </button>
             </div>
           </div>
