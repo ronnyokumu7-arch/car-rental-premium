@@ -12,6 +12,7 @@ import {
   Check,
   SlidersHorizontal,
   Tag,
+  Fuel,
   ShieldCheck,
   Plane,
   Clock,
@@ -120,7 +121,7 @@ export function BookingBar() {
         >
           {/* ── Tabs ── */}
           <div className="border-b border-charcoal-300/30 px-4 sm:px-6 lg:px-10">
-            <div className="flex items-stretch -mb-px">
+            <div className="flex items-stretch -mb-px overflow-x-auto scrollbar-hide">
               <button
                 type="button"
                 onClick={() => setActiveTab('search')}
@@ -148,7 +149,7 @@ export function BookingBar() {
                   activeTab === 'fuel' ? 'booking-tab-active' : ''
                 }`}
               >
-                <Tag size={14} />
+                <Fuel size={14} />
                 <span>Fuel Types</span>
               </button>
             </div>
