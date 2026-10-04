@@ -13,6 +13,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { getPriceRange } from '../../lib/vehicles';
+import { Select } from '../ui/Select';
 
 /* ─────────────────────────────────────────────────────────────
    FLEET FILTERS
@@ -51,6 +52,12 @@ const SEAT_OPTIONS = [
 
 const MODES = ['All', 'Self-Drive', 'Chauffeured'] as const;
 const TRANSMISSIONS = ['All', 'Auto', 'Manual'] as const;
+
+const SORT_OPTIONS = [
+  { value: 'popular', label: 'Popular' },
+  { value: 'price-asc', label: 'Price: Low to High' },
+  { value: 'price-desc', label: 'Price: High to Low' },
+];
 
 /* Live price range from the fleet — never hardcode. */
 const PRICE_RANGE = getPriceRange();
@@ -285,17 +292,16 @@ export function FleetFilters({
               <Tag size={14} className="text-ink-subtle" />
               Sort By
             </label>
-            <select
+
+            <Select
+              name="sort"
               value={filters.sort}
-              onChange={(e) =>
-                updateFilter('sort', e.target.value as SortOption)
-              }
-              className="booking-input"
-            >
-              <option value="popular">Popular</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-            </select>
+              onChange={(v) => updateFilter('sort', v as SortOption)}
+              options={SORT_OPTIONS}
+              placeholder="Sort by…"
+              sheetTitle="Sort by"
+              ariaLabel="Sort vehicles by"
+            />
           </div>
 
           {/* Price Range */}

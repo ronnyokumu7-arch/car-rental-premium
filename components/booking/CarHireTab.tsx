@@ -23,6 +23,7 @@ import {
   ConciergeHeader,
   CarSeatsIcon,
 } from './shared';
+import { Select, type SelectOption } from '../ui/Select';
 
 /* ─────────────────────────────────────────────────────────────
    CAR HIRE TAB
@@ -35,21 +36,23 @@ import {
      • Hidden fields for the server action
    ───────────────────────────────────────────────────────────── */
 
-const VEHICLE_TYPES = [
-  { value: 'Sedan',     label: 'Sedan' },
-  { value: 'SUV',       label: 'SUV' },
-  { value: 'Crossover', label: 'Crossover' },
-  { value: 'Wagon',     label: 'Wagon' },
-  { value: 'Hatchback', label: 'Hatchback' },
-  { value: 'Van',       label: 'Van' },
-] as const;
-
 const SEAT_OPTIONS = [
   { value: 'any', label: 'Any' },
   { value: '5',   label: '5' },
   { value: '7',   label: '7' },
   { value: '8+',  label: '8+' },
 ] as const;
+
+/* Vehicle type options mapped for Select */
+const VEHICLE_TYPE_OPTIONS: SelectOption[] = [
+  { value: '',          label: 'Any vehicle type' },
+  { value: 'Sedan',     label: 'Sedan' },
+  { value: 'SUV',       label: 'SUV' },
+  { value: 'Crossover', label: 'Crossover' },
+  { value: 'Wagon',     label: 'Wagon' },
+  { value: 'Hatchback', label: 'Hatchback' },
+  { value: 'Van',       label: 'Van' },
+];
 
 /* Computed once at module load — the fleet doesn't change at runtime. */
 const PRICE_RANGE = getPriceRange();
@@ -262,19 +265,14 @@ export function CarHireTab({
           {/* Vehicle type + Seats */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <FieldWrapper label="Vehicle Type" icon={<Car size={14} />}>
-              <select
+              <Select
                 name="vehicleType"
                 value={vehicleType}
-                onChange={(e) => setVehicleType(e.target.value)}
-                className="booking-input"
-              >
-                <option value="">Any vehicle type</option>
-                {VEHICLE_TYPES.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                onChange={setVehicleType}
+                options={VEHICLE_TYPE_OPTIONS}
+                sheetTitle="Vehicle type"
+                ariaLabel="Choose a vehicle type"
+              />
             </FieldWrapper>
 
             <div>

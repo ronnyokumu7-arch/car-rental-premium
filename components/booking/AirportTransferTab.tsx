@@ -21,6 +21,7 @@ import {
   ConciergeHeader,
   CarSeatsIcon,
 } from './shared';
+import { Select, type SelectOption } from '../ui/Select';
 
 /* ─────────────────────────────────────────────────────────────
    AIRPORT TRANSFER TAB
@@ -49,6 +50,23 @@ const DIRECTIONS: { value: Direction; label: string; hint: string }[] = [
     hint: 'From address to airport',
   },
 ];
+
+/* ── Options mapped for the Select component ── */
+const AIRPORT_OPTIONS: SelectOption[] = AIRPORTS.map((a) => ({
+  value: a.value,
+  label: a.label,
+}));
+
+const TIME_WINDOW_OPTIONS: SelectOption[] = TIME_WINDOWS.map((t) => ({
+  value: t.value,
+  label: t.label,
+  hint: t.hint,
+}));
+
+const VEHICLE_OPTIONS: SelectOption[] = TRANSFER_VEHICLES.map((v) => ({
+  value: v.value,
+  label: v.label,
+}));
 
 /* ─────────────────────────────────────────────────────────────
    COMPONENT
@@ -95,13 +113,15 @@ export function AirportTransferTab({
     const airportShort =
       airport === 'jkia' ? 'JKIA' : airport === 'wilson' ? 'Wilson' : null;
     const directionWord = direction === 'arrival' ? 'Arrival' : 'Departure';
-    const window = TIME_WINDOWS.find((t) => t.value === timeWindow)?.label;
+    const windowLabel = TIME_WINDOWS.find(
+      (t) => t.value === timeWindow
+    )?.label;
 
     return [
       directionWord,
       airportShort,
       transferDate || null,
-      window || null,
+      windowLabel || null,
       passengers !== 'any' ? `${passengers} pax` : null,
     ];
   }, [direction, airport, transferDate, timeWindow, passengers]);
@@ -109,7 +129,7 @@ export function AirportTransferTab({
   /* ── Active hint for the mobile toggle ── */
   const activeHint = DIRECTIONS.find((d) => d.value === direction)?.hint;
 
-  /* ── Counterpart field labels (swap based on direction) ── */
+  /* ── Counterpart field labels ── */
   const counterpartLabel =
     direction === 'arrival' ? 'Drop-off Address' : 'Pickup Address';
 
@@ -121,14 +141,12 @@ export function AirportTransferTab({
   return (
     <>
       {/* ═══════════════════════════════════════════
-          Concierge header — live summary
+          Concierge header
           ═══════════════════════════════════════════ */}
       <ConciergeHeader segments={summarySegments} />
 
       {/* ═══════════════════════════════════════════
           DIRECTION TOGGLE
-          Mobile: compact pill switch (label only)
-          Desktop: two-up tiles with hints
           ═══════════════════════════════════════════ */}
       <div className="mb-5">
         <label className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-ink-subtle mb-3">
@@ -136,7 +154,7 @@ export function AirportTransferTab({
           Transfer Direction
         </label>
 
-        {/* ── Mobile: compact pill switch ── */}
+        {/* Mobile: compact pill switch */}
         <div className="sm:hidden inline-flex items-center p-1 bg-surface-sunken border border-border rounded-full">
           {DIRECTIONS.map((d) => {
             const isActive = direction === d.value;
@@ -163,7 +181,7 @@ export function AirportTransferTab({
           })}
         </div>
 
-        {/* ── Desktop: two-up tiles with hints ── */}
+        {/* Desktop: two-up tiles */}
         <div className="hidden sm:grid grid-cols-2 gap-2">
           {DIRECTIONS.map((d) => {
             const isActive = direction === d.value;
@@ -198,7 +216,6 @@ export function AirportTransferTab({
           })}
         </div>
 
-        {/* ── Active hint — mobile only, below the switch ── */}
         <p className="sm:hidden mt-2 text-[10px] uppercase tracking-widest text-ink-subtle text-center">
           {activeHint}
         </p>
@@ -211,18 +228,14 @@ export function AirportTransferTab({
           ═══════════════════════════════════════════ */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 mb-5">
         <FieldWrapper label="Airport" icon={<Plane size={14} />}>
-          <select
+          <Select
             name="airport"
             value={airport}
-            onChange={(e) => setAirport(e.target.value)}
-            className="booking-input"
-          >
-            {AIRPORTS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            onChange={setAirport}
+            options={AIRPORT_OPTIONS}
+            sheetTitle="Select airport"
+            ariaLabel="Select airport"
+          />
         </FieldWrapper>
 
         <FieldWrapper
@@ -265,20 +278,16 @@ export function AirportTransferTab({
         </FieldWrapper>
 
         <FieldWrapper label="Time Window" icon={<Clock size={14} />}>
-          <select
+          <Select
             name="timeWindow"
             value={timeWindow}
-            onChange={(e) => setTimeWindow(e.target.value)}
-            className="booking-input"
+            onChange={setTimeWindow}
+            options={TIME_WINDOW_OPTIONS}
+            placeholder="Choose a time window"
+            sheetTitle="Time window"
+            ariaLabel="Choose a pickup time window"
             required
-          >
-            <option value="">Choose a time window…</option>
-            {TIME_WINDOWS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label} · {opt.hint}
-              </option>
-            ))}
-          </select>
+          />
         </FieldWrapper>
       </div>
 
@@ -324,7 +333,7 @@ export function AirportTransferTab({
 
       {showPreferences && (
         <div id="airport-transfer-details" className="pb-2">
-          {/* Flight number — only meaningful for arrivals */}
+          {/* Flight number — arrivals only */}
           {direction === 'arrival' && (
             <div className="mb-6">
               <FieldWrapper
@@ -378,18 +387,15 @@ export function AirportTransferTab({
               label="Vehicle Preference"
               icon={<CarSeatsIcon size={16} className="text-ink-subtle" />}
             >
-              <select
+              <Select
                 name="vehicleType"
                 value={vehicleType}
-                onChange={(e) => setVehicleType(e.target.value)}
-                className="booking-input"
-              >
-                {TRANSFER_VEHICLES.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                onChange={setVehicleType}
+                options={VEHICLE_OPTIONS}
+                placeholder="Any vehicle"
+                sheetTitle="Vehicle preference"
+                ariaLabel="Choose a vehicle preference"
+              />
             </FieldWrapper>
           </div>
 

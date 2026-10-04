@@ -1,12 +1,20 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import { useSearchParams } from 'next/navigation';
-import { ArrowRight, Check, AlertCircle, Sparkles, Phone } from 'lucide-react';
+import {
+  ArrowRight,
+  Check,
+  AlertCircle,
+  Sparkles,
+  Phone,
+} from 'lucide-react';
 import { submitContact, type ContactState } from '../../app/actions/contact';
 import { SERVICE_OPTIONS } from '../../lib/contact';
 import { VEHICLES } from '../../lib/vehicles';
 import { BRAND } from '../../lib/constants';
+import { Select, type SelectOption } from '../ui/Select';
 
 const initialState: ContactState = {};
 
@@ -24,7 +32,7 @@ const initialState: ContactState = {};
 
    Contracts:
      • Server action: submitContact (app/actions/contact.ts)
-     • Uses booking-input styles from globals.css
+     • Service field is controlled (needed for the custom Select)
      • Success state replaces the entire form (no dialog)
    ───────────────────────────────────────────────────────────── */
 
@@ -36,14 +44,15 @@ export function ContactForm() {
   const vehicleParam = searchParams.get('vehicle') || '';
   const serviceParam = searchParams.get('service') || '';
 
-  /* ── Resolve vehicle name (falls back to the raw param) ── */
-  const preselectedVehicle = VEHICLES.find((v) => v.id === vehicleParam);
-  const preselectedVehicleName = preselectedVehicle?.name || '';
+  /* ── Resolve vehicle name ── */
+  const preselectedVehicleName = useMemo(
+    () => VEHICLES.find((v) => v.id === vehicleParam)?.name || '',
+    [vehicleParam]
+  );
 
   /* ── Normalize service param → must match SERVICE_OPTIONS ── */
-  const normalizedService = (() => {
+  const normalizedService = useMemo(() => {
     if (!serviceParam) return '';
-    /* Case-insensitive + flexible matching */
     const needle = serviceParam.toLowerCase();
     return (
       SERVICE_OPTIONS.find((opt) => opt.toLowerCase() === needle) ??
@@ -52,37 +61,47 @@ export function ContactForm() {
       ) ??
       ''
     );
-  })();
+  }, [serviceParam]);
+
+  /* ── Controlled service field ──
+     Priority: server-returned value → query param → empty */
+  const [service, setService] = useState<string>(
+    state.fields?.service || normalizedService || ''
+  );
+
+  /* ── Service options for the Select ── */
+  const serviceOptions: SelectOption[] = useMemo(
+    () =>
+      SERVICE_OPTIONS.map((opt) => ({
+        value: opt,
+        label: opt,
+      })),
+    []
+  );
 
   /* ── Success state ── */
   if (state.success) {
     return (
       <div className="bg-surface border border-border rounded-2xl overflow-hidden shadow-[0_12px_32px_rgba(14,14,16,0.08)]">
-        {/* Copper accent bar */}
         <div className="h-1 bg-gradient-to-r from-copper-500 via-copper-400 to-copper-500" />
 
         <div className="p-8 lg:p-14">
-          {/* Success icon */}
           <div className="w-16 h-16 rounded-full bg-copper-500/[0.10] border border-copper-500/30 flex items-center justify-center mb-8">
             <Check size={28} strokeWidth={2.5} className="text-copper-600" />
           </div>
 
-          {/* Label */}
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-copper-600 mb-3">
             Enquiry Received
           </p>
 
-          {/* Headline */}
           <h3 className="font-display text-3xl lg:text-4xl text-ink mb-6 leading-[1.1] tracking-[-0.015em]">
             Thank you.
           </h3>
 
-          {/* Body */}
           <p className="text-ink-muted leading-relaxed mb-8 max-w-lg text-base font-light">
             {state.message}
           </p>
 
-          {/* Divider + phone */}
           <div className="pt-6 border-t border-border">
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-subtle mb-4">
               Need us sooner?
@@ -148,7 +167,7 @@ export function ContactForm() {
         </div>
       )}
 
-      {/* ── Hidden fields: submit the resolved values ── */}
+      {/* ── Hidden field: submit resolved vehicle ── */}
       {preselectedVehicleName && (
         <input
           type="hidden"
@@ -206,25 +225,20 @@ export function ContactForm() {
             autoComplete="email"
           />
 
-          {/* Service */}
+          {/* Service — now a controlled Select */}
           <div>
             <FormLabel label="Service Required" required htmlFor="service" />
-            <select
+            <Select
               id="service"
               name="service"
+              value={service}
+              onChange={setService}
+              options={serviceOptions}
+              placeholder="Select a service"
+              sheetTitle="Service required"
+              ariaLabel="Select the service you require"
               required
-              defaultValue={state.fields?.service ?? normalizedService}
-              className="booking-input"
-            >
-              <option value="" disabled>
-                Select a service
-              </option>
-              {SERVICE_OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
+            />
             {state.errors?.service?.[0] && (
               <p className="mt-1.5 text-[11px] text-danger">
                 {state.errors.service[0]}

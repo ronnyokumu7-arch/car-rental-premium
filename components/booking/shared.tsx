@@ -10,6 +10,7 @@ import {
   Clock,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { Select, type SelectOption } from '../ui/Select';
 
 /* ─────────────────────────────────────────────────────────────
    SHARED PRIMITIVES — booking bar
@@ -94,7 +95,7 @@ export function PillButton({
 }
 
 /* ═══════════════════════════════════════════════════════
-   LOCATION FIELD — select with smart label + sub-hint
+   LOCATION FIELD — Select with smart label + sub-hint
    ═══════════════════════════════════════════════════════ */
 export function LocationField({
   label,
@@ -111,27 +112,45 @@ export function LocationField({
   onChange: (v: string) => void;
   options: { value: string; label: string; fee: number }[];
 }) {
+  /* Convert location options → SelectOption format.
+     Fee becomes a hint — the Select auto-detects KES/Free
+     patterns and renders them as copper pills. */
+  const selectOptions: SelectOption[] = options.map((opt) => {
+    let hint: string | undefined;
+
+    if (opt.fee === -1) {
+      hint = 'Quote';
+    } else if (opt.fee === 0) {
+      /* Only show "Free" for the office itself, not "same-as-pickup" */
+      hint = opt.value === 'same-as-pickup' ? undefined : 'Free';
+    } else if (!opt.label.includes('KES')) {
+      hint = `+ KES ${opt.fee.toLocaleString('en-KE')}`;
+    }
+
+    return {
+      value: opt.value,
+      label: opt.label,
+      hint,
+    };
+  });
+
   return (
     <div>
       <label className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-ink-subtle mb-2">
         <MapPin size={14} className="text-ink-subtle" />
         {label}
       </label>
-      <select
+
+      <Select
         name={name}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="booking-input"
-      >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-            {opt.fee > 0 && !opt.label.includes('KES')
-              ? ` (+ KES ${opt.fee.toLocaleString('en-KE')})`
-              : ''}
-          </option>
-        ))}
-      </select>
+        onChange={onChange}
+        options={selectOptions}
+        sheetTitle={label}
+        ariaLabel={label}
+        required
+      />
+
       <p className="mt-1.5 text-[10px] uppercase tracking-widest text-ink-subtle">
         {subLabel}
       </p>
@@ -141,12 +160,10 @@ export function LocationField({
 
 /* ═══════════════════════════════════════════════════════
    CONCIERGE HEADER — live summary line
-   Reads like a receptionist reading back your booking.
    ═══════════════════════════════════════════════════════ */
 export function ConciergeHeader({
   segments,
 }: {
-  /** Short phrases, e.g. ["3 days", "Nairobi → JKIA", "2 pax"] */
   segments: (string | null | undefined)[];
 }) {
   const clean = segments.filter(Boolean) as string[];
@@ -183,14 +200,13 @@ export function ConciergeHeader({
 }
 
 /* ═══════════════════════════════════════════════════════
-   SUBMIT BUTTON — glows copper when form is valid
+   SUBMIT BUTTON
    ═══════════════════════════════════════════════════════ */
 export function SubmitButton({
   label = 'Check Availability',
   ready = true,
 }: {
   label?: string;
-  /** When true, button glows copper. When false, dims. */
   ready?: boolean;
 }) {
   const { pending } = useFormStatus();
@@ -262,7 +278,7 @@ export function SubmitButton({
 }
 
 /* ═══════════════════════════════════════════════════════
-   SUMMARY BAR — bottom of card
+   SUMMARY BAR
    ═══════════════════════════════════════════════════════ */
 export function SummaryBar({
   label,
@@ -299,7 +315,7 @@ export function SummaryBar({
 }
 
 /* ═══════════════════════════════════════════════════════
-   FEEDBACK BANNER — success / error message above form
+   FEEDBACK BANNER
    ═══════════════════════════════════════════════════════ */
 export function FeedbackBanner({
   success,
@@ -329,8 +345,7 @@ export function FeedbackBanner({
 }
 
 /* ═══════════════════════════════════════════════════════
-   TRUST STRIP — 3 items
-   Mobile: horizontal scroll snap. Desktop: 3-column grid.
+   TRUST STRIP
    ═══════════════════════════════════════════════════════ */
 const TRUST_ITEMS = [
   {
@@ -376,7 +391,7 @@ export function TrustStrip() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   CAR SEATS ICON — custom SVG (side-profile, two seats)
+   CAR SEATS ICON
    ═══════════════════════════════════════════════════════ */
 export function CarSeatsIcon({
   size = 16,
