@@ -207,15 +207,16 @@ export function VehicleModal({ vehicle, onClose }: VehicleModalProps) {
                       }}
                     />
 
-                    {vehicle.image ? (
-                      <>
-                        <img
-                          src={vehicle.image}
-                          alt={`${vehicle.name} — ${vehicle.category} available for hire in Nairobi`}
-                          className="absolute inset-0 w-full h-full object-cover"
-                          loading="eager"
-                          decoding="async"
-                        />
+{vehicle.image ? (
+  <>
+    {/* eslint-disable-next-line @next/next/no-img-element -- intentionally plain img; source is already cached from VehicleCard, next/image adds overhead with no benefit inside a modal */}
+    <img
+      src={vehicle.image}
+      alt={`${vehicle.name} — ${vehicle.category} available for hire in Nairobi`}
+      className="absolute inset-0 w-full h-full object-cover"
+      loading="eager"
+      decoding="async"
+    />
                         <div
                           aria-hidden="true"
                           className="absolute inset-0 pointer-events-none"

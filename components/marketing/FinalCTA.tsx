@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Phone, MessageCircle, Key, UserCheck } from 'lucide-react';
+import { ArrowRight, MessageCircle, Key, UserCheck } from 'lucide-react';
 import { motion } from 'motion/react';
 import { BRAND } from '../../lib/constants';
 import { CONTACT } from '../../lib/contact';

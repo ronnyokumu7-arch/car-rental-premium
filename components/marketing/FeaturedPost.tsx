@@ -6,6 +6,20 @@ import { motion } from 'motion/react';
 import { type Post, formatDate } from '../../lib/posts';
 import { getCategoryIcon } from '../../lib/postIcons';
 
+/* ─────────────────────────────────────────────────────────────
+   FEATURED POST
+   The lead story on the homepage's "From the road" section.
+   Two-column editorial: dark visual panel on the left,
+   ivory content panel on the right.
+
+   Different from PostCard:
+     • Bigger, more editorial, no truncation of excerpt
+     • Presented as THE lead story (label + reading time)
+     • Split layout, not stacked
+
+   Used only by LatestUpdates.tsx
+   ───────────────────────────────────────────────────────────── */
+
 interface FeaturedPostProps {
   post: Post;
 }
@@ -14,87 +28,128 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
   const Icon = getCategoryIcon(post.category);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
+    <motion.article
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
     >
       <Link
         href={`/updates/${post.slug}`}
-        className="group block overflow-hidden rounded-sm border border-charcoal-300/30 hover:border-accent-500/40 transition-all duration-500"
+        className="group block overflow-hidden rounded-2xl border border-border bg-surface transition-all duration-500 ease-lux hover:border-copper-500/40 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(14,14,16,0.08),0_32px_64px_rgba(14,14,16,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 focus-visible:ring-offset-2"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2">
-          {/* Visual */}
-          <div className="relative aspect-[4/3] lg:aspect-auto lg:min-h-[440px] overflow-hidden flex items-center justify-center">
+
+          {/* ═══════════════════════════════════════════
+              VISUAL PANEL
+              ═══════════════════════════════════════════ */}
+          <div className="relative aspect-[16/10] lg:aspect-auto lg:min-h-[440px] overflow-hidden flex items-center justify-center bg-obsidian-950">
+
+            {/* Post's own gradient */}
             <div
-              className="absolute inset-0 transition-transform duration-700 group-hover:scale-105"
+              aria-hidden="true"
+              className="absolute inset-0 transition-transform duration-700 ease-lux group-hover:scale-[1.04]"
               style={{
                 background: `linear-gradient(135deg, ${post.accentFrom} 0%, ${post.accentTo} 100%)`,
               }}
             />
+
+            {/* Copper ambient glow */}
             <div
+              aria-hidden="true"
               className="absolute inset-0 opacity-60 pointer-events-none"
               style={{
                 background:
-                  'radial-gradient(ellipse at 50% 50%, rgba(201, 162, 39, 0.35) 0%, transparent 65%)',
+                  'radial-gradient(ellipse at 50% 45%, rgba(194,112,46,0.35) 0%, transparent 65%)',
               }}
             />
-            <div className="grain-overlay absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none" />
 
-            {/* Centered icon + category */}
-            <div className="relative flex flex-col items-center gap-4">
+            {/* Grain */}
+            <div className="grain-overlay absolute inset-0 opacity-[0.12] mix-blend-overlay pointer-events-none" />
+
+            {/* Bottom gradient for the icon + label legibility */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background:
+                  'linear-gradient(to top, rgba(7,7,8,0.55) 0%, transparent 40%)',
+              }}
+            />
+
+            {/* Centered category icon + label */}
+            <div className="relative flex flex-col items-center gap-5">
               <Icon
                 size={56}
                 strokeWidth={1}
-                className="text-accent-500 transition-transform duration-700 group-hover:scale-110"
+                className="text-copper-300 transition-transform duration-700 ease-lux group-hover:scale-110"
               />
-              <span className="text-[11px] uppercase tracking-[0.25em] text-porcelain/80 font-medium">
+              <span className="text-[11px] uppercase tracking-[0.28em] text-white/85 font-semibold">
                 {post.category}
               </span>
             </div>
 
             {/* Featured badge — top left */}
-            <div className="absolute top-6 left-6">
-              <span className="px-3 py-1 bg-accent-500 text-primary-900 rounded-sm text-[10px] font-bold uppercase tracking-widest">
-                Featured
+            <div className="absolute top-5 left-5">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-copper-500 text-obsidian-950 rounded-md text-[10px] font-bold uppercase tracking-[0.16em] shadow-[0_4px_12px_rgba(194,112,46,0.35)]">
+                Lead Story
+              </span>
+            </div>
+
+            {/* Reading time — bottom left */}
+            <div className="absolute bottom-5 left-5">
+              <span className="text-[10px] uppercase tracking-[0.18em] text-white/55 font-medium">
+                {post.readTime}
               </span>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="flex flex-col justify-center p-8 lg:p-14 bg-porcelain">
-            <div className="flex items-center gap-3 mb-5 text-[11px] uppercase tracking-widest text-charcoal-500">
+          {/* ═══════════════════════════════════════════
+              CONTENT PANEL
+              ═══════════════════════════════════════════ */}
+          <div className="flex flex-col justify-center p-8 lg:p-12">
+
+            {/* Date + category meta */}
+            <div className="flex items-center gap-3 mb-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-subtle">
               <span>{formatDate(post.publishedAt)}</span>
-              <span className="text-charcoal-300">·</span>
-              <span>{post.readTime}</span>
+              <span
+                aria-hidden="true"
+                className="w-px h-3 bg-border-strong"
+              />
+              <span>{post.category}</span>
             </div>
 
-            <h2 className="font-display text-3xl lg:text-4xl text-primary-900 leading-tight mb-6 group-hover:text-accent-600 transition-colors">
+            {/* Title */}
+            <h3 className="font-display text-2xl lg:text-3xl xl:text-4xl text-ink leading-[1.15] tracking-[-0.015em] mb-6 transition-colors duration-300 group-hover:text-copper-700">
               {post.title}
-            </h2>
+            </h3>
 
-            <p className="text-charcoal-700 leading-relaxed mb-8 line-clamp-3">
+            {/* Excerpt */}
+            <p className="text-base text-ink-muted leading-relaxed font-light mb-8 line-clamp-3">
               {post.excerpt}
             </p>
 
-            <div className="flex items-center justify-between pt-6 border-t border-charcoal-300/30 gap-3">
-              <span className="text-xs uppercase tracking-widest text-charcoal-500 truncate">
-                {post.author.name}
+            {/* Author + CTA */}
+            <div className="flex items-center justify-between pt-6 mt-auto border-t border-border gap-4">
+              <div className="min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink truncate">
+                  {post.author.name}
+                </p>
                 {post.author.role && (
-                  <span className="text-charcoal-400 block text-[10px] mt-0.5 normal-case tracking-normal">
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-ink-subtle mt-1 truncate">
                     {post.author.role}
-                  </span>
+                  </p>
                 )}
-              </span>
-              <span className="shrink-0 inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-600 font-medium group-hover:gap-3 transition-all">
-                Read the Story
-                <ArrowRight size={14} />
+              </div>
+
+              <span className="shrink-0 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-copper-600 transition-all duration-300 ease-lux group-hover:gap-3">
+                Read
+                <ArrowRight size={13} strokeWidth={2.5} />
               </span>
             </div>
           </div>
         </div>
       </Link>
-    </motion.div>
+    </motion.article>
   );
 }

@@ -3,81 +3,100 @@
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
-import { POSTS } from '../../lib/posts';
-import { CompactPostCard } from './CompactPostCard';
+import { getPostsSorted } from '../../lib/posts';
+import { FeaturedPost } from './FeaturedPost';
+import { UpdateIndex } from './UpdateIndex';
+
+/* ─────────────────────────────────────────────────────────────
+   LATEST UPDATES — "From the road"
+   Homepage section that presents the newest posts as an
+   editorial page, not a card grid.
+
+   Layout:
+     Featured post (lead story) + index of the next 3 posts
+
+   Desktop: 7/5 split — featured left, index right
+   Mobile:  featured on top, index stacked below
+   ───────────────────────────────────────────────────────────── */
 
 export function LatestUpdates() {
-  // 3 most recent posts by publishedAt
-  const sorted = [...POSTS].sort(
-    (a, b) =>
-      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-  );
-  const latest = sorted.slice(0, 3);
+  const sorted = getPostsSorted();
+  const featured = sorted[0];
+  const index = sorted.slice(1, 4);
+
+  /* Nothing to render if no posts */
+  if (!featured) return null;
 
   return (
-    <section className="bg-porcelain pt-20 lg:pt-28 pb-8 lg:pb-12 px-6 lg:px-8">
+    <section className="relative bg-background pt-20 lg:pt-28 pb-16 lg:pb-24 px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+
+        {/* ═══════════════════════════════════════════
+            Section header
+            ═══════════════════════════════════════════ */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12"
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12 lg:mb-16"
         >
-          <div className="max-w-2xl">
-            <p className="type-caption text-accent-600 mb-3">
-              Latest Updates
+          <div className="max-w-3xl">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-copper-600 mb-4">
+              From the Road
             </p>
-            <h2 className="font-display text-4xl lg:text-5xl text-primary-900 leading-tight mb-4">
-              News &amp; Insights from the{' '}
-              <span className=" font-light">Road</span>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl text-ink leading-[1.1] tracking-[-0.015em] mb-5">
+              Stories, guides &amp; fleet news.
             </h2>
-            <p className="type-lead">
-              Fleet additions, travel guides, seasonal offers — and the
-              occasional story from behind the wheel.
+            <p className="text-base lg:text-lg text-ink-muted leading-relaxed font-light max-w-2xl">
+              What we&apos;re adding, where we&apos;re driving, and what
+              we&apos;re learning along the way.
             </p>
           </div>
 
           <Link
             href="/updates"
-            className="hidden md:inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-primary-900 hover:text-accent-600 transition-colors group whitespace-nowrap"
+            className="hidden md:inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink hover:text-copper-600 transition-colors duration-300 group whitespace-nowrap"
           >
-            View All Updates
+            All updates
             <ArrowRight
-              size={16}
-              className="transition-transform group-hover:translate-x-1"
+              size={14}
+              strokeWidth={2.5}
+              className="transition-transform duration-300 ease-lux group-hover:translate-x-1"
             />
           </Link>
         </motion.div>
 
-        {/* Carousel — horizontal scroll on mobile, grid on desktop */}
-        <div
-          className="
-            flex lg:grid lg:grid-cols-3 gap-5 lg:gap-6
-            overflow-x-auto lg:overflow-visible
-            snap-x snap-mandatory lg:snap-none
-            -mx-6 lg:mx-0
-            px-6 lg:px-0
-            pb-4 lg:pb-0
-            scrollbar-hide
-          "
-        >
-          {latest.map((post, i) => (
-            <CompactPostCard key={post.id} post={post} index={i} />
-          ))}
+        {/* ═══════════════════════════════════════════
+            Featured + Index
+            Desktop: 7/5 grid
+            Mobile:  stacked
+            ═══════════════════════════════════════════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+          {/* ── Featured post ── */}
+          <div className="lg:col-span-7">
+            <FeaturedPost post={featured} />
+          </div>
+
+          {/* ── Index of next 3 posts ── */}
+          <div className="lg:col-span-5">
+            <UpdateIndex posts={index} />
+          </div>
         </div>
 
-        {/* Mobile CTA — text + arrow, left-aligned */}
+        {/* ═══════════════════════════════════════════
+            Mobile CTA
+            ═══════════════════════════════════════════ */}
         <div className="md:hidden mt-10">
           <Link
             href="/updates"
-            className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-600 hover:text-primary-900 transition-colors group"
+            className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-copper-600 hover:text-copper-700 transition-colors duration-300 group"
           >
-            View All Updates
+            All updates
             <ArrowRight
               size={14}
-              className="transition-transform group-hover:translate-x-1"
+              strokeWidth={2.5}
+              className="transition-transform duration-300 ease-lux group-hover:translate-x-1"
             />
           </Link>
         </div>
