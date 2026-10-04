@@ -50,7 +50,7 @@ const SEAT_OPTIONS = [
 ];
 
 const MODES = ['All', 'Self-Drive', 'Chauffeured'] as const;
-const TRANSMISSIONS = ['All', 'Automatic', 'Manual'] as const;
+const TRANSMISSIONS = ['All', 'Auto', 'Manual'] as const;
 
 /* Live price range from the fleet — never hardcode. */
 const PRICE_RANGE = getPriceRange();
