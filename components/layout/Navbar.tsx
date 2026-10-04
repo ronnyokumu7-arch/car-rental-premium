@@ -1,31 +1,93 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, Phone, ArrowUpRight } from 'lucide-react';
 import { BRAND, NAV_LINKS } from '@/lib/constants';
 
+/* ─────────────────────────────────────────────────────────────
+   NAVBAR
+   Fixed header with three visibility states:
+
+     • top        — transparent on homepage hero, solid elsewhere
+     • scrolled   — solid obsidian glass, always visible on desktop
+     • hidden     — mobile only, slides up out of view on scroll-down
+
+   Mobile behavior:
+     • Past the hero (scrollY > heroThreshold)
+     • Scrolling down → hide
+     • Scrolling up   → show
+     • Near the top   → always show
+     • Mobile drawer open → always show
+
+   Desktop behavior:
+     • Always visible (no hide-on-scroll)
+     • Transparent → solid transition at scrollY > 24
+
+   Contracts:
+     • body scroll locked while mobile drawer open
+     • Escape closes drawer
+     • Closes drawer on route change
+   ───────────────────────────────────────────────────────────── */
+
+/* Past this scroll depth we start hiding on scroll-down (mobile only) */
+const HERO_THRESHOLD = 200;
+/* Minimum scroll delta to trigger direction change — prevents jitter */
+const SCROLL_DELTA = 8;
+
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
   const pathname = usePathname();
   const isHomePage = pathname === '/';
 
-  /* ── Scroll detection ── */
+  /* Track last scroll position for direction detection */
+  const lastScrollY = useRef(0);
+
+  /* ── Scroll listener ── */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      const y = window.scrollY;
+
+      /* Solid navbar appearance once past the hero edge */
+      setScrolled(y > 24);
+
+      /* Hide/show logic — mobile only, past the hero */
+      const isMobile = window.matchMedia('(max-width: 1023px)').matches;
+      if (!isMobile) {
+        /* Desktop: always visible */
+        if (hidden) setHidden(false);
+        lastScrollY.current = y;
+        return;
+      }
+
+      const delta = y - lastScrollY.current;
+
+      /* Near the top — always show */
+      if (y < HERO_THRESHOLD) {
+        if (hidden) setHidden(false);
+      } else if (Math.abs(delta) > SCROLL_DELTA) {
+        /* Scrolling down → hide. Scrolling up → show. */
+        setHidden(delta > 0);
+      }
+
+      lastScrollY.current = y;
+    };
+
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [hidden]);
 
-  /* ── Close mobile menu on route change ── */
+  /* ── Close drawer on route change ── */
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
 
-  /* ── Lock body scroll while mobile menu is open ── */
+  /* ── Lock body scroll while drawer is open ── */
   useEffect(() => {
     if (!mobileOpen) return;
     const original = document.body.style.overflow;
@@ -35,7 +97,7 @@ export function Navbar() {
     };
   }, [mobileOpen]);
 
-  /* ── Close on Escape key ── */
+  /* ── Close on Escape ── */
   useEffect(() => {
     if (!mobileOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -45,16 +107,25 @@ export function Navbar() {
     return () => window.removeEventListener('keydown', onKey);
   }, [mobileOpen]);
 
+  /* Solid look when drawer is open, or when scrolled, or when off-homepage */
   const solid = scrolled || mobileOpen || !isHomePage;
+
+  /* Hide on mobile only — never while drawer is open */
+  const shouldHide = hidden && !mobileOpen;
 
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ease-lux ${
-          solid
-            ? 'bg-obsidian-950/85 backdrop-blur-xl border-b border-white/[0.06]'
-            : 'bg-transparent border-b border-transparent'
-        }`}
+        className={`
+          fixed top-0 left-0 right-0 z-[100]
+          transition-all duration-500 ease-lux
+          ${
+            solid
+              ? 'bg-obsidian-950/85 backdrop-blur-xl border-b border-white/[0.06]'
+              : 'bg-transparent border-b border-transparent'
+          }
+          ${shouldHide ? '-translate-y-full' : 'translate-y-0'}
+        `}
       >
         <nav className="relative z-50 max-w-7xl mx-auto px-6 lg:px-8">
           <div
@@ -87,11 +158,12 @@ export function Navbar() {
                     <Link
                       href={link.href}
                       className={`group relative inline-flex flex-col items-center text-[11px] font-medium uppercase tracking-[0.18em] transition-colors duration-300 ${
-                        isActive ? 'text-white' : 'text-white/70 hover:text-white'
+                        isActive
+                          ? 'text-white'
+                          : 'text-white/70 hover:text-white'
                       }`}
                     >
                       {link.label}
-                      {/* Underline — animates in on hover/active */}
                       <span
                         className={`absolute -bottom-1.5 left-0 right-0 h-px origin-left transition-transform duration-300 ease-lux ${
                           isActive
@@ -112,8 +184,11 @@ export function Navbar() {
                 href={`tel:${BRAND.phones[0].replace(/\s/g, '')}`}
                 className="group flex items-center gap-2 text-white/70 hover:text-copper-300 transition-colors duration-300 text-[11px] tracking-[0.14em] font-medium"
               >
-                <Phone size={13} className="transition-transform duration-300 group-hover:-rotate-12" />
-                <span>{BRAND.phones[0]}</span>
+                <Phone
+                  size={13}
+                  className="transition-transform duration-300 group-hover:-rotate-12"
+                />
+                <span className="tabular-nums">{BRAND.phones[0]}</span>
               </a>
 
               <Link
@@ -131,7 +206,6 @@ export function Navbar() {
                   size={13}
                   className="relative z-10 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 />
-                {/* Sheen sweep on hover */}
                 <span
                   aria-hidden="true"
                   className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-lux"
@@ -179,7 +253,6 @@ export function Navbar() {
         }`}
       >
         <div className="flex flex-col h-full pt-24 pb-8 px-8 overflow-y-auto">
-          {/* Nav links — big, tactile */}
           <ul className="space-y-1">
             {NAV_LINKS.map((link, i) => {
               const isActive =
@@ -189,7 +262,9 @@ export function Navbar() {
                 <li
                   key={link.href}
                   style={{
-                    transitionDelay: mobileOpen ? `${120 + i * 60}ms` : '0ms',
+                    transitionDelay: mobileOpen
+                      ? `${120 + i * 60}ms`
+                      : '0ms',
                   }}
                   className={`transform transition-all duration-500 ease-lux ${
                     mobileOpen
@@ -200,7 +275,9 @@ export function Navbar() {
                   <Link
                     href={link.href}
                     className={`group flex items-center justify-between py-4 border-b border-white/[0.06] transition-colors duration-300 ${
-                      isActive ? 'text-copper-300' : 'text-white/85 hover:text-white'
+                      isActive
+                        ? 'text-copper-300'
+                        : 'text-white/85 hover:text-white'
                     }`}
                   >
                     <span className="font-display text-3xl font-normal tracking-tight">
@@ -216,7 +293,6 @@ export function Navbar() {
             })}
           </ul>
 
-          {/* Contact block + CTA pinned to bottom */}
           <div className="mt-auto pt-8 space-y-5">
             <div className="space-y-3">
               <p className="text-[10px] uppercase tracking-[0.28em] text-white/40">
@@ -229,7 +305,9 @@ export function Navbar() {
                   className="flex items-center gap-3 text-white/85 hover:text-copper-300 transition-colors duration-300 text-sm"
                 >
                   <Phone size={14} className="text-copper-400" />
-                  <span className="tracking-wider">{phone}</span>
+                  <span className="tracking-wider tabular-nums">
+                    {phone}
+                  </span>
                 </a>
               ))}
             </div>
@@ -240,8 +318,7 @@ export function Navbar() {
               style={{
                 backgroundImage:
                   'linear-gradient(135deg, #E3A468 0%, #D98A44 45%, #C2702E 100%)',
-                boxShadow:
-                  '0 8px 24px rgba(194,112,46,0.28)',
+                boxShadow: '0 8px 24px rgba(194,112,46,0.28)',
               }}
             >
               <span className="relative z-10">Book Your Vehicle</span>
