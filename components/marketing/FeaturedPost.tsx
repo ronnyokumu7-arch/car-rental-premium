@@ -4,17 +4,14 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { type Post, formatDate } from '../../lib/posts';
-import { getCategoryIcon } from '../../lib/postIcons';
 
 /* ─────────────────────────────────────────────────────────────
    FEATURED POST
    The lead story on the homepage's "From the road" section.
 
    Two layouts:
-     • Mobile  — title rendered over the image (editorial cover)
-                 category pill on image, date moves to panel
+     • Mobile  — compact banner: category badge + title over image
      • Desktop — two-column split (image left, content right)
-                 title in the ivory panel as before
 
    Used only by LatestUpdates.tsx
    ───────────────────────────────────────────────────────────── */
@@ -24,8 +21,6 @@ interface FeaturedPostProps {
 }
 
 export function FeaturedPost({ post }: FeaturedPostProps) {
-  const Icon = getCategoryIcon(post.category);
-
   return (
     <motion.article
       initial={{ opacity: 0, y: 24 }}
@@ -41,10 +36,10 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
 
           {/* ═══════════════════════════════════════════
               VISUAL PANEL
-              Mobile: title overlays the bottom of the image
-              Desktop: icon + category label centered
+              Mobile:  short banner with badge + title
+              Desktop: full image column with icon + label
               ═══════════════════════════════════════════ */}
-          <div className="relative aspect-[4/5] sm:aspect-[16/10] lg:aspect-auto lg:min-h-[440px] overflow-hidden flex items-center justify-center bg-obsidian-950">
+          <div className="relative aspect-[5/3] sm:aspect-[16/10] lg:aspect-auto lg:min-h-[440px] overflow-hidden flex items-center justify-center bg-obsidian-950">
 
             {/* Post gradient */}
             <div
@@ -71,28 +66,24 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
             {/* Bottom gradient — heavier on mobile for title legibility */}
             <div
               aria-hidden="true"
-              className="absolute inset-0 pointer-events-none max-sm:opacity-100 sm:opacity-0"
+              className="absolute inset-0 pointer-events-none sm:hidden"
               style={{
                 background:
-                  'linear-gradient(to top, rgba(7,7,8,0.85) 0%, rgba(7,7,8,0.55) 30%, transparent 60%)',
+                  'linear-gradient(to top, rgba(7,7,8,0.85) 0%, rgba(7,7,8,0.50) 45%, transparent 75%)',
               }}
             />
 
-            {/* Desktop-only: centered icon + category */}
+            {/* Desktop-only: centered icon + category label */}
             <div className="relative hidden sm:flex flex-col items-center gap-5">
-              <Icon
-                size={56}
-                strokeWidth={1}
-                className="text-copper-300 transition-transform duration-700 ease-lux group-hover:scale-110"
-              />
+              <CategoryIcon category={post.category} size={56} />
               <span className="text-[11px] uppercase tracking-[0.28em] text-white/85 font-semibold">
                 {post.category}
               </span>
             </div>
 
-            {/* Featured badge — top left */}
-            <div className="absolute top-5 left-5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-copper-500 text-obsidian-950 rounded-md text-[10px] font-bold uppercase tracking-[0.16em] shadow-[0_4px_12px_rgba(194,112,46,0.35)]">
+            {/* Category badge — top-left */}
+            <div className="absolute top-4 left-4 sm:top-5 sm:left-5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 bg-copper-500 text-obsidian-950 rounded-md text-[10px] font-bold uppercase tracking-[0.16em] shadow-[0_4px_12px_rgba(194,112,46,0.35)]">
                 Lead Story
               </span>
             </div>
@@ -107,9 +98,9 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
             {/* ═══════════════════════════════════════════
                 MOBILE-ONLY: title over the image
                 ═══════════════════════════════════════════ */}
-            <div className="absolute inset-x-0 bottom-0 p-6 sm:hidden">
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:hidden">
               {/* Category + reading time */}
-              <div className="flex items-center gap-2.5 mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-copper-300">
+              <div className="flex items-center gap-2.5 mb-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-copper-300">
                 <span>{post.category}</span>
                 <span
                   aria-hidden="true"
@@ -119,7 +110,7 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
               </div>
 
               {/* Title */}
-              <h3 className="font-display text-2xl text-white leading-[1.15] tracking-[-0.015em] line-clamp-3">
+              <h3 className="font-display text-xl text-white leading-[1.2] tracking-[-0.01em] line-clamp-2">
                 {post.title}
               </h3>
             </div>
@@ -179,5 +170,38 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
         </div>
       </Link>
     </motion.article>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CATEGORY ICON
+   Small inline SVG wrapper — returns the right lucide icon
+   based on the post's category. Used only on desktop in this
+   file; kept local to avoid a shared import.
+   ───────────────────────────────────────────────────────────── */
+
+import { Car, Compass, Newspaper, Tag, type LucideIcon } from 'lucide-react';
+
+const CATEGORY_ICON_MAP: Record<string, LucideIcon> = {
+  News: Newspaper,
+  Guides: Compass,
+  Offers: Tag,
+  Fleet: Car,
+};
+
+function CategoryIcon({
+  category,
+  size = 56,
+}: {
+  category: string;
+  size?: number;
+}) {
+  const Icon = CATEGORY_ICON_MAP[category] ?? Newspaper;
+  return (
+    <Icon
+      size={size}
+      strokeWidth={1}
+      className="text-copper-300 transition-transform duration-700 ease-lux group-hover:scale-110"
+    />
   );
 }
