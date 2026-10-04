@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, Phone, ArrowUpRight } from 'lucide-react';
@@ -8,32 +8,31 @@ import { BRAND, NAV_LINKS } from '@/lib/constants';
 
 /* ─────────────────────────────────────────────────────────────
    NAVBAR
-   Fixed header with three visibility states:
+   Fixed header, three states:
 
-     • top        — transparent on homepage hero, solid elsewhere
-     • scrolled   — solid obsidian glass, always visible on desktop
-     • hidden     — mobile only, slides up out of view on scroll-down
+     • transparent — at the top of any page (over the hero)
+     • solid       — once scrolled > 24px, or while drawer is open
+     • hidden      — mobile only, slides up on scroll-down past hero
 
    Mobile behavior:
-     • Past the hero (scrollY > heroThreshold)
-     • Scrolling down → hide
-     • Scrolling up   → show
-     • Near the top   → always show
-     • Mobile drawer open → always show
+     • Past 200px scroll + scrolling down → hide
+     • Scrolling up                      → show
+     • Near top of page                  → always show
+     • Drawer open                       → always show
 
    Desktop behavior:
-     • Always visible (no hide-on-scroll)
-     • Transparent → solid transition at scrollY > 24
+     • Always visible
+     • Transparent → solid at 24px scroll
 
    Contracts:
-     • body scroll locked while mobile drawer open
-     • Escape closes drawer
-     • Closes drawer on route change
+     • Body scroll locked while drawer is open
+     • Escape closes the drawer
+     • Drawer closes on route change
    ───────────────────────────────────────────────────────────── */
 
-/* Past this scroll depth we start hiding on scroll-down (mobile only) */
+/** Past this scroll depth the navbar may hide on scroll-down (mobile only) */
 const HERO_THRESHOLD = 200;
-/* Minimum scroll delta to trigger direction change — prevents jitter */
+/** Minimum scroll delta to trigger a hide/show (prevents jitter) */
 const SCROLL_DELTA = 8;
 
 export function Navbar() {
@@ -42,9 +41,6 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const pathname = usePathname();
-  const isHomePage = pathname === '/';
-
-  /* Track last scroll position for direction detection */
   const lastScrollY = useRef(0);
 
   /* ── Scroll listener ── */
@@ -52,11 +48,12 @@ export function Navbar() {
     const onScroll = () => {
       const y = window.scrollY;
 
-      /* Solid navbar appearance once past the hero edge */
+      /* Solid appearance once past the hero edge */
       setScrolled(y > 24);
 
       /* Hide/show logic — mobile only, past the hero */
       const isMobile = window.matchMedia('(max-width: 1023px)').matches;
+
       if (!isMobile) {
         /* Desktop: always visible */
         if (hidden) setHidden(false);
@@ -64,13 +61,16 @@ export function Navbar() {
         return;
       }
 
-      const delta = y - lastScrollY.current;
-
       /* Near the top — always show */
       if (y < HERO_THRESHOLD) {
         if (hidden) setHidden(false);
-      } else if (Math.abs(delta) > SCROLL_DELTA) {
-        /* Scrolling down → hide. Scrolling up → show. */
+        lastScrollY.current = y;
+        return;
+      }
+
+      /* Past the hero — react to scroll direction */
+      const delta = y - lastScrollY.current;
+      if (Math.abs(delta) > SCROLL_DELTA) {
         setHidden(delta > 0);
       }
 
@@ -97,7 +97,7 @@ export function Navbar() {
     };
   }, [mobileOpen]);
 
-  /* ── Close on Escape ── */
+  /* ── Close drawer on Escape ── */
   useEffect(() => {
     if (!mobileOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -107,10 +107,10 @@ export function Navbar() {
     return () => window.removeEventListener('keydown', onKey);
   }, [mobileOpen]);
 
-  /* Solid look when drawer is open, or when scrolled, or when off-homepage */
-  const solid = scrolled || mobileOpen || !isHomePage;
+  /* Solid appearance once scrolled or while the drawer is open */
+  const solid = scrolled || mobileOpen;
 
-  /* Hide on mobile only — never while drawer is open */
+  /* Hide only on mobile, and never while the drawer is open */
   const shouldHide = hidden && !mobileOpen;
 
   return (
