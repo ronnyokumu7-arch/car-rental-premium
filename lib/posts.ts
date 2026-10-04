@@ -1,3 +1,14 @@
+/* ─────────────────────────────────────────────────────────────
+   POSTS — /updates content.
+
+   Two things to keep clean:
+   1. `content` is markdown. Detail pages render it via a
+      markdown renderer. Keep it portable — no MDX-only syntax.
+   2. `publishedAt` and `updatedAt` are ISO strings. Never
+      generate them at render time — hardcode so the sitemap
+      and schema.org dates stay stable across builds.
+   ───────────────────────────────────────────────────────────── */
+
 export interface Post {
   id: string;
   slug: string;
@@ -5,30 +16,49 @@ export interface Post {
   /** Short punchy line for the hero — appears under the title on detail pages */
   heroHook?: string;
   excerpt: string;
-  content?: string;              // full body (markdown or plain text) — for detail pages
-  category: 'News' | 'Guides' | 'Offers' | 'Fleet';
-  publishedAt: string;           // ISO — when originally written
-  updatedAt?: string;            // ISO — optional, only if post was revised
+  /** Full body (markdown). Optional — posts without content are teasers. */
+  content?: string;
+  category: PostCategory;
+  /** ISO date — when originally written */
+  publishedAt: string;
+  /** ISO date — only if post was revised after publishing */
+  updatedAt?: string;
+  /** Human-readable read time, e.g. "4 min read" */
   readTime: string;
   author: {
     name: string;
-    role?: string;               // "Founder" / "Royride Team" etc.
+    role?: string;
   };
+  /** Shown on /updates hero + homepage */
   featured?: boolean;
+  /** Fallback gradient for the card's SVG panel */
   accentFrom: string;
   accentTo: string;
 }
 
-/**
- * Accent color palette — keep gradients in the DARK spectrum.
- * Bright colors break the premium dark-card aesthetic.
- *
- * Reference:
- *   Navy:     #081529 → #1a365d
- *   Charcoal: #1a1a1a → #3d3d3d
- *   Amber:    #2a1f08 → #5c4410
- *   Burgundy: #2a0a0a → #5c1a1a   ← Used for Offers
- */
+export const POST_CATEGORIES = [
+  'News',
+  'Guides',
+  'Offers',
+  'Fleet',
+] as const;
+export type PostCategory = (typeof POST_CATEGORIES)[number];
+
+/** Filter chips on /updates — "All" is a UI concern, added in component */
+export const CATEGORIES = ['All', ...POST_CATEGORIES] as const;
+export type Category = (typeof CATEGORIES)[number];
+
+/* ─────────────────────────────────────────────────────────────
+   ACCENT PALETTE
+   Keep gradients in the DARK spectrum — obsidian & copper family.
+   Bright colors break the premium dark-card aesthetic.
+
+   Reference (matching tailwind.config.ts tokens):
+     Obsidian:  #0E0E10 → #3F3F46
+     Iron:      #18181B → #52525B
+     Copper-lo: #472410 → #87461B   ← Used for Offers
+     Midnight:  #070708 → #27272A
+   ───────────────────────────────────────────────────────────── */
 
 export const POSTS: Post[] = [
   {
@@ -70,14 +100,14 @@ The Prado works for:
 The new Prados are available now at **KES 14,000 per day** — the same rate as our existing fleet. Self-drive and chauffeured options are both available.
 
 Ready to book? [Get in touch](/contact) with your dates and pickup location.
-  `.trim(),
+    `.trim(),
     category: 'Fleet',
     publishedAt: '2026-09-15',
     readTime: '4 min read',
     author: { name: 'Royride Team' },
     featured: true,
-    accentFrom: '#0f2440',
-    accentTo: '#1a365d',
+    accentFrom: '#0E0E10',
+    accentTo: '#3F3F46',
   },
   {
     id: 'jkia-pickup-guide',
@@ -91,11 +121,9 @@ Ready to book? [Get in touch](/contact) with your dates and pickup location.
     publishedAt: '2026-09-08',
     updatedAt: '2026-09-12',
     readTime: '6 min read',
-    author: {
-      name: 'Royride Team',
-    },
-    accentFrom: '#1a1a1a',
-    accentTo: '#3d3d3d',
+    author: { name: 'Royride Team' },
+    accentFrom: '#18181B',
+    accentTo: '#52525B',
   },
   {
     id: 'weekend-escapes-nairobi',
@@ -108,11 +136,9 @@ Ready to book? [Get in touch](/contact) with your dates and pickup location.
     category: 'Guides',
     publishedAt: '2026-08-30',
     readTime: '7 min read',
-    author: {
-      name: 'Royride Team',
-    },
-    accentFrom: '#1a365d',
-    accentTo: '#3d3d3d',
+    author: { name: 'Royride Team' },
+    accentFrom: '#27272A',
+    accentTo: '#52525B',
   },
   {
     id: 'self-drive-vs-chauffeured',
@@ -125,11 +151,9 @@ Ready to book? [Get in touch](/contact) with your dates and pickup location.
     category: 'Guides',
     publishedAt: '2026-08-22',
     readTime: '5 min read',
-    author: {
-      name: 'Royride Team',
-    },
-    accentFrom: '#3d3d3d',
-    accentTo: '#6b6b6b',
+    author: { name: 'Royride Team' },
+    accentFrom: '#3F3F46',
+    accentTo: '#71717A',
   },
   {
     id: 'long-term-rental-offer',
@@ -142,11 +166,9 @@ Ready to book? [Get in touch](/contact) with your dates and pickup location.
     category: 'Offers',
     publishedAt: '2026-08-15',
     readTime: '3 min read',
-    author: {
-      name: 'Royride Team',
-    },
-    accentFrom: '#2a0a0a',
-    accentTo: '#5c1a1a',
+    author: { name: 'Royride Team' },
+    accentFrom: '#472410',
+    accentTo: '#87461B',
   },
   {
     id: 'royride-since-2019',
@@ -163,30 +185,67 @@ Ready to book? [Get in touch](/contact) with your dates and pickup location.
       name: 'Ronny Okumu',
       role: 'Founder & Managing Director',
     },
-    accentFrom: '#081529',
-    accentTo: '#1a365d',
+    accentFrom: '#070708',
+    accentTo: '#27272A',
   },
 ];
 
-export const CATEGORIES = ['All', 'News', 'Guides', 'Offers', 'Fleet'] as const;
-export type Category = (typeof CATEGORIES)[number];
+/* ─────────────────────────────────────────────────────────────
+   DERIVED HELPERS
+   ───────────────────────────────────────────────────────────── */
 
-/* ─────────────────────────────────────────────────── */
-/* Date formatters                                     */
-/* ─────────────────────────────────────────────────── */
+export function getPostsSorted(): Post[] {
+  return [...POSTS].sort(
+    (a, b) =>
+      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+  );
+}
 
-export const formatDate = (isoDate: string): string => {
-  return new Date(isoDate).toLocaleDateString('en-GB', {
+export function getFeaturedPosts(limit = 3): Post[] {
+  return getPostsSorted().filter((p) => p.featured).slice(0, limit);
+}
+
+export function getPostBySlug(slug: string): Post | undefined {
+  return POSTS.find((p) => p.slug === slug);
+}
+
+export function getAllPostSlugs(): string[] {
+  return POSTS.map((p) => p.slug);
+}
+
+export function getPostsByCategory(category: Category): Post[] {
+  const sorted = getPostsSorted();
+  if (category === 'All') return sorted;
+  return sorted.filter((p) => p.category === category);
+}
+
+export function getCategoryCounts(): Record<PostCategory, number> {
+  const counts = POST_CATEGORIES.reduce(
+    (acc, cat) => ({ ...acc, [cat]: 0 }),
+    {} as Record<PostCategory, number>
+  );
+  POSTS.forEach((p) => {
+    counts[p.category] += 1;
+  });
+  return counts;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DATE FORMATTERS
+   ───────────────────────────────────────────────────────────── */
+
+export function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   });
-};
+}
 
-export const formatDateLong = (isoDate: string): string => {
-  return new Date(isoDate).toLocaleDateString('en-GB', {
+export function formatDateLong(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
-};
+}

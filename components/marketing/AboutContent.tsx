@@ -328,7 +328,7 @@ export function AboutContent() {
               index={1}
             />
             <Stat
-              value="119"
+              value="120"
               label="Google Reviews"
               sublabel="Rated 4.9/5"
               stars

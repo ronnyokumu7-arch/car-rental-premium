@@ -4,6 +4,7 @@ import Image from 'next/image';
 import {
   Users,
   Fuel,
+  Cog,
   Key,
   UserCheck,
   Sparkles,
@@ -12,72 +13,121 @@ import {
 import { motion } from 'motion/react';
 import { type Vehicle, formatPrice } from '../../lib/vehicles';
 
+/* ─────────────────────────────────────────────────────────────
+   VEHICLE CARD
+   The most-viewed component after the navbar. Used in:
+     • /vehicles grid
+     • Homepage fleet preview
+     • Featured sections
+     • Search results
+
+   Design language:
+     • Ivory surface, obsidian text, copper accents
+     • Cinematic image treatment with layered gradients
+     • Quiet hover — border warms, shadow deepens, image scales
+     • Specs rendered as a hairline-divided strip, not boxes
+   ───────────────────────────────────────────────────────────── */
+
 interface VehicleCardProps {
   vehicle: Vehicle;
   index?: number;
   onViewDetails?: () => void;
+  /** Set to true on the first card for LCP priority loading */
+  priority?: boolean;
 }
 
 export function VehicleCard({
   vehicle,
   index = 0,
   onViewDetails,
+  priority,
 }: VehicleCardProps) {
+  const hasImage = Boolean(vehicle.image);
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
+    <motion.article
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
+      viewport={{ once: true, margin: '-60px' }}
       transition={{
-        duration: 0.4,
-        delay: index * 0.05,
-        ease: [0.25, 0.1, 0.25, 1],
+        duration: 0.5,
+        delay: index * 0.06,
+        ease: [0.22, 1, 0.36, 1],
       }}
       onClick={onViewDetails}
-      className={`group relative flex flex-col bg-porcelain border border-charcoal-300/20 rounded-sm overflow-hidden transition-[border-color,box-shadow,transform] duration-300 hover:border-accent-500/40 hover:shadow-lg hover:-translate-y-0.5 ${
-        onViewDetails ? 'cursor-pointer' : ''
-      }`}
+      role={onViewDetails ? 'button' : undefined}
+      tabIndex={onViewDetails ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (onViewDetails && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          onViewDetails();
+        }
+      }}
+      className={`
+        group relative flex flex-col
+        bg-surface border border-border rounded-lg overflow-hidden
+        transition-all duration-500 ease-lux
+        hover:border-copper-500/40 hover:-translate-y-1
+        hover:shadow-[0_12px_32px_rgba(14,14,16,0.10),0_32px_64px_rgba(14,14,16,0.08)]
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 focus-visible:ring-offset-2
+        ${onViewDetails ? 'cursor-pointer' : ''}
+      `}
     >
-      {/* ── Visual panel ── */}
-      <div className="relative aspect-[16/10] overflow-hidden transform-gpu">
-        {/* Base gradient — always visible as fallback layer */}
+      {/* ═══════════════════════════════════════════
+          VISUAL PANEL
+          ═══════════════════════════════════════════ */}
+      <div className="relative aspect-[16/10] overflow-hidden transform-gpu bg-obsidian-950">
+        {/* Base gradient — the fallback when no photo */}
         <div
+          aria-hidden="true"
           className="absolute inset-0"
           style={{
             background: `linear-gradient(135deg, ${vehicle.accentFrom} 0%, ${vehicle.accentTo} 100%)`,
           }}
         />
 
-        {/* Vehicle image (if provided) OR SVG silhouette */}
-        {vehicle.image ? (
+        {hasImage ? (
           <>
             <Image
-              src={vehicle.image}
-              alt={vehicle.name}
+              src={vehicle.image as string}
+              alt={`${vehicle.name} — ${vehicle.category} available for hire in Nairobi`}
               fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-              priority={index === 0}
-              loading={index === 0 ? 'eager' : 'lazy'}
-              quality={75}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover transition-transform duration-[900ms] ease-lux group-hover:scale-[1.06]"
+              priority={priority ?? index === 0}
+              loading={priority ?? index === 0 ? 'eager' : 'lazy'}
+              quality={85}
             />
-            {/* Subtle bottom gradient so badges/SKU stay readable on any photo */}
-            <div className="absolute inset-0 bg-gradient-to-t from-primary-900/70 via-transparent to-primary-900/20 pointer-events-none" />
+
+            {/* Bottom gradient — makes badges + SKU legible on any photo */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background:
+                  'linear-gradient(to top, rgba(7,7,8,0.72) 0%, rgba(7,7,8,0.30) 30%, transparent 55%, rgba(7,7,8,0.15) 100%)',
+              }}
+            />
           </>
         ) : (
           <>
+            {/* Ambient warm glow */}
             <div
-              className="absolute inset-0 opacity-50"
+              aria-hidden="true"
+              className="absolute inset-0 opacity-55"
               style={{
                 background:
-                  'radial-gradient(ellipse at 70% 40%, rgba(201, 162, 39, 0.35) 0%, transparent 60%)',
+                  'radial-gradient(ellipse at 70% 40%, rgba(194,112,46,0.35) 0%, transparent 60%)',
               }}
             />
-            <div className="grain-overlay absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none" />
+            {/* Grain */}
+            <div className="grain-overlay absolute inset-0 opacity-[0.12] mix-blend-overlay pointer-events-none" />
+            {/* Silhouette */}
             <svg
               viewBox="0 0 200 100"
-              className="absolute inset-0 w-full h-full p-8 text-porcelain/40 transition-all duration-500 group-hover:text-porcelain/70 group-hover:scale-105"
+              className="absolute inset-0 w-full h-full p-8 text-white/35 transition-all duration-[700ms] ease-lux group-hover:text-white/60 group-hover:scale-[1.04]"
               preserveAspectRatio="xMidYMid meet"
+              aria-hidden="true"
             >
               <path
                 d={vehicle.silhouettePath}
@@ -90,77 +140,109 @@ export function VehicleCard({
           </>
         )}
 
-        {/* Top-left: Category + Popular badge */}
-        <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
-          <span className="px-3 py-1 bg-porcelain/10 backdrop-blur-sm border border-porcelain/20 rounded-sm text-[10px] font-medium uppercase tracking-widest text-porcelain">
+        {/* ═══ Top-left: Category + Popular badges ═══ */}
+        <div className="absolute top-3.5 left-3.5 flex items-center gap-2 z-10">
+          <span className="px-2.5 py-1 bg-obsidian-950/70 backdrop-blur-md border border-white/10 rounded-md text-[10px] font-medium uppercase tracking-[0.16em] text-white/90">
             {vehicle.category}
           </span>
           {vehicle.popular && (
-            <span className="flex items-center gap-1 px-3 py-1 bg-accent-500 text-primary-900 rounded-sm text-[10px] font-bold uppercase tracking-widest">
-              <Sparkles size={10} />
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-copper-500 rounded-md text-[10px] font-bold uppercase tracking-[0.16em] text-obsidian-950 shadow-[0_4px_12px_rgba(194,112,46,0.35)]">
+              <Sparkles size={10} strokeWidth={2.5} />
               Popular
             </span>
           )}
         </div>
 
-        {/* Bottom-left: SKU */}
-        <div className="absolute bottom-4 left-4 z-10">
-          <span className="text-[10px] font-mono uppercase tracking-widest text-porcelain/70">
+        {/* ═══ Bottom-left: SKU + fleet count ═══ */}
+        <div className="absolute bottom-3.5 left-3.5 z-10 flex items-center gap-3">
+          <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-white/55">
             {vehicle.sku}
+          </span>
+          {vehicle.units > 1 && (
+            <>
+              <span
+                aria-hidden="true"
+                className="w-px h-3 bg-white/20"
+              />
+              <span className="text-[10px] uppercase tracking-[0.18em] text-white/55">
+                {vehicle.units} available
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* ═══ Corner action indicator — reveals on hover ═══ */}
+        <div
+          aria-hidden="true"
+          className="absolute top-3.5 right-3.5 z-10 opacity-0 translate-x-2 -translate-y-2 transition-all duration-400 ease-lux group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0"
+        >
+          <span className="flex items-center justify-center w-9 h-9 rounded-full bg-copper-500 text-obsidian-950 shadow-[0_8px_24px_rgba(194,112,46,0.40)]">
+            <ArrowUpRight size={16} strokeWidth={2.5} />
           </span>
         </div>
       </div>
 
-      {/* ── Content ── */}
+      {/* ═══════════════════════════════════════════
+          CONTENT
+          ═══════════════════════════════════════════ */}
       <div className="flex flex-col flex-1 p-6">
-        <h3 className="type-h3 text-primary-900 mb-3">{vehicle.name}</h3>
 
-        <p className="text-sm text-charcoal-500 leading-relaxed line-clamp-2 mb-6">
+        {/* Name */}
+        <h3 className="font-display text-2xl text-ink leading-tight tracking-[-0.01em] mb-2 group-hover:text-copper-700 transition-colors duration-300">
+          {vehicle.name}
+        </h3>
+
+        {/* Description */}
+        <p className="text-sm text-ink-muted leading-relaxed line-clamp-2 mb-6 font-light">
           {vehicle.description}
         </p>
 
-        <div className="grid grid-cols-3 gap-3 mb-6 pb-6 border-b border-charcoal-300/20">
+        {/* ═══ Spec strip — hairline-divided ═══ */}
+        <div className="grid grid-cols-3 border-y border-border py-4 mb-5">
           <Spec
-            icon={<Users size={16} />}
+            icon={<Users size={15} />}
             label="Seats"
             value={`${vehicle.seats}`}
           />
           <Spec
-            icon={<Fuel size={16} />}
+            icon={<Fuel size={15} />}
             label="Fuel"
             value={vehicle.fuel}
+            withDivider
           />
           <Spec
-            icon={<Key size={16} />}
-            label="Trans"
+            icon={<Cog size={15} />}
+            label="Gearbox"
             value={vehicle.transmission === 'Automatic' ? 'Auto' : 'Manual'}
+            withDivider
           />
         </div>
 
+        {/* ═══ Mode pills ═══ */}
         <div className="flex flex-wrap gap-2 mb-6">
           {(vehicle.mode === 'Self-Drive' || vehicle.mode === 'Both') && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-900/5 text-primary-900 text-[10px] font-medium uppercase tracking-widest rounded-sm border border-primary-900/10">
-              <Key size={11} />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-obsidian-900/[0.04] text-ink text-[10px] font-medium uppercase tracking-[0.14em] rounded-md border border-border">
+              <Key size={10} strokeWidth={2.5} />
               Self-Drive
             </span>
           )}
           {(vehicle.mode === 'Chauffeured' || vehicle.mode === 'Both') && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-900/5 text-primary-900 text-[10px] font-medium uppercase tracking-widest rounded-sm border border-primary-900/10">
-              <UserCheck size={11} />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-copper-500/[0.08] text-copper-700 text-[10px] font-medium uppercase tracking-[0.14em] rounded-md border border-copper-500/25">
+              <UserCheck size={10} strokeWidth={2.5} />
               Chauffeured
             </span>
           )}
         </div>
 
-        {/* Price + CTA */}
-        <div className="mt-auto flex items-end justify-between pt-2">
+        {/* ═══ Price + action ═══ */}
+        <div className="mt-auto flex items-end justify-between gap-4">
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-charcoal-500 mb-1">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-ink-subtle mb-1.5">
               From
             </p>
-            <p className="font-display text-2xl text-primary-900 leading-none">
+            <p className="font-display text-3xl text-ink leading-none tabular-nums">
               {formatPrice(vehicle.dailyRate)}
-              <span className="text-xs font-sans text-charcoal-500 ml-1">
+              <span className="font-sans text-xs text-ink-subtle ml-1.5 tracking-wide">
                 /day
               </span>
             </p>
@@ -172,34 +254,48 @@ export function VehicleCard({
               e.stopPropagation();
               onViewDetails?.();
             }}
-            className="flex items-center justify-center w-11 h-11 rounded-full bg-primary-900 text-porcelain transition-all duration-300 hover:bg-accent-500 hover:text-primary-900 group-hover:rotate-45"
-            aria-label={`View ${vehicle.name}`}
+            className="group/btn flex items-center justify-center w-11 h-11 rounded-full bg-obsidian-900 text-white transition-all duration-400 ease-lux hover:bg-copper-500 hover:text-obsidian-950 hover:scale-105 hover:shadow-[0_8px_24px_rgba(194,112,46,0.35)] focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 focus-visible:ring-offset-2"
+            aria-label={`View details for ${vehicle.name}`}
           >
-            <ArrowUpRight size={18} />
+            <ArrowUpRight
+              size={17}
+              strokeWidth={2.5}
+              className="transition-transform duration-400 ease-lux group-hover/btn:rotate-45"
+            />
           </button>
         </div>
       </div>
-    </motion.div>
+    </motion.article>
   );
 }
 
-/* ─────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────
+   SPEC
+   Vertical stack — icon on top, then label, then value.
+   Hairline dividers between cells when `withDivider` is true.
+   ───────────────────────────────────────────────────────────── */
 function Spec({
   icon,
   label,
   value,
+  withDivider = false,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
+  withDivider?: boolean;
 }) {
   return (
-    <div className="flex flex-col items-start gap-1.5">
-      <span className="text-charcoal-400">{icon}</span>
-      <span className="text-[9px] uppercase tracking-widest text-charcoal-500">
+    <div
+      className={`flex flex-col items-start gap-1 px-3 first:pl-0 last:pr-0 ${
+        withDivider ? 'border-l border-border' : ''
+      }`}
+    >
+      <span className="text-ink-subtle mb-1">{icon}</span>
+      <span className="text-[9px] uppercase tracking-[0.16em] text-ink-subtle font-medium">
         {label}
       </span>
-      <span className="text-sm font-medium text-primary-900">{value}</span>
+      <span className="text-sm font-semibold text-ink">{value}</span>
     </div>
   );
 }

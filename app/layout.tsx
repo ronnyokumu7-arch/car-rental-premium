@@ -9,8 +9,6 @@ import './globals.css';
 
 /* ─────────────────────────────────────────────────────────────
    FONTS — self-hosted at build time via next/font
-   No runtime requests to Google. Files are downloaded once during
-   `next build` and served from your own domain afterward.
    ───────────────────────────────────────────────────────────── */
 
 const playfair = Playfair_Display({
@@ -20,6 +18,7 @@ const playfair = Playfair_Display({
   display: 'swap',
   preload: true,
   fallback: ['Georgia', 'Times New Roman', 'serif'],
+  adjustFontFallback: true,
 });
 
 const inter = Inter({
@@ -29,23 +28,26 @@ const inter = Inter({
   display: 'swap',
   preload: true,
   fallback: ['system-ui', 'Segoe UI', 'Roboto', 'sans-serif'],
+  adjustFontFallback: true,
 });
 
 /* ─────────────────────────────────────────────────────────────
-   VIEWPORT — controls browser chrome color (mobile)
-   Renders as <meta name="theme-color"> in <head>.
-   Matches the brand's primary-900 navy.
+   VIEWPORT
    ───────────────────────────────────────────────────────────── */
 
 export const viewport: Viewport = {
-  themeColor: '#081529',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#FCFBF8' },
+    { media: '(prefers-color-scheme: dark)', color: '#070708' },
+  ],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  colorScheme: 'light dark',
 };
 
 /* ─────────────────────────────────────────────────────────────
-   METADATA — brand defaults for every page
+   METADATA
    ───────────────────────────────────────────────────────────── */
 
 const SITE_URL =
@@ -107,10 +109,30 @@ export const metadata: Metadata = {
     apple: '/apple-icon',
   },
   verification: {
-    // Add your Google Search Console verification code here when ready:
     // google: 'your-verification-code-here',
   },
 };
+
+/* ─────────────────────────────────────────────────────────────
+   THEME BOOTSTRAP — runs before paint, prevents dark-mode flash
+   Reads localStorage, falls back to OS preference.
+   ───────────────────────────────────────────────────────────── */
+
+const THEME_SCRIPT = `
+(function() {
+  try {
+    var stored = localStorage.getItem('royride-theme');
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var theme = stored || (prefersDark ? 'dark' : 'light');
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = 'dark';
+    } else {
+      document.documentElement.style.colorScheme = 'light';
+    }
+  } catch (e) {}
+})();
+`;
 
 /* ─────────────────────────────────────────────────────────────
    ROOT LAYOUT
@@ -127,10 +149,29 @@ export default function RootLayout({
       className={`${playfair.variable} ${inter.variable}`}
       suppressHydrationWarning
     >
-      <body className="font-sans bg-porcelain text-charcoal-700 antialiased">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }}
+          // Must run before paint — no defer, no async
+        />
+      </head>
+      <body className="font-sans bg-background text-ink antialiased min-h-screen flex flex-col">
         <LocalBusinessSchema />
+
+        {/* Skip link for a11y — invisible until focused */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:bg-ink focus:text-ink-inverted focus:rounded-sm focus:text-sm focus:font-medium"
+        >
+          Skip to content
+        </a>
+
         <Navbar />
-        <main className="relative z-0">{children}</main>
+
+        <main id="main" className="relative z-0 flex-1">
+          {children}
+        </main>
+
         <Footer />
         <FloatingWidgets />
       </body>

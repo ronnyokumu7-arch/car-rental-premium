@@ -11,13 +11,17 @@ export function SocialLinks({
   size = 'sm',
   variant = 'dark',
 }: SocialLinksProps) {
-  const circleSize = size === 'sm' ? 'w-9 h-9' : 'w-10 h-10';
-  const iconSize = size === 'sm' ? 15 : 17;
+  const circle = size === 'sm' ? 'w-9 h-9' : 'w-10 h-10';
+  const icon = size === 'sm' ? 15 : 17;
 
-  const styles =
+  /* ── Variant styles ──
+     dark  = for use on obsidian/near-black surfaces (footer, navbar)
+     light = for use on ivory/white surfaces (contact page, cards)
+  */
+  const variantStyles =
     variant === 'dark'
-      ? 'border-porcelain/15 text-porcelain/60 hover:border-accent-500/60 hover:bg-accent-500/10 hover:text-accent-500'
-      : 'border-charcoal-300/40 text-charcoal-500 hover:border-accent-500/60 hover:bg-accent-500/10 hover:text-accent-600';
+      ? 'border-white/12 text-white/55 hover:border-copper-400/70 hover:bg-copper-500/10 hover:text-copper-300'
+      : 'border-obsidian-200 text-obsidian-500 hover:border-copper-500/70 hover:bg-copper-500/10 hover:text-copper-600';
 
   return (
     <ul className="flex items-center gap-3">
@@ -29,14 +33,30 @@ export function SocialLinks({
             rel="noopener noreferrer"
             aria-label={name}
             title={name}
-            className={`group flex items-center justify-center ${circleSize} rounded-full border ${styles} transition-all duration-300 hover:-translate-y-0.5`}
+            className={`
+              group relative flex items-center justify-center
+              ${circle} rounded-full border
+              ${variantStyles}
+              transition-all duration-400 ease-lux
+              hover:-translate-y-1
+            `}
           >
+            {/* Copper halo — blooms on hover, sits behind the icon */}
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-400 ease-lux pointer-events-none"
+              style={{
+                boxShadow: '0 0 20px rgba(194,112,46,0.35)',
+              }}
+            />
+
             <svg
-              width={iconSize}
-              height={iconSize}
+              width={icon}
+              height={icon}
               viewBox="0 0 24 24"
               fill="currentColor"
               aria-hidden="true"
+              className="relative z-10 transition-transform duration-400 ease-lux group-hover:scale-[1.08]"
             >
               <path d={path} />
             </svg>

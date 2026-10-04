@@ -1,37 +1,62 @@
 import { BRAND } from '../../lib/constants';
 import { CONTACT } from '../../lib/contact';
+import { SITE_URL } from '../../lib/metadata';
+import { getSocialUrls } from '../../lib/social';
+import { TRUST_STATS } from '../../lib/testimonials';
+import { getPriceRange, formatPrice } from '../../lib/vehicles';
+
+/* ─────────────────────────────────────────────────────────────
+   LOCAL BUSINESS SCHEMA (schema.org / AutoRental)
+   Injected once in the root layout. Feeds Google:
+     • Knowledge Panel
+     • Local business map pack
+     • Rich results for reviews & offerings
+   All values are derived from lib/ constants — never hardcoded
+   here. If a phone number changes, one file changes.
+   ───────────────────────────────────────────────────────────── */
 
 export function LocalBusinessSchema() {
+  const priceRange = getPriceRange();
+  const phoneDigits = BRAND.phones[0].replace(/\s/g, '');
+
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'AutoRental',
-    '@id': 'https://royride.com/#organization',
-    name: 'Royride Car Hire Ltd.',
-    alternateName: 'Royride',
-    url: 'https://royride.com',
-    logo: 'https://royride.com/icon',
-    image: 'https://royride.com/opengraph-image',
-    description:
-      'Private car hire in Nairobi — self-drive and chauffeured. Short-term and long-term rentals, airport transfers from JKIA, and concierge delivery across Kenya.',
-    telephone: BRAND.phones[0].replace(/\s/g, ''),
-    email: 'sales@royride.com',
-    priceRange: 'KES 6,500 – KES 14,000 per day',
+    '@id': `${SITE_URL}/#organization`,
+
+    name: BRAND.fullName,
+    alternateName: BRAND.name,
+    url: SITE_URL,
+    logo: `${SITE_URL}/icon`,
+    image: `${SITE_URL}/opengraph-image`,
+    description: BRAND.description,
+
+    telephone: `+${phoneDigits.replace(/^\+/, '')}`,
+    email: CONTACT.email,
+
+    priceRange: `${formatPrice(priceRange.min)} – ${formatPrice(
+      priceRange.max
+    )} per day`,
     paymentAccepted: 'Cash, M-PESA, Bank Transfer',
     currenciesAccepted: 'KES, USD',
+
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Kibiku Road, Off Eastern Bypass, Utawala',
+      streetAddress: CONTACT.address.full,
       addressLocality: 'Nairobi',
       addressRegion: 'Nairobi County',
       postalCode: '00100',
       addressCountry: 'KE',
     },
+
     geo: {
       '@type': 'GeoCoordinates',
       latitude: -1.2776425,
       longitude: 36.9554776,
     },
+
     hasMap: CONTACT.shareUrl,
+
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
@@ -47,13 +72,15 @@ export function LocalBusinessSchema() {
         closes: '18:00',
       },
     ],
+
     aggregateRating: {
       '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: '119',
+      ratingValue: TRUST_STATS.rating,
+      reviewCount: TRUST_STATS.reviewCount,
       bestRating: '5',
       worstRating: '1',
     },
+
     areaServed: [
       { '@type': 'City', name: 'Nairobi' },
       { '@type': 'City', name: 'Mombasa' },
@@ -61,6 +88,7 @@ export function LocalBusinessSchema() {
       { '@type': 'City', name: 'Nakuru' },
       { '@type': 'AdministrativeArea', name: 'Nairobi County' },
     ],
+
     serviceArea: {
       '@type': 'GeoCircle',
       geoMidpoint: {
@@ -70,6 +98,7 @@ export function LocalBusinessSchema() {
       },
       geoRadius: '200000',
     },
+
     makesOffer: [
       {
         '@type': 'Offer',
@@ -81,13 +110,13 @@ export function LocalBusinessSchema() {
         '@type': 'Offer',
         name: 'Chauffeured Car Hire',
         description:
-          'Executive car hire with professional chauffeurs. Ideal for weddings, business travel, and special occasions.',
+          'Executive car hire with professional chauffeurs. Contact us for a tailored quotation.',
       },
       {
         '@type': 'Offer',
         name: 'Airport Transfers',
         description:
-          'Real-time flight tracking and punctual pickups from JKIA. From USD 50 to any hotel or residence in Nairobi.',
+          'Real-time flight tracking and punctual pickups from JKIA — delivered to any hotel or residence in Nairobi.',
       },
       {
         '@type': 'Offer',
@@ -96,13 +125,8 @@ export function LocalBusinessSchema() {
           'Monthly car hire with a 15% discount on standard daily rates.',
       },
     ],
-    sameAs: [
-      'https://facebook.com/royridecarhire',
-      'https://instagram.com/royridecarhire',
-      'https://linkedin.com/company/royridecarhire',
-      'https://tiktok.com/@royridecarhire',
-      'https://youtube.com/@royridecarhire',
-    ],
+
+    sameAs: getSocialUrls(),
   };
 
   return (

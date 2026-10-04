@@ -2,52 +2,147 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═════════════════════════════════════════════════════════════
+   DESIGN TOKENS (runtime CSS variables — flip on .dark)
+   ═════════════════════════════════════════════════════════════ */
 @layer base {
   :root {
-    --color-primary-900: #081529;
-    --color-primary-700: #0f2440;
-    --color-primary-500: #1a365d;
-    --color-accent-500: #c9a227;
-    --color-accent-600: #a8861f;
-    --color-porcelain: #faf9f7;
-    --color-charcoal-900: #1a1a1a;
-    --color-charcoal-700: #3d3d3d;
-    --color-charcoal-500: #6b6b6b;
-    --color-charcoal-300: #b5b5b5;
+    /* Surfaces */
+    --bg:              #FCFBF8;   /* ivory-50 */
+    --surface:         #FFFFFF;
+    --surface-sunken:  #F7F4EE;   /* ivory-100 */
+    --border:          #EFEAE0;   /* ivory-200 */
+    --border-strong:   #E3DCCD;   /* ivory-300 */
+
+    /* Ink */
+    --ink:             #0E0E10;   /* obsidian-900 */
+    --ink-muted:       #52525B;   /* obsidian-500 */
+    --ink-subtle:      #A1A1AA;   /* obsidian-300 */
+    --ink-inverted:    #FCFBF8;
+
+    /* Brand */
+    --copper:          #C2702E;
+    --copper-hi:       #D98A44;
+    --copper-lo:       #A85A22;
+    --copper-glow:     rgba(194, 112, 46, 0.22);
+
+    /* Focus ring */
+    --ring:            rgba(194, 112, 46, 0.35);
+  }
+
+  .dark {
+    --bg:              #070708;   /* obsidian-950 */
+    --surface:         #0E0E10;   /* obsidian-900 */
+    --surface-sunken:  #18181B;   /* obsidian-800 */
+    --border:          #27272A;   /* obsidian-700 */
+    --border-strong:   #3F3F46;   /* obsidian-600 */
+
+    --ink:             #FCFBF8;
+    --ink-muted:       #A1A1AA;
+    --ink-subtle:      #71717A;
+    --ink-inverted:    #0E0E10;
+
+    --copper:          #D98A44;
+    --copper-hi:       #E3A468;
+    --copper-lo:       #C2702E;
+    --copper-glow:     rgba(217, 138, 68, 0.28);
+
+    --ring:            rgba(217, 138, 68, 0.45);
   }
 
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    background-color: var(--color-accent-500);
-    color: var(--color-porcelain);
+    background-color: var(--copper);
+    color: var(--ink-inverted);
+  }
+
+  /* Global focus ring — accessible + on-brand */
+  :focus-visible {
+    outline: 2px solid var(--copper);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Mobile text-selection UX (kept from before — good call) */
+  * { -webkit-tap-highlight-color: transparent; }
+
+  button, a, nav, header, footer, svg, [role='button'], .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  section[data-scroll='true'],
+  .grain-overlay,
+  [data-decorative] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  p, h1, h2, h3, h4, h5, h6, li, blockquote, article, .selectable {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* Typography rhythm */
+  p          { line-height: 1.65; margin-bottom: 0; }
+  h1, h2     { line-height: 1.15; }
+  h3, h4, h5, h6 { line-height: 1.3; }
+  li         { line-height: 1.65; }
+  blockquote { line-height: 1.6; }
+
+  /* Premium scrollbar (desktop only) */
+  @media (pointer: fine) {
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-strong);
+      border-radius: 9999px;
+      border: 2px solid var(--bg);
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--ink-subtle); }
   }
 }
 
+/* ═════════════════════════════════════════════════════════════
+   TYPOGRAPHY PRIMITIVES
+   ═════════════════════════════════════════════════════════════ */
 @layer components {
-  /* === TYPOGRAPHY === */
   .type-display {
     font-family: var(--font-playfair), Georgia, serif;
-    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
     font-weight: 400;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
   }
 
   .type-h1 {
     font-family: var(--font-playfair), Georgia, serif;
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 400;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
     line-height: 1.15;
   }
 
   .type-h2 {
     font-family: var(--font-playfair), Georgia, serif;
-    font-size: clamp(1.75rem, 4vw, 2rem);
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
     font-weight: 400;
+    letter-spacing: -0.01em;
     line-height: 1.2;
   }
 
@@ -55,89 +150,207 @@
     font-family: var(--font-inter), system-ui, sans-serif;
     font-size: 1.5rem;
     font-weight: 500;
+    letter-spacing: -0.005em;
     line-height: 1.3;
   }
 
   .type-body {
     font-family: var(--font-inter), system-ui, sans-serif;
     font-size: 1rem;
-    font-weight: 400;
     line-height: 1.65;
-    color: var(--color-charcoal-700);
+    color: var(--ink-muted);
   }
 
   .type-lead {
     font-family: var(--font-inter), system-ui, sans-serif;
     font-size: 1.125rem;
-    font-weight: 400;
     line-height: 1.6;
-    color: var(--color-charcoal-500);
+    color: var(--ink-muted);
   }
 
   .type-caption {
     font-family: var(--font-inter), system-ui, sans-serif;
     font-size: 0.75rem;
     font-weight: 500;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-charcoal-500);
-  }
-
-  /* === BUTTONS === */
-  .btn-primary {
-    @apply inline-flex items-center justify-center px-8 py-4 text-xs font-semibold uppercase tracking-widest text-porcelain bg-primary-900 rounded-sm transition-all duration-300;
-  }
-  .btn-primary:hover {
-    @apply bg-primary-700 -translate-y-0.5;
-    box-shadow: 0 8px 24px rgba(26, 54, 93, 0.3);
-  }
-
-  .btn-secondary {
-    @apply inline-flex items-center justify-center px-8 py-4 text-xs font-semibold uppercase tracking-widest text-primary-900 bg-transparent border-2 border-primary-900 rounded-sm transition-all duration-300;
-  }
-  .btn-secondary:hover {
-    @apply bg-primary-900 text-porcelain;
-  }
-
-  .btn-ghost {
-    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-charcoal-700 bg-transparent transition-colors duration-200;
-  }
-  .btn-ghost:hover {
-    @apply text-accent-500;
-  }
-
-  /* === LINKS === */
-  .link-accent {
-    @apply text-accent-500 no-underline transition-all duration-200 border-b border-transparent;
-  }
-  .link-accent:hover {
-    @apply border-accent-500;
+    color: var(--ink-subtle);
   }
 }
 
-@layer utilities {
-  /* === GRAIN TEXTURE (CSS-only, no images) === */
-  .grain-overlay {
-    background-image:
-      repeating-radial-gradient(
-        circle at 17% 32%,
-        rgba(255, 255, 255, 0.9) 0px,
-        transparent 1px
-      ),
-      repeating-radial-gradient(
-        circle at 73% 68%,
-        rgba(255, 255, 255, 0.7) 0px,
-        transparent 1px
-      ),
-      repeating-radial-gradient(
-        circle at 43% 89%,
-        rgba(255, 255, 255, 0.6) 0px,
-        transparent 1px
-      );
-    background-size: 4px 4px, 5px 5px, 6px 6px;
-    animation: grain-shift 8s steps(6) infinite;
+/* ═════════════════════════════════════════════════════════════
+   BUTTONS — the "expensive" feel comes from here
+   ═════════════════════════════════════════════════════════════ */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold uppercase tracking-[0.14em] whitespace-nowrap select-none transition-all duration-300 ease-lux disabled:opacity-50 disabled:pointer-events-none;
   }
 
+  /* Primary — obsidian slab with copper sheen on hover */
+  .btn-primary {
+    @apply btn px-8 py-4 text-xs text-ink-inverted bg-obsidian-900 rounded-sm;
+    box-shadow: 0 1px 2px rgba(14,14,16,0.06), 0 8px 24px rgba(14,14,16,0.10);
+  }
+  .btn-primary:hover {
+    @apply bg-obsidian-800 -translate-y-0.5;
+    box-shadow: 0 2px 4px rgba(14,14,16,0.08), 0 12px 32px rgba(14,14,16,0.16);
+  }
+  .btn-primary:active { @apply translate-y-0; }
+
+  /* Copper — the CTA hero button */
+  .btn-copper {
+    @apply btn px-8 py-4 text-xs text-white rounded-sm;
+    background-image: linear-gradient(135deg, #D98A44 0%, #C2702E 55%, #A85A22 100%);
+    box-shadow: 0 1px 2px rgba(168,90,34,0.20), 0 8px 24px rgba(194,112,46,0.28);
+  }
+  .btn-copper:hover {
+    @apply -translate-y-0.5;
+    box-shadow: 0 2px 4px rgba(168,90,34,0.28), 0 14px 36px rgba(194,112,46,0.38);
+  }
+  .btn-copper:active { @apply translate-y-0; }
+
+  /* Secondary — outlined, flips on hover */
+  .btn-secondary {
+    @apply btn px-8 py-4 text-xs text-ink bg-transparent border rounded-sm;
+    border-color: var(--border-strong);
+  }
+  .btn-secondary:hover {
+    @apply bg-obsidian-900 text-ink-inverted border-obsidian-900 -translate-y-0.5;
+  }
+
+  /* Ghost — subtle text-only */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-ink-muted transition-colors duration-200;
+  }
+  .btn-ghost:hover { color: var(--copper); }
+
+  /* Link with animated underline */
+  .link-accent {
+    @apply text-ink no-underline border-b border-transparent transition-colors duration-200;
+  }
+  .link-accent:hover {
+    color: var(--copper);
+    border-bottom-color: var(--copper);
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════
+   FORM INPUTS
+   ═════════════════════════════════════════════════════════════ */
+@layer components {
+  .booking-input {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+    font-family: var(--font-inter), system-ui, sans-serif;
+    font-size: 0.875rem;
+    color: var(--ink);
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .booking-input:focus {
+    border-color: var(--copper);
+    box-shadow: 0 0 0 4px var(--copper-glow);
+  }
+  .booking-input::placeholder { color: var(--ink-subtle); }
+  .booking-input::-webkit-calendar-picker-indicator {
+    opacity: 0.55;
+    cursor: pointer;
+    filter: invert(0); /* dark icon on light */
+  }
+  .dark .booking-input::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* light icon on dark */
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════
+   BOOKING WIDGET — tabs, pills, price slider
+   ═════════════════════════════════════════════════════════════ */
+@layer components {
+  .booking-tab {
+    @apply relative shrink-0 flex items-center justify-center gap-2 whitespace-nowrap px-5 py-3 text-[11px] font-medium uppercase tracking-[0.1em] transition-colors duration-200;
+    color: var(--ink-muted);
+  }
+  .booking-tab:hover { color: var(--ink); }
+
+  .booking-tab-active { color: var(--ink); }
+
+  .booking-tab-active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 2px;
+    background-color: var(--copper);
+    border-radius: 2px;
+  }
+
+  .seat-pill {
+    @apply inline-flex items-center justify-center min-w-[44px] h-[46px] px-3 text-sm font-medium rounded-sm transition-all duration-200 cursor-pointer;
+    color: var(--ink-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+  .seat-pill:hover {
+    border-color: var(--border-strong);
+    color: var(--ink);
+  }
+
+  .seat-pill-active {
+    @apply text-white border-transparent;
+    background: var(--ink); /* obsidian-900 / ivory-50 in dark */
+  }
+  .dark .seat-pill-active {
+    background: var(--copper);
+    color: #0E0E10;
+  }
+
+  /* react-range slider */
+  .price-range-track {
+    height: 4px;
+    background-color: var(--border);
+    border-radius: 9999px;
+  }
+  .price-range-track-active { background-color: var(--copper); }
+
+  .price-range-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: var(--ink);
+    border: 3px solid var(--bg);
+    border-radius: 9999px;
+    box-shadow: 0 2px 8px rgba(14,14,16,0.25);
+    cursor: grab;
+    outline: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .price-range-thumb:hover,
+  .price-range-thumb:focus {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(14,14,16,0.35), 0 0 0 4px var(--copper-glow);
+  }
+  .price-range-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.15);
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════
+   UTILITIES
+   ═════════════════════════════════════════════════════════════ */
+@layer utilities {
+  /* Film-grain texture (CSS-only, no image assets) */
+  .grain-overlay {
+    background-image:
+      repeating-radial-gradient(circle at 17% 32%, rgba(255,255,255,0.9) 0px, transparent 1px),
+      repeating-radial-gradient(circle at 73% 68%, rgba(255,255,255,0.7) 0px, transparent 1px),
+      repeating-radial-gradient(circle at 43% 89%, rgba(255,255,255,0.6) 0px, transparent 1px);
+    background-size: 4px 4px, 5px 5px, 6px 6px;
+    animation: grain-shift 8s steps(6) infinite;
+    pointer-events: none;
+  }
   @keyframes grain-shift {
     0%, 100% { transform: translate(0, 0); }
     10% { transform: translate(-5%, -5%); }
@@ -151,220 +364,22 @@
     90% { transform: translate(5%, 5%); }
   }
 
-  /* === SOFT BOUNCE (used for hero scroll arrow) === */
   @keyframes bounce-soft {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(6px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
   }
+  .animate-bounce-soft { animation: bounce-soft 2s ease-in-out infinite; }
 
-  .animate-bounce-soft {
-    animation: bounce-soft 2s ease-in-out infinite;
-  }
-}
-
-@layer components {
-  .booking-input {
-    width: 100%;
-    height: 46px;
-    padding: 0 14px;
-    font-family: var(--font-inter), system-ui, sans-serif;
-    font-size: 0.875rem;
-    color: #1a1a1a;
-    background-color: #ffffff;
-    border: 1px solid #e5e5e5;
-    border-radius: 0.25rem;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-
-  .booking-input:focus {
-    border-color: #c9a227;
-    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.12);
-  }
-
-  .booking-input::placeholder {
-    color: #b5b5b5;
-  }
-
-  /* Dark mode input reset for date/time pickers on some browsers */
-  .booking-input::-webkit-calendar-picker-indicator {
-    opacity: 0.5;
-    cursor: pointer;
-  }
-}
-
-@layer utilities {
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-}
 
-@layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-/* ─────────────────────────────────────────────────────────────
-   MOBILE TEXT SELECTION UX
-   ───────────────────────────────────────────────────────────── */
-
-@layer base {
-  * {
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  button,
-  a,
-  nav,
-  header,
-  footer,
-  svg,
-  [role='button'],
-  .no-select {
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
-  }
-
-  section[data-scroll='true'],
-  .grain-overlay,
-  [data-decorative] {
-    -webkit-user-select: none;
-    user-select: none;
-  }
-
-  p,
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  li,
-  blockquote,
-  article,
-  .selectable {
-    -webkit-user-select: text;
-    user-select: text;
-  }
-}
-
-/* ─────────────────────────────────────────────────────────────
-   GLOBAL TYPOGRAPHY RHYTHM
-   ───────────────────────────────────────────────────────────── */
-
-@layer base {
-  body {
-    line-height: 1.65;
-  }
-
-  p {
-    line-height: 1.65;
-    margin-bottom: 0;
-  }
-
-  h1, h2 {
-    line-height: 1.15;
-  }
-
-  h3, h4, h5, h6 {
-    line-height: 1.3;
-  }
-
-  li {
-    line-height: 1.65;
-  }
-
-  blockquote {
-    line-height: 1.6;
-  }
-}
-
-/* ─────────────────────────────────────────────────────────────
-   BOOKING WIDGET — UPGRADED COMPONENT STYLES
-   Tabs, seat toggles, price range slider, running total.
-   ───────────────────────────────────────────────────────────── */
-
-@layer components {
-  /* ── Tab navigation — natural width, horizontally scrollable on mobile ── */
-  .booking-tab {
-    @apply relative shrink-0 flex items-center justify-center gap-2 whitespace-nowrap px-5 py-3 text-[11px] font-medium uppercase tracking-[0.1em] text-charcoal-500 transition-colors duration-200;
-  }
-
-  .booking-tab:hover {
-    @apply text-primary-900;
-  }
-
-  .booking-tab-active {
-    @apply text-primary-900;
-  }
-
-  .booking-tab-active::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -1px;
-    height: 2px;
-    background-color: #c9a227;
-  }
-
-  /* ── Seat toggle pills ── */
-  .seat-pill {
-    @apply inline-flex items-center justify-center min-w-[44px] h-[46px] px-3 text-sm font-medium text-charcoal-700 bg-white border border-charcoal-300/50 rounded-sm transition-all duration-200 cursor-pointer;
-  }
-
-  .seat-pill:hover {
-    @apply border-primary-900/50 text-primary-900;
-  }
-
-  .seat-pill-active {
-    @apply bg-primary-900 text-porcelain border-primary-900;
-  }
-
-  /* ── Price range slider (react-range) ── */
-  .price-range-track {
-    height: 4px;
-    background-color: rgba(8, 21, 41, 0.08);
-    border-radius: 9999px;
-  }
-
-  .price-range-track-active {
-    background-color: #c9a227;
-  }
-
-  .price-range-thumb {
-    width: 20px;
-    height: 20px;
-    background-color: #081529;
-    border: 3px solid #faf9f7;
-    border-radius: 9999px;
-    box-shadow: 0 2px 8px rgba(8, 21, 41, 0.2);
-    cursor: grab;
-    outline: none;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  .price-range-thumb:hover,
-  .price-range-thumb:focus {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(8, 21, 41, 0.3), 0 0 0 3px rgba(201, 162, 39, 0.2);
-  }
-
-  .price-range-thumb:active {
-    cursor: grabbing;
-    transform: scale(1.15);
-  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
 }

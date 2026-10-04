@@ -1,16 +1,30 @@
 import { Car, Compass, Newspaper, Tag, type LucideIcon } from 'lucide-react';
+import type { PostCategory } from './posts';
 
-/**
- * Category → icon mapping for Update post visuals.
- * Used by CompactPostCard, PostCard, and FeaturedPost.
- */
-export const POST_CATEGORY_ICONS: Record<string, LucideIcon> = {
+/* ─────────────────────────────────────────────────────────────
+   POST CATEGORY ICONS
+   Maps each PostCategory to a lucide icon.
+   Used by CompactPostCard, PostCard, FeaturedPost, and the
+   /updates filter chips.
+   ───────────────────────────────────────────────────────────── */
+
+export const POST_CATEGORY_ICONS: Record<PostCategory, LucideIcon> = {
   News: Newspaper,
   Guides: Compass,
   Offers: Tag,
   Fleet: Car,
 };
 
-export const getCategoryIcon = (category: string): LucideIcon => {
-  return POST_CATEGORY_ICONS[category] ?? Newspaper;
-};
+/* ─────────────────────────────────────────────────────────────
+   HELPERS
+   ───────────────────────────────────────────────────────────── */
+
+/**
+ * Get the icon for a post category.
+ * Falls back to Newspaper if the category is unknown (defensive).
+ */
+export function getCategoryIcon(category: string): LucideIcon {
+  return (
+    POST_CATEGORY_ICONS[category as PostCategory] ?? Newspaper
+  );
+}

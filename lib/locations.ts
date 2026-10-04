@@ -1,26 +1,46 @@
+/* ─────────────────────────────────────────────────────────────
+   LOCATIONS — Nairobi pickup & return locations.
+
+   Fee semantics:
+     fee = 0   → free (customer collects from / returns to our office)
+     fee > 0   → paid delivery / collection (KES)
+     fee = -1  → quote on request (custom address)
+
+   Coordinates are stored so we can (a) render them on the contact
+   map, (b) compute distance-based fees later, (c) feed schema.org.
+   ───────────────────────────────────────────────────────────── */
+
 export interface Location {
+  /** Stable key — used in URLs, form values, and localStorage */
   value: string;
+  /** Display label. No fee embedded — fee is rendered separately. */
   label: string;
-  fee: number;      // KES — flat fee for pickup OR return at this location
+  /** KES — see fee semantics above */
+  fee: number;
+  /** Nairobi sub-region — used for grouping in the picker */
   region?: string;
+  /** Shown first / in a "Popular" group in the location picker */
   popular?: boolean;
+  /** Optional coordinates for map + distance calc */
+  lat?: number;
+  lng?: number;
 }
 
-/**
- * Nairobi pickup & return locations.
- *
- * Fee semantics:
- * - fee = 0   → customer collects from / returns to us (free)
- * - fee > 0   → we deliver / collect the vehicle (paid)
- * - fee = -1  → quote on request (custom address)
- */
+/* ─────────────────────────────────────────────────────────────
+   LOCATIONS
+   Order matters: popular locations first, then alphabetical-ish
+   by region, then "custom" last. This is what users see.
+   ───────────────────────────────────────────────────────────── */
 export const LOCATIONS: Location[] = [
   {
     value: 'utawala-office',
-    label: 'Utawala Office | Free',
+    label: 'Utawala Office',
     fee: 0,
     region: 'Eastern Bypass',
     popular: true,
+    // Royride HQ — matches CONTACT.address coords
+    lat: -1.2776425,
+    lng: 36.9554776,
   },
   {
     value: 'jkia',
@@ -28,12 +48,16 @@ export const LOCATIONS: Location[] = [
     fee: 1500,
     region: 'Embakasi',
     popular: true,
+    lat: -1.3192,
+    lng: 36.9278,
   },
   {
     value: 'wilson-airport',
     label: 'Wilson Airport',
     fee: 2000,
     region: 'Langata',
+    lat: -1.3219,
+    lng: 36.8147,
   },
   {
     value: 'westlands',
@@ -94,36 +118,45 @@ export const LOCATIONS: Location[] = [
 export const DEFAULT_PICKUP_LOCATION = 'utawala-office';
 export const DEFAULT_RETURN_LOCATION = 'same-as-pickup';
 
-/** Compute the pickup fee from a location value. */
+/* ─────────────────────────────────────────────────────────────
+   INTERNAL HELPERS
+   ───────────────────────────────────────────────────────────── */
+
+function findLocation(value: string): Location | undefined {
+  return LOCATIONS.find((l) => l.value === value);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   PUBLIC API
+   ───────────────────────────────────────────────────────────── */
+
+/** Pickup fee for a given location value. Returns 0 if unknown. */
 export function getPickupFee(value: string): number {
-  const loc = LOCATIONS.find((l) => l.value === value);
-  return loc?.fee ?? 0;
+  return findLocation(value)?.fee ?? 0;
 }
 
 /**
- * Compute the return fee.
- *
- * Logic:
- * - "Same as pickup" → mirrors pickup fee (round-trip delivery)
- * - Return to Utawala Office → always 0 (customer drops car to us)
- * - Return to any other location → that location's fee
+ * Return fee logic:
+ *   - "same-as-pickup"  → mirrors the pickup fee (round-trip)
+ *   - Utawala Office    → 0 (customer returns the car to us)
+ *   - Same value as pickup → 0 (already covered by the delivery fee)
+ *   - Any other location → that location's fee
  */
 export function getReturnFee(
   returnValue: string,
   pickupValue: string
 ): number {
-  if (returnValue === 'same-as-pickup') {
-    return getPickupFee(pickupValue);
-  }
+  if (returnValue === 'same-as-pickup') return getPickupFee(pickupValue);
   if (returnValue === 'utawala-office') return 0;
   if (returnValue === pickupValue) return 0;
-
-  const loc = LOCATIONS.find((l) => l.value === returnValue);
-  return loc?.fee ?? 0;
+  return findLocation(returnValue)?.fee ?? 0;
 }
 
 /** True if either fee is "quote on request" (-1). */
-export function requiresQuote(pickupValue: string, returnValue: string): boolean {
+export function requiresQuote(
+  pickupValue: string,
+  returnValue: string
+): boolean {
   return (
     getPickupFee(pickupValue) === -1 ||
     getReturnFee(returnValue, pickupValue) === -1
@@ -138,11 +171,10 @@ export function formatFee(fee: number): string {
 }
 
 /**
- * Smart pickup label — changes based on whether the location is free or paid.
- *
- *   fee = 0     → "Pickup Location"
- *   fee > 0     → "Delivery Location"
- *   fee = -1    → "Custom Location"
+ * Smart pickup label — swaps based on whether the location is free or paid.
+ *   fee = 0   → "Pickup Location"
+ *   fee > 0   → "Delivery Location"
+ *   fee = -1  → "Custom Location"
  */
 export function getPickupLabel(value: string): string {
   const fee = getPickupFee(value);
@@ -151,13 +183,7 @@ export function getPickupLabel(value: string): string {
   return 'Delivery Location';
 }
 
-/**
- * Smart pickup fee subtext — explains what the fee means.
- *
- *   fee = 0     → "Free pickup — collect from our Utawala office"
- *   fee > 0     → "Delivery fee: KES X"
- *   fee = -1    → "Quote on request"
- */
+/** Short fee summary for the pickup subtext. */
 export function getPickupFeeLabel(value: string): string {
   const fee = getPickupFee(value);
   if (fee === -1) return 'Quote on request';
@@ -166,13 +192,9 @@ export function getPickupFeeLabel(value: string): string {
 }
 
 /**
- * Smart return fee subtext — distinguishes pickup from collection.
- *
- *   returnValue = "same-as-pickup" AND pickup free   → "Same as pickup — free"
- *   returnValue = "same-as-pickup" AND pickup paid   → "Round-trip delivery: KES X"
- *   returnValue = utawala-office                     → "Free return — bring it to us"
- *   returnValue = a paid location                    → "Collection fee: KES X"
- *   returnValue = custom                             → "Quote on request"
+ * Smart return fee label.
+ * Distinguishes "same as pickup" / "free return to office" /
+ * "paid collection from a different location".
  */
 export function getReturnFeeLabel(
   returnValue: string,
@@ -181,27 +203,22 @@ export function getReturnFeeLabel(
   const pickupFee = getPickupFee(pickupValue);
   const returnFee = getReturnFee(returnValue, pickupValue);
 
-  // Custom
   if (returnFee === -1) return 'Quote on request';
 
-  // Same as pickup
   if (returnValue === 'same-as-pickup') {
     if (pickupFee === 0) return 'Same as pickup — no fee';
     if (pickupFee === -1) return 'Same as pickup — quote on request';
     return `Round-trip delivery: KES ${pickupFee.toLocaleString('en-KE')}`;
   }
 
-  // Return to Utawala Office (free)
   if (returnValue === 'utawala-office') {
     return 'Free return — bring it to our office';
   }
 
-  // Return to the same location as pickup (already paid as delivery)
   if (returnValue === pickupValue && returnFee === 0) {
     return 'Return to same location — no extra fee';
   }
 
-  // Return to a different paid location
   if (returnFee > 0) {
     return `Collection fee: KES ${returnFee.toLocaleString('en-KE')}`;
   }
@@ -209,21 +226,24 @@ export function getReturnFeeLabel(
   return 'No fee';
 }
 
-/**
- * Build the return options list.
- * The "Same as pickup" option's label is DYNAMIC — shows the current
- * pickup fee inline so users see the true return cost before committing.
- */
-export function buildReturnOptions(pickupValue: string): {
+/* ─────────────────────────────────────────────────────────────
+   RETURN OPTIONS BUILDER
+   Produces the dropdown for the "return location" field.
+   "Same as pickup" is dynamic — shows the true cost inline.
+   ───────────────────────────────────────────────────────────── */
+
+export interface LocationOption {
   value: string;
   label: string;
   fee: number;
-}[] {
+}
+
+export function buildReturnOptions(pickupValue: string): LocationOption[] {
   const pickupFee = getPickupFee(pickupValue);
 
   let sameAsPickupLabel = 'Same as pickup';
   if (pickupFee === -1) {
-    sameAsPickupLabel = 'Same as pickup (Quote on request)';
+    sameAsPickupLabel = 'Same as pickup (quote on request)';
   } else if (pickupFee > 0) {
     sameAsPickupLabel = `Same as pickup (+ KES ${pickupFee.toLocaleString(
       'en-KE'
@@ -231,11 +251,7 @@ export function buildReturnOptions(pickupValue: string): {
   }
 
   return [
-    {
-      value: 'same-as-pickup',
-      label: sameAsPickupLabel,
-      fee: pickupFee,
-    },
+    { value: 'same-as-pickup', label: sameAsPickupLabel, fee: pickupFee },
     ...LOCATIONS.map((loc) => ({
       value: loc.value,
       label: loc.label,
@@ -243,3 +259,32 @@ export function buildReturnOptions(pickupValue: string): {
     })),
   ];
 }
+
+/* ─────────────────────────────────────────────────────────────
+   DERIVED HELPERS — added for the new UI we're building
+   ───────────────────────────────────────────────────────────── */
+
+/** Locations grouped by region — for the picker's grouped list. */
+export function getLocationsByRegion(): Record<string, Location[]> {
+  return LOCATIONS.reduce<Record<string, Location[]>>((acc, loc) => {
+    const region = loc.region ?? 'Other';
+    (acc[region] ||= []).push(loc);
+    return acc;
+  }, {});
+}
+
+/** Popular locations only — for quick-pick chips in the booking bar. */
+export function getPopularLocations(): Location[] {
+  return LOCATIONS.filter((l) => l.popular);
+}
+
+/** Look up a full Location object. Returns undefined if not found. */
+export function getLocation(value: string): Location | undefined {
+  return findLocation(value);
+}
+
+/** All values as a typed tuple — useful for Zod enums in form validation. */
+export const LOCATION_VALUES = LOCATIONS.map((l) => l.value) as [
+  string,
+  ...string[],
+];
