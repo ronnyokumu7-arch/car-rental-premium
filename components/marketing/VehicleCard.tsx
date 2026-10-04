@@ -64,7 +64,7 @@ export function VehicleCard({
         }
       }}
       className={`
-        group relative flex flex-col
+        group relative flex flex-col h-full
         bg-surface border border-border rounded-lg overflow-hidden
         transition-all duration-500 ease-lux
         hover:border-copper-500/40 hover:-translate-y-1
@@ -76,7 +76,7 @@ export function VehicleCard({
       {/* ═══════════════════════════════════════════
           VISUAL PANEL
           ═══════════════════════════════════════════ */}
-      <div className="relative aspect-[16/10] overflow-hidden transform-gpu bg-obsidian-950">
+      <div className="relative w-full aspect-[16/10] overflow-hidden transform-gpu bg-obsidian-950 shrink-0">
         {/* Base gradient — the fallback when no photo */}
         <div
           aria-hidden="true"
@@ -272,7 +272,6 @@ export function VehicleCard({
 /* ─────────────────────────────────────────────────────────────
    SPEC
    Vertical stack — icon on top, then label, then value.
-   Hairline dividers between cells when `withDivider` is true.
    ───────────────────────────────────────────────────────────── */
 function Spec({
   icon,

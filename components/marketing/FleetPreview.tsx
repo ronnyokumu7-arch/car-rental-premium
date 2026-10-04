@@ -1,38 +1,56 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { VehicleCardCompact } from './VehicleCardCompact';
-import { VEHICLES } from '../../lib/vehicles';
+import { VehicleCard } from './VehicleCard';
+import { getPopularVehicles } from '../../lib/vehicles';
+
+/* ─────────────────────────────────────────────────────────────
+   FLEET PREVIEW
+   Homepage section — shows popular vehicles for quick browsing.
+
+   Layout:
+     • Mobile:  one full-width card per view, snap carousel
+     • Desktop: 3-column grid
+
+   Shows only popular vehicles (curated).
+   Full fleet lives at /vehicles.
+   ───────────────────────────────────────────────────────────── */
 
 const AUTOPLAY_INTERVAL = 6000;
 
 export function FleetPreview() {
+  const featured = useMemo(
+    () => getPopularVehicles().slice(0, 6),
+    []
+  );
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Auto-scroll on mobile
+  /* ── Auto-advance on mobile only ── */
   useEffect(() => {
     const carousel = carouselRef.current;
     if (!carousel) return;
 
-    const timer = setInterval(() => {
+    const timer = window.setInterval(() => {
       const isScrollable = carousel.scrollWidth > carousel.clientWidth;
       if (!isScrollable) return;
 
-      const nextIndex = (activeIndex + 1) % VEHICLES.length;
-      carousel.scrollTo({
-        left: nextIndex * carousel.clientWidth,
-        behavior: 'smooth',
+      setActiveIndex((prev) => {
+        const next = (prev + 1) % featured.length;
+        carousel.scrollTo({
+          left: next * carousel.clientWidth,
+          behavior: 'smooth',
+        });
+        return next;
       });
-      setActiveIndex(nextIndex);
     }, AUTOPLAY_INTERVAL);
 
-    return () => clearInterval(timer);
-  }, [activeIndex]);
+    return () => window.clearInterval(timer);
+  }, [featured.length]);
 
-  // Detect scroll to sync dots
+  /* ── Sync active index to scroll position ── */
   useEffect(() => {
     const carousel = carouselRef.current;
     if (!carousel) return;
@@ -41,16 +59,17 @@ export function FleetPreview() {
       const newIndex = Math.round(
         carousel.scrollLeft / carousel.clientWidth
       );
-      if (newIndex !== activeIndex && newIndex >= 0 && newIndex < VEHICLES.length) {
+      if (newIndex >= 0 && newIndex < featured.length) {
         setActiveIndex(newIndex);
       }
     };
 
     carousel.addEventListener('scroll', handleScroll, { passive: true });
-    return () => carousel.removeEventListener('scroll', handleScroll);
-  }, [activeIndex]);
+    return () =>
+      carousel.removeEventListener('scroll', handleScroll);
+  }, [featured.length]);
 
-  const scrollToIndex = (index: number) => {
+  const scrollToIndex = useCallback((index: number) => {
     const carousel = carouselRef.current;
     if (!carousel) return;
     carousel.scrollTo({
@@ -58,21 +77,22 @@ export function FleetPreview() {
       behavior: 'smooth',
     });
     setActiveIndex(index);
-  };
+  }, []);
 
   return (
-    <section className="bg-porcelain pt-20 lg:pt-28 pb-8 lg:pb-12 px-6 lg:px-8">
+    <section className="bg-background pt-20 lg:pt-28 pb-16 lg:pb-24 px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Section header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
+
+        {/* ═══ Section header ═══ */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12 lg:mb-16">
           <div className="max-w-3xl">
-            <p className="type-caption text-accent-600 mb-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-copper-600 mb-4">
               Our Fleet
             </p>
-            <h2 className="type-h1 text-primary-900 mb-4">
-              Curated for Every Journey
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl text-ink leading-[1.1] tracking-[-0.015em] mb-5">
+              Curated for every journey.
             </h2>
-            <p className="type-lead">
+            <p className="text-base lg:text-lg text-ink-muted leading-relaxed font-light max-w-2xl">
               From executive SUVs to family vans — every vehicle maintained,
               inspected, and delivered ready.
             </p>
@@ -80,67 +100,76 @@ export function FleetPreview() {
 
           <Link
             href="/vehicles"
-            className="hidden md:inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-primary-900 hover:text-accent-600 transition-colors group whitespace-nowrap"
+            className="hidden md:inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink hover:text-copper-600 transition-colors duration-300 group whitespace-nowrap"
           >
-            View Full Fleet
+            View full fleet
             <ArrowRight
-              size={16}
-              className="transition-transform group-hover:translate-x-1"
+              size={14}
+              strokeWidth={2.5}
+              className="transition-transform duration-300 ease-lux group-hover:translate-x-1"
             />
           </Link>
         </div>
 
-        {/* Cards — carousel on mobile, grid on desktop */}
+        {/* ═══ Cards — full-width snap on mobile, grid on desktop ═══ */}
         <div
           ref={carouselRef}
           className="
-            flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-0 md:gap-8
+            flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-0 md:gap-6 lg:gap-8
             overflow-x-auto md:overflow-visible
             snap-x snap-mandatory md:snap-none
             pb-4 md:pb-0
             scrollbar-hide
+            -mx-6 px-6 md:mx-0 md:px-0
           "
         >
-          {VEHICLES.map((vehicle) => (
+          {featured.map((vehicle, i) => (
             <div
               key={vehicle.id}
-              className="shrink-0 w-full md:w-auto snap-center md:snap-align-none px-0 md:px-0"
+              className="
+                flex-shrink-0 basis-full
+                pr-4 last:pr-0
+                md:pr-0 md:basis-auto md:w-auto
+                snap-start md:snap-align-none
+              "
             >
-              <VehicleCardCompact vehicle={vehicle} />
+              <VehicleCard vehicle={vehicle} index={i} />
             </div>
           ))}
         </div>
 
-        {/* Gold dots — mobile only */}
+        {/* ═══ Dot indicators — mobile only ═══ */}
         <div className="md:hidden mt-6 flex items-center justify-center gap-2">
-          {VEHICLES.map((_, index) => (
+          {featured.map((_, index) => (
             <button
               key={index}
               type="button"
               onClick={() => scrollToIndex(index)}
-              aria-label={`Show vehicle ${index + 1}`}
+              aria-label={`Show vehicle ${index + 1} of ${featured.length}`}
+              aria-current={index === activeIndex}
               className={`
-                h-1 rounded-full transition-all duration-300
+                h-1 rounded-full transition-all duration-300 ease-lux
                 ${
                   index === activeIndex
-                    ? 'w-8 bg-accent-500'
-                    : 'w-2 bg-charcoal-300 hover:bg-accent-500/60'
+                    ? 'w-8 bg-copper-500'
+                    : 'w-2 bg-border-strong hover:bg-copper-500/60'
                 }
               `}
             />
           ))}
         </div>
 
-        {/* Mobile CTA */}
-        <div className="md:hidden mt-8">
+        {/* ═══ Mobile CTA ═══ */}
+        <div className="md:hidden mt-10">
           <Link
             href="/vehicles"
-            className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent-600 hover:text-primary-900 transition-colors group"
+            className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-copper-600 hover:text-copper-700 transition-colors duration-300 group"
           >
-            View Full Fleet
+            View full fleet
             <ArrowRight
               size={14}
-              className="transition-transform group-hover:translate-x-1"
+              strokeWidth={2.5}
+              className="transition-transform duration-300 ease-lux group-hover:translate-x-1"
             />
           </Link>
         </div>

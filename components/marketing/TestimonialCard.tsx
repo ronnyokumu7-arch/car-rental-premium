@@ -4,29 +4,39 @@ import { Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { Testimonial } from '../../lib/testimonials';
 
+/* ─────────────────────────────────────────────────────────────
+   TESTIMONIAL CARD
+   Dark surface, editorial typography, copper accents.
+   Cycles through 3 ambient variants so a grid of cards
+   doesn't look repetitive.
+
+   Layout order:
+     Stars + Google badge  (top row)
+     Quote                 (editorial, Playfair)
+     ─── hairline ───
+     Author + role         (full width — no truncation)
+   ───────────────────────────────────────────────────────────── */
+
 interface TestimonialCardProps {
   testimonial: Testimonial;
   index?: number;
 }
 
 const CARD_VARIANTS = [
-  // Variant 0 — default navy → teal-charcoal
   {
     gradient:
-      'linear-gradient(135deg, #081529 0%, #0f2440 55%, #0f2b2b 100%)',
-    glow: 'rgba(201, 162, 39, 0.18)',
+      'linear-gradient(135deg, #070708 0%, #0E0E10 55%, #18181B 100%)',
+    glow: 'rgba(194, 112, 46, 0.14)',
   },
-  // Variant 1 — charcoal → warm bronze-charcoal
   {
     gradient:
-      'linear-gradient(135deg, #1a1a1a 0%, #2a1f1a 55%, #3d2a1a 100%)',
-    glow: 'rgba(201, 162, 39, 0.22)',
+      'linear-gradient(135deg, #0E0E10 0%, #18181B 55%, #27272A 100%)',
+    glow: 'rgba(194, 112, 46, 0.20)',
   },
-  // Variant 2 — navy → cool indigo-charcoal
   {
     gradient:
-      'linear-gradient(135deg, #081529 0%, #1a1a3d 55%, #1a2433 100%)',
-    glow: 'rgba(201, 162, 39, 0.16)',
+      'linear-gradient(135deg, #18181B 0%, #2A1810 55%, #472410 100%)',
+    glow: 'rgba(217, 138, 68, 0.22)',
   },
 ];
 
@@ -44,110 +54,92 @@ export function TestimonialCard({
   const variant = CARD_VARIANTS[index % CARD_VARIANTS.length];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
+    <motion.figure
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{
         duration: 0.6,
-        delay: index * 0.12,
-        ease: [0.25, 0.1, 0.25, 1],
+        delay: index * 0.08,
+        ease: [0.22, 1, 0.36, 1],
       }}
       className="
         relative flex flex-col
-        rounded-sm overflow-hidden p-8
-        transition-all duration-500
-        hover:shadow-2xl hover:-translate-y-1
-        shrink-0
-        w-full md:w-auto
-        snap-center md:snap-align-none
+        rounded-lg
+        p-6 sm:p-8 lg:p-9
+        transition-all duration-500 ease-lux
+        hover:-translate-y-1
+        hover:shadow-[0_24px_56px_rgba(14,14,16,0.20)]
       "
     >
-      {/* Unique gradient per card */}
+      {/* Base gradient */}
       <div
-        className="absolute inset-0"
+        aria-hidden="true"
+        className="absolute inset-0 rounded-lg"
         style={{ background: variant.gradient }}
       />
 
-      {/* Warm accent glow — varies per card */}
+      {/* Warm copper glow */}
       <div
-        className="absolute inset-0 opacity-40 pointer-events-none"
+        aria-hidden="true"
+        className="absolute inset-0 rounded-lg opacity-50 pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse at 80% 20%, ${variant.glow} 0%, transparent 60%)`,
+          background: `radial-gradient(ellipse at 80% 15%, ${variant.glow} 0%, transparent 60%)`,
         }}
       />
 
-      {/* Grain texture */}
-      <div className="grain-overlay absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none" />
+      {/* Grain */}
+      <div className="grain-overlay absolute inset-0 rounded-lg opacity-[0.08] mix-blend-overlay pointer-events-none" />
+
+      {/* Copper top hairline */}
+      <div
+        aria-hidden="true"
+        className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-copper-500/30 to-transparent"
+      />
 
       {/* Decorative quote mark */}
       <svg
         viewBox="0 0 32 32"
-        className="absolute top-6 right-6 w-10 h-10 text-accent-500/25"
+        className="absolute top-5 right-6 w-8 h-8 text-copper-400/15"
         fill="currentColor"
         aria-hidden="true"
       >
         <path d="M10 6C5 6 2 10 2 15c0 5 3 9 8 9 1 0 2 0 3-1v-4c-1 1-2 1-3 1-2 0-3-2-3-4h6V6zm16 0c-5 0-8 4-8 9 0 5 3 9 8 9 1 0 2 0 3-1v-4c-1 1-2 1-3 1-2 0-3-2-3-4h6V6z" />
       </svg>
 
-      {/* Content */}
+      {/* ═══ CONTENT ═══ */}
       <div className="relative flex flex-col flex-1">
-        {/* Stars */}
-        <div className="flex items-center gap-1 mb-6">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star
-              key={i}
-              size={14}
-              className={
-                i < testimonial.rating
-                  ? 'fill-accent-500 text-accent-500'
-                  : 'text-porcelain/20'
-              }
-            />
-          ))}
-        </div>
 
-        {/* Quote */}
-        <blockquote className="flex-1 mb-8">
-          <p className="font-display text-lg leading-relaxed text-porcelain/90">
-            &ldquo;{testimonial.quote}&rdquo;
-          </p>
-        </blockquote>
-
-        {/* Author */}
-        <div className="flex items-center gap-4 pt-6 border-t border-porcelain/10">
-          <div className="w-11 h-11 rounded-full bg-accent-500/15 border border-accent-500/30 flex items-center justify-center shrink-0">
-            <span className="font-display text-sm text-accent-500">
-              {initials}
-            </span>
-          </div>
-
-          <div className="min-w-0 flex-1 pr-2">
-            <p className="text-sm font-medium text-porcelain truncate">
-              {testimonial.name}
-            </p>
-            <p
-              className="text-[10px] uppercase tracking-widest text-porcelain/50 truncate"
-              title={
-                testimonial.location
-                  ? `${testimonial.role} · ${testimonial.location}`
-                  : testimonial.role
-              }
-            >
-              {testimonial.role}
-              {testimonial.location && ` · ${testimonial.location}`}
-            </p>
+        {/* ── Top row: stars + Google badge ── */}
+        <div className="flex items-center justify-between gap-3 mb-5">
+          <div
+            className="flex items-center gap-0.5"
+            aria-label={`${testimonial.rating} out of 5 stars`}
+          >
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star
+                key={i}
+                size={12}
+                strokeWidth={2}
+                className={
+                  i < testimonial.rating
+                    ? 'fill-copper-400 text-copper-400'
+                    : 'text-white/15'
+                }
+              />
+            ))}
           </div>
 
           {testimonial.source === 'Google' && (
             <div
-              className="flex items-center gap-1.5 shrink-0"
-              aria-label="Google review"
+              className="shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-white/95"
+              aria-label="Verified Google review"
+              title="Verified Google review"
             >
               <svg
                 viewBox="0 0 24 24"
-                className="w-4 h-4"
-                aria-label="Google"
+                className="w-3.5 h-3.5"
+                aria-hidden="true"
               >
                 <path
                   fill="#4285F4"
@@ -166,13 +158,36 @@ export function TestimonialCard({
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              <span className="hidden sm:inline text-[9px] uppercase tracking-widest text-porcelain/40">
-                Google
-              </span>
             </div>
           )}
         </div>
+
+        {/* ── Quote ── */}
+        <blockquote className="flex-1 mb-6">
+          <p className="font-display text-[15px] sm:text-lg lg:text-xl leading-[1.55] text-white/90 tracking-[-0.005em]">
+            &ldquo;{testimonial.quote}&rdquo;
+          </p>
+        </blockquote>
+
+        {/* ── Author block ── */}
+        <figcaption className="flex items-center gap-3 pt-5 border-t border-white/[0.08]">
+          <div className="w-10 h-10 rounded-full bg-copper-500/[0.12] border border-copper-500/30 flex items-center justify-center shrink-0">
+            <span className="font-display text-xs text-copper-300">
+              {initials}
+            </span>
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-white leading-tight">
+              {testimonial.name}
+            </p>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-white/45 leading-tight mt-1">
+              {testimonial.role}
+              {testimonial.location && ` · ${testimonial.location}`}
+            </p>
+          </div>
+        </figcaption>
       </div>
-    </motion.div>
+    </motion.figure>
   );
 }
