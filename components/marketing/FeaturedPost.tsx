@@ -9,8 +9,12 @@ import { getCategoryIcon } from '../../lib/postIcons';
 /* ─────────────────────────────────────────────────────────────
    FEATURED POST
    The lead story on the homepage's "From the road" section.
-   Two-column editorial: dark visual panel on the left,
-   ivory content panel on the right.
+
+   Two layouts:
+     • Mobile  — title rendered over the image (editorial cover)
+                 category pill on image, date moves to panel
+     • Desktop — two-column split (image left, content right)
+                 title in the ivory panel as before
 
    Used only by LatestUpdates.tsx
    ───────────────────────────────────────────────────────────── */
@@ -37,10 +41,12 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
 
           {/* ═══════════════════════════════════════════
               VISUAL PANEL
+              Mobile: title overlays the bottom of the image
+              Desktop: icon + category label centered
               ═══════════════════════════════════════════ */}
-          <div className="relative aspect-[16/10] lg:aspect-auto lg:min-h-[440px] overflow-hidden flex items-center justify-center bg-obsidian-950">
+          <div className="relative aspect-[4/5] sm:aspect-[16/10] lg:aspect-auto lg:min-h-[440px] overflow-hidden flex items-center justify-center bg-obsidian-950">
 
-            {/* Post's own gradient */}
+            {/* Post gradient */}
             <div
               aria-hidden="true"
               className="absolute inset-0 transition-transform duration-700 ease-lux group-hover:scale-[1.04]"
@@ -62,18 +68,18 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
             {/* Grain */}
             <div className="grain-overlay absolute inset-0 opacity-[0.12] mix-blend-overlay pointer-events-none" />
 
-            {/* Bottom gradient for the icon + label legibility */}
+            {/* Bottom gradient — heavier on mobile for title legibility */}
             <div
               aria-hidden="true"
-              className="absolute inset-0 pointer-events-none"
+              className="absolute inset-0 pointer-events-none max-sm:opacity-100 sm:opacity-0"
               style={{
                 background:
-                  'linear-gradient(to top, rgba(7,7,8,0.55) 0%, transparent 40%)',
+                  'linear-gradient(to top, rgba(7,7,8,0.85) 0%, rgba(7,7,8,0.55) 30%, transparent 60%)',
               }}
             />
 
-            {/* Centered category icon + label */}
-            <div className="relative flex flex-col items-center gap-5">
+            {/* Desktop-only: centered icon + category */}
+            <div className="relative hidden sm:flex flex-col items-center gap-5">
               <Icon
                 size={56}
                 strokeWidth={1}
@@ -91,21 +97,43 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
               </span>
             </div>
 
-            {/* Reading time — bottom left */}
-            <div className="absolute bottom-5 left-5">
+            {/* Reading time — bottom left (desktop only) */}
+            <div className="absolute bottom-5 left-5 hidden sm:block">
               <span className="text-[10px] uppercase tracking-[0.18em] text-white/55 font-medium">
                 {post.readTime}
               </span>
+            </div>
+
+            {/* ═══════════════════════════════════════════
+                MOBILE-ONLY: title over the image
+                ═══════════════════════════════════════════ */}
+            <div className="absolute inset-x-0 bottom-0 p-6 sm:hidden">
+              {/* Category + reading time */}
+              <div className="flex items-center gap-2.5 mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-copper-300">
+                <span>{post.category}</span>
+                <span
+                  aria-hidden="true"
+                  className="w-1 h-1 rounded-full bg-copper-400/60"
+                />
+                <span className="text-white/60">{post.readTime}</span>
+              </div>
+
+              {/* Title */}
+              <h3 className="font-display text-2xl text-white leading-[1.15] tracking-[-0.015em] line-clamp-3">
+                {post.title}
+              </h3>
             </div>
           </div>
 
           {/* ═══════════════════════════════════════════
               CONTENT PANEL
+              Mobile:  date · excerpt · author · CTA
+              Desktop: date · category · title · excerpt · author · CTA
               ═══════════════════════════════════════════ */}
-          <div className="flex flex-col justify-center p-8 lg:p-12">
+          <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-12">
 
-            {/* Date + category meta */}
-            <div className="flex items-center gap-3 mb-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-subtle">
+            {/* Desktop-only: date + category eyebrow */}
+            <div className="hidden sm:flex items-center gap-3 mb-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-subtle">
               <span>{formatDate(post.publishedAt)}</span>
               <span
                 aria-hidden="true"
@@ -114,18 +142,23 @@ export function FeaturedPost({ post }: FeaturedPostProps) {
               <span>{post.category}</span>
             </div>
 
-            {/* Title */}
-            <h3 className="font-display text-2xl lg:text-3xl xl:text-4xl text-ink leading-[1.15] tracking-[-0.015em] mb-6 transition-colors duration-300 group-hover:text-copper-700">
+            {/* Mobile-only: date */}
+            <div className="sm:hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-subtle mb-3">
+              {formatDate(post.publishedAt)}
+            </div>
+
+            {/* Desktop-only: title */}
+            <h3 className="hidden sm:block font-display text-2xl lg:text-3xl xl:text-4xl text-ink leading-[1.15] tracking-[-0.015em] mb-6 transition-colors duration-300 group-hover:text-copper-700">
               {post.title}
             </h3>
 
             {/* Excerpt */}
-            <p className="text-base text-ink-muted leading-relaxed font-light mb-8 line-clamp-3">
+            <p className="text-sm sm:text-base text-ink-muted leading-relaxed font-light mb-6 sm:mb-8 line-clamp-2 sm:line-clamp-3">
               {post.excerpt}
             </p>
 
             {/* Author + CTA */}
-            <div className="flex items-center justify-between pt-6 mt-auto border-t border-border gap-4">
+            <div className="flex items-center justify-between pt-5 sm:pt-6 mt-auto border-t border-border gap-4">
               <div className="min-w-0">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink truncate">
                   {post.author.name}

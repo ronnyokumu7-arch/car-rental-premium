@@ -8,13 +8,15 @@ import { getCategoryIcon } from '../../lib/postIcons';
 
 /* ─────────────────────────────────────────────────────────────
    UPDATE INDEX
-   Compact numbered list of posts. No images. Editorial.
+   Compact numbered list of posts. Editorial "also in this issue."
 
    Two variants:
      • light — ivory/obsidian, for light backgrounds
-                (homepage "Also in this issue")
      • dark  — white/muted, for dark backgrounds
-                (post page "Keep Reading" on mobile)
+
+   Layout:
+     • Mobile  — row includes a 2-line excerpt below the title
+     • Desktop — row is compact: number · category · title · meta
 
    Used by:
      • LatestUpdates.tsx (light)
@@ -24,9 +26,7 @@ import { getCategoryIcon } from '../../lib/postIcons';
 interface UpdateIndexProps {
   posts: Post[];
   variant?: 'light' | 'dark';
-  /** Header label — defaults to "Also in this issue" */
   header?: string;
-  /** Footer hint — set to null to hide */
   footer?: string | null;
 }
 
@@ -43,7 +43,7 @@ export function UpdateIndex({
   return (
     <div className="flex flex-col h-full">
 
-      {/* ── Header label ── */}
+      {/* Header label */}
       <div
         className={`flex items-center gap-3 mb-6 pb-4 border-b ${
           isDark ? 'border-white/[0.08]' : 'border-border'
@@ -62,7 +62,7 @@ export function UpdateIndex({
         </p>
       </div>
 
-      {/* ── The list ── */}
+      {/* The list */}
       <div className="flex flex-col">
         {posts.map((post, i) => (
           <IndexRow
@@ -74,7 +74,7 @@ export function UpdateIndex({
         ))}
       </div>
 
-      {/* ── Footer hint ── */}
+      {/* Footer hint */}
       {footer && (
         <p
           className={`mt-auto pt-6 text-[11px] uppercase tracking-[0.16em] font-medium ${
@@ -178,6 +178,20 @@ function IndexRow({
           >
             {post.title}
           </h3>
+
+          {/* ═══════════════════════════════════════════
+              MOBILE-ONLY: 2-line excerpt
+              ═══════════════════════════════════════════ */}
+          {post.excerpt && (
+            <p
+              className={`
+                sm:hidden text-xs leading-relaxed font-light line-clamp-2 mb-2.5
+                ${isDark ? 'text-white/50' : 'text-ink-muted'}
+              `}
+            >
+              {post.excerpt}
+            </p>
+          )}
 
           {/* Meta line */}
           <div
