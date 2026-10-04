@@ -12,11 +12,6 @@ import { getCategoryIcon } from '../../lib/postIcons';
    Two-column editorial: dark visual panel on the left,
    ivory content panel on the right.
 
-   Different from PostCard:
-     • Bigger, more editorial, no truncation of excerpt
-     • Presented as THE lead story (label + reading time)
-     • Split layout, not stacked
-
    Used only by LatestUpdates.tsx
    ───────────────────────────────────────────────────────────── */
 

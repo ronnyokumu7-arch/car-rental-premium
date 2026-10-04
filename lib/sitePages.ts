@@ -38,15 +38,17 @@ export interface SitePage {
      0.9 → Primary conversion surface (fleet)
      0.8 → High-value secondary (contact, updates index)
      0.7 → Trust pages (about)
+     0.6 → Feature pages (rental calendar)
      0.5 → Legal / utility (privacy, terms)
    ───────────────────────────────────────────────────────────── */
 
 export const STATIC_PAGES: SitePage[] = [
-  { path: '/',         priority: 1.0, changeFrequency: 'weekly' },
-  { path: '/vehicles', priority: 0.9, changeFrequency: 'weekly' },
-  { path: '/contact',  priority: 0.8, changeFrequency: 'monthly' },
-  { path: '/updates',  priority: 0.8, changeFrequency: 'weekly' },
-  { path: '/about',    priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/',                priority: 1.0, changeFrequency: 'weekly' },
+  { path: '/vehicles',        priority: 0.9, changeFrequency: 'weekly' },
+  { path: '/contact',         priority: 0.8, changeFrequency: 'monthly' },
+  { path: '/updates',         priority: 0.8, changeFrequency: 'weekly' },
+  { path: '/about',           priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/rental-calendar', priority: 0.6, changeFrequency: 'monthly' },
 
   /* ─── Reserved for later — uncomment when the pages exist ─── */
   // { path: '/list-your-car', priority: 0.7, changeFrequency: 'monthly' },
