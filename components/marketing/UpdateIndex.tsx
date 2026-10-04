@@ -8,64 +8,102 @@ import { getCategoryIcon } from '../../lib/postIcons';
 
 /* ─────────────────────────────────────────────────────────────
    UPDATE INDEX
-   Compact numbered list of posts — the "also in this issue"
-   column beside the featured post.
+   Compact numbered list of posts. No images. Editorial.
 
-   No images. No big cards. Just:
-     number · category · title · date · read time · arrow
+   Two variants:
+     • light — ivory/obsidian, for light backgrounds
+                (homepage "Also in this issue")
+     • dark  — white/muted, for dark backgrounds
+                (post page "Keep Reading" on mobile)
 
-   Purpose:
-     • Compact on mobile (each row ~100px, not ~500px)
-     • Editorial feel — reads like a table of contents
-     • On desktop, sits beside the FeaturedPost in a 5-col slot
-
-   Used only by LatestUpdates.tsx
+   Used by:
+     • LatestUpdates.tsx (light)
+     • app/updates/[slug]/page.tsx (dark, mobile)
    ───────────────────────────────────────────────────────────── */
 
 interface UpdateIndexProps {
   posts: Post[];
+  variant?: 'light' | 'dark';
+  /** Header label — defaults to "Also in this issue" */
+  header?: string;
+  /** Footer hint — set to null to hide */
+  footer?: string | null;
 }
 
-export function UpdateIndex({ posts }: UpdateIndexProps) {
+export function UpdateIndex({
+  posts,
+  variant = 'light',
+  header = 'Also in this issue',
+  footer = 'More on the updates page',
+}: UpdateIndexProps) {
   if (posts.length === 0) return null;
+
+  const isDark = variant === 'dark';
 
   return (
     <div className="flex flex-col h-full">
 
       {/* ── Header label ── */}
-      <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border">
+      <div
+        className={`flex items-center gap-3 mb-6 pb-4 border-b ${
+          isDark ? 'border-white/[0.08]' : 'border-border'
+        }`}
+      >
         <span
           aria-hidden="true"
           className="w-6 h-px bg-copper-500/50"
         />
-        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-subtle">
-          Also in this issue
+        <p
+          className={`text-[10px] font-semibold uppercase tracking-[0.28em] ${
+            isDark ? 'text-copper-400' : 'text-ink-subtle'
+          }`}
+        >
+          {header}
         </p>
       </div>
 
       {/* ── The list ── */}
       <div className="flex flex-col">
         {posts.map((post, i) => (
-          <IndexRow key={post.id} post={post} index={i} />
+          <IndexRow
+            key={post.id}
+            post={post}
+            index={i}
+            variant={variant}
+          />
         ))}
       </div>
 
       {/* ── Footer hint ── */}
-      <p className="mt-auto pt-6 text-[11px] uppercase tracking-[0.16em] text-ink-subtle font-medium">
-        More on the updates page
-      </p>
+      {footer && (
+        <p
+          className={`mt-auto pt-6 text-[11px] uppercase tracking-[0.16em] font-medium ${
+            isDark ? 'text-white/40' : 'text-ink-subtle'
+          }`}
+        >
+          {footer}
+        </p>
+      )}
     </div>
   );
 }
 
 /* ─────────────────────────────────────────────────────────────
    INDEX ROW
-   One line item. Numbered, compact, hoverable.
    ───────────────────────────────────────────────────────────── */
 
-function IndexRow({ post, index }: { post: Post; index: number }) {
+function IndexRow({
+  post,
+  index,
+  variant,
+}: {
+  post: Post;
+  index: number;
+  variant: 'light' | 'dark';
+}) {
   const Icon = getCategoryIcon(post.category);
-  const rowNumber = String(index + 2).padStart(2, '0'); // 02, 03, 04 (01 is the featured post)
+  const rowNumber = String(index + 2).padStart(2, '0');
+  const isDark = variant === 'dark';
 
   return (
     <motion.div
@@ -80,17 +118,34 @@ function IndexRow({ post, index }: { post: Post; index: number }) {
     >
       <Link
         href={`/updates/${post.slug}`}
-        className="group flex items-start gap-4 py-5 border-b border-border last:border-b-0 transition-colors duration-300 hover:border-copper-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 focus-visible:ring-offset-2 rounded-sm"
+        className={`
+          group flex items-start gap-4 py-5 border-b last:border-b-0
+          transition-colors duration-300 rounded-sm
+          focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 focus-visible:ring-offset-2
+          ${
+            isDark
+              ? 'border-white/[0.08] hover:border-copper-500/40'
+              : 'border-border hover:border-copper-500/30'
+          }
+        `}
       >
-        {/* ── Row number (mono) ── */}
+        {/* Row number */}
         <span
           aria-hidden="true"
-          className="shrink-0 font-mono text-[11px] tracking-[0.14em] text-ink-subtle tabular-nums pt-1 transition-colors duration-300 group-hover:text-copper-500"
+          className={`
+            shrink-0 font-mono text-[11px] tracking-[0.14em] tabular-nums pt-1
+            transition-colors duration-300
+            ${
+              isDark
+                ? 'text-white/35 group-hover:text-copper-400'
+                : 'text-ink-subtle group-hover:text-copper-500'
+            }
+          `}
         >
           {rowNumber}
         </span>
 
-        {/* ── Content ── */}
+        {/* Content */}
         <div className="flex-1 min-w-0">
 
           {/* Category row */}
@@ -100,36 +155,72 @@ function IndexRow({ post, index }: { post: Post; index: number }) {
               strokeWidth={2}
               className="text-copper-500 shrink-0"
             />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-subtle">
+            <span
+              className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${
+                isDark ? 'text-copper-400' : 'text-ink-subtle'
+              }`}
+            >
               {post.category}
             </span>
           </div>
 
           {/* Title */}
-          <h3 className="font-display text-lg lg:text-xl text-ink leading-snug tracking-[-0.005em] mb-2 transition-colors duration-300 group-hover:text-copper-700">
+          <h3
+            className={`
+              font-display text-lg lg:text-xl leading-snug tracking-[-0.005em] mb-2
+              transition-colors duration-300
+              ${
+                isDark
+                  ? 'text-white group-hover:text-copper-200'
+                  : 'text-ink group-hover:text-copper-700'
+              }
+            `}
+          >
             {post.title}
           </h3>
 
           {/* Meta line */}
-          <div className="flex items-center gap-2.5 text-[10px] font-medium uppercase tracking-[0.16em] text-ink-subtle">
+          <div
+            className={`flex items-center gap-2.5 text-[10px] font-medium uppercase tracking-[0.16em] ${
+              isDark ? 'text-white/45' : 'text-ink-subtle'
+            }`}
+          >
             <span>{formatDate(post.publishedAt)}</span>
             <span
               aria-hidden="true"
-              className="w-1 h-1 rounded-full bg-border-strong"
+              className={`w-1 h-1 rounded-full ${
+                isDark ? 'bg-white/25' : 'bg-border-strong'
+              }`}
             />
             <span>{post.readTime}</span>
           </div>
         </div>
 
-        {/* ── Arrow ── */}
+        {/* Arrow */}
         <span
           aria-hidden="true"
-          className="shrink-0 mt-1 flex items-center justify-center w-8 h-8 rounded-full border border-border transition-all duration-300 ease-lux group-hover:border-copper-500/60 group-hover:bg-copper-500/[0.06]"
+          className={`
+            shrink-0 mt-1 flex items-center justify-center w-8 h-8 rounded-full border
+            transition-all duration-300 ease-lux
+            ${
+              isDark
+                ? 'border-white/[0.10] group-hover:border-copper-500/60 group-hover:bg-copper-500/[0.08]'
+                : 'border-border group-hover:border-copper-500/60 group-hover:bg-copper-500/[0.06]'
+            }
+          `}
         >
           <ArrowUpRight
             size={13}
             strokeWidth={2.5}
-            className="text-ink-muted transition-all duration-300 ease-lux group-hover:text-copper-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            className={`
+              transition-all duration-300 ease-lux
+              ${
+                isDark
+                  ? 'text-white/50 group-hover:text-copper-300'
+                  : 'text-ink-muted group-hover:text-copper-600'
+              }
+              group-hover:translate-x-0.5 group-hover:-translate-y-0.5
+            `}
           />
         </span>
       </Link>

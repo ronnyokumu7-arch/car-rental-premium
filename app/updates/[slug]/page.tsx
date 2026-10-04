@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Clock } from 'lucide-react';
+import type { Metadata } from 'next';
 import {
   POSTS,
   getPostBySlug,
@@ -9,35 +10,23 @@ import {
 } from '../../../lib/posts';
 import { PostBody } from '../../../components/marketing/PostBody';
 import { CompactPostCard } from '../../../components/marketing/CompactPostCard';
+import { UpdateIndex } from '../../../components/marketing/UpdateIndex';
 import { FinalCTA } from '../../../components/marketing/FinalCTA';
 import { SITE_URL } from '../../../lib/metadata';
-import type { Metadata } from 'next';
 
 /* ─────────────────────────────────────────────────────────────
    POST DETAIL PAGE
    /updates/[slug]
-
-   Layout:
-     1. Hero — accent gradient from post, category badge,
-        title, heroHook pull-quote, meta row
-     2. Article body — rendered markdown via PostBody
-     3. Author block
-     4. Related posts (CompactPostCard grid, dark section)
-     5. FinalCTA
-
-   Uses full site palette (obsidian / copper / ivory).
    ───────────────────────────────────────────────────────────── */
 
 interface PageProps {
   params: { slug: string };
 }
 
-/* ── Static params ── */
 export function generateStaticParams() {
   return getAllPostSlugs().map((slug) => ({ slug }));
 }
 
-/* ── Per-post metadata ── */
 export function generateMetadata({ params }: PageProps): Metadata {
   const post = getPostBySlug(params.slug);
 
@@ -75,7 +64,6 @@ export default function PostPage({ params }: PageProps) {
     notFound();
   }
 
-  /* ── Related posts: same category first, fallback to recent ── */
   const sameCategory = POSTS.filter(
     (p) => p.slug !== post.slug && p.category === post.category
   ).slice(0, 3);
@@ -91,7 +79,6 @@ export default function PostPage({ params }: PageProps) {
           ══════════════════════════════════════════════════════ */}
       <section className="relative bg-obsidian-950 pt-28 lg:pt-36 pb-20 lg:pb-24 px-6 lg:px-8 overflow-hidden">
 
-        {/* Post-specific gradient wash */}
         <div
           aria-hidden="true"
           className="absolute inset-0 opacity-40 pointer-events-none"
@@ -100,7 +87,6 @@ export default function PostPage({ params }: PageProps) {
           }}
         />
 
-        {/* Copper ambient glow */}
         <div
           aria-hidden="true"
           className="absolute inset-0 opacity-40 pointer-events-none"
@@ -110,7 +96,6 @@ export default function PostPage({ params }: PageProps) {
           }}
         />
 
-        {/* Cool counter-glow */}
         <div
           aria-hidden="true"
           className="absolute inset-0 pointer-events-none"
@@ -120,10 +105,8 @@ export default function PostPage({ params }: PageProps) {
           }}
         />
 
-        {/* Grain */}
         <div className="grain-overlay absolute inset-0 opacity-[0.10] mix-blend-overlay pointer-events-none" />
 
-        {/* Copper bottom hairline */}
         <div
           aria-hidden="true"
           className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-copper-500/30 to-transparent"
@@ -131,7 +114,6 @@ export default function PostPage({ params }: PageProps) {
 
         <div className="relative max-w-4xl mx-auto">
 
-          {/* Back link */}
           <Link
             href="/updates"
             className="group inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/60 hover:text-white transition-colors duration-300 mb-10"
@@ -144,26 +126,22 @@ export default function PostPage({ params }: PageProps) {
             Back to updates
           </Link>
 
-          {/* Category badge */}
           <div className="flex items-center gap-2 mb-6">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-copper-500 text-obsidian-950 rounded-md text-[10px] font-bold uppercase tracking-[0.16em] shadow-[0_4px_12px_rgba(194,112,46,0.35)]">
               {post.category}
             </span>
           </div>
 
-          {/* Title */}
           <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl xl:text-6xl text-white leading-[1.05] tracking-[-0.025em] mb-8 max-w-4xl">
             {post.title}
           </h1>
 
-          {/* Hero hook — editorial pull-quote */}
           {post.heroHook && (
             <p className="font-display text-lg lg:text-xl text-white/85 italic leading-relaxed max-w-2xl mb-10 border-l-2 border-copper-500/60 pl-5 tracking-[-0.005em]">
               {post.heroHook}
             </p>
           )}
 
-          {/* Meta row */}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">
             <span>{formatDateLong(post.publishedAt)}</span>
             <span
@@ -180,9 +158,7 @@ export default function PostPage({ params }: PageProps) {
             />
             <span>
               By{' '}
-              <span className="text-white/90">
-                {post.author.name}
-              </span>
+              <span className="text-white/90">{post.author.name}</span>
               {post.author.role && (
                 <span className="text-white/45">
                   {' '}
@@ -192,7 +168,6 @@ export default function PostPage({ params }: PageProps) {
             </span>
           </div>
 
-          {/* Updated notice */}
           {post.updatedAt && (
             <div className="mt-8 pt-6 border-t border-white/[0.08]">
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-copper-400">
@@ -206,12 +181,12 @@ export default function PostPage({ params }: PageProps) {
       {/* ══════════════════════════════════════════════════════
           ARTICLE BODY
           ══════════════════════════════════════════════════════ */}
-      <article className="bg-background py-16 lg:py-24 px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          {post.content ? (
-            <PostBody content={post.content} />
-          ) : (
-            <div className="max-w-3xl mx-auto text-center py-16">
+<article className="bg-background py-16 lg:py-24 px-6 lg:px-8">
+  <div className="max-w-7xl mx-auto">
+    {post.content ? (
+      <PostBody content={post.content} />
+    ) : (
+            <div className="text-center py-16">
               <p className="font-display text-2xl lg:text-3xl text-ink mb-3 tracking-[-0.01em]">
                 Full story coming soon.
               </p>
@@ -253,7 +228,7 @@ export default function PostPage({ params }: PageProps) {
           AUTHOR BLOCK
           ══════════════════════════════════════════════════════ */}
       <section className="bg-background pb-16 lg:pb-24 px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="pt-12 border-t border-border">
             <div className="flex items-start gap-5">
               <div className="shrink-0 w-16 h-16 rounded-full bg-obsidian-950 flex items-center justify-center text-white font-display text-xl tracking-[-0.01em]">
@@ -285,11 +260,12 @@ export default function PostPage({ params }: PageProps) {
 
       {/* ══════════════════════════════════════════════════════
           RELATED POSTS
+          Mobile:  UpdateIndex list (typographic, no cards)
+          Desktop: CompactPostCard grid (3-column)
           ══════════════════════════════════════════════════════ */}
       {relatedPosts.length > 0 && (
         <section className="relative bg-obsidian-950 py-20 lg:py-24 px-6 lg:px-8 overflow-hidden">
 
-          {/* Ambient lighting */}
           <div
             aria-hidden="true"
             className="absolute inset-0 pointer-events-none"
@@ -300,7 +276,6 @@ export default function PostPage({ params }: PageProps) {
           />
           <div className="grain-overlay absolute inset-0 opacity-[0.08] mix-blend-overlay pointer-events-none" />
 
-          {/* Copper top hairline */}
           <div
             aria-hidden="true"
             className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-copper-500/25 to-transparent"
@@ -332,8 +307,18 @@ export default function PostPage({ params }: PageProps) {
               </Link>
             </div>
 
-            {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+            {/* ── Mobile: typographic index ── */}
+            <div className="sm:hidden">
+              <UpdateIndex
+                posts={relatedPosts}
+                variant="dark"
+                header="Also in this issue"
+                footer={null}
+              />
+            </div>
+
+            {/* ── Desktop: card grid ── */}
+            <div className="hidden sm:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
               {relatedPosts.map((p, i) => (
                 <CompactPostCard key={p.id} post={p} index={i} />
               ))}
@@ -343,7 +328,7 @@ export default function PostPage({ params }: PageProps) {
       )}
 
       {/* ══════════════════════════════════════════════════════
-          FINAL CTA — the real one
+          FINAL CTA
           ══════════════════════════════════════════════════════ */}
       <FinalCTA />
     </main>
