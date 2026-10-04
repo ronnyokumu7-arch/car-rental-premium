@@ -2,52 +2,101 @@
 
 import { useFormState, useFormStatus } from 'react-dom';
 import { useSearchParams } from 'next/navigation';
-import { ArrowRight, Check, AlertCircle, Sparkles } from 'lucide-react';
+import { ArrowRight, Check, AlertCircle, Sparkles, Phone } from 'lucide-react';
 import { submitContact, type ContactState } from '../../app/actions/contact';
 import { SERVICE_OPTIONS } from '../../lib/contact';
 import { VEHICLES } from '../../lib/vehicles';
+import { BRAND } from '../../lib/constants';
 
 const initialState: ContactState = {};
+
+/* ─────────────────────────────────────────────────────────────
+   CONTACT FORM
+   Primary enquiry surface. Handles three input modes:
+
+     1. Blank       — user arrives at /contact directly
+     2. ?vehicle=X  — user clicked "Reserve" on a vehicle
+     3. ?service=Y  — user clicked a service CTA (chauffeured,
+                      airport transfer, etc.)
+
+   Query params pre-fill the corresponding field. Never
+   auto-submit — always let the user review.
+
+   Contracts:
+     • Server action: submitContact (app/actions/contact.ts)
+     • Uses booking-input styles from globals.css
+     • Success state replaces the entire form (no dialog)
+   ───────────────────────────────────────────────────────────── */
 
 export function ContactForm() {
   const [state, formAction] = useFormState(submitContact, initialState);
   const searchParams = useSearchParams();
-  const preselectedVehicle = searchParams.get('vehicle') || '';
-  const preselectedVehicleName =
-    VEHICLES.find((v) => v.id === preselectedVehicle)?.name || '';
 
-  /* ── SUCCESS STATE ── */
+  /* ── Query params ── */
+  const vehicleParam = searchParams.get('vehicle') || '';
+  const serviceParam = searchParams.get('service') || '';
+
+  /* ── Resolve vehicle name (falls back to the raw param) ── */
+  const preselectedVehicle = VEHICLES.find((v) => v.id === vehicleParam);
+  const preselectedVehicleName = preselectedVehicle?.name || '';
+
+  /* ── Normalize service param → must match SERVICE_OPTIONS ── */
+  const normalizedService = (() => {
+    if (!serviceParam) return '';
+    /* Case-insensitive + flexible matching */
+    const needle = serviceParam.toLowerCase();
+    return (
+      SERVICE_OPTIONS.find((opt) => opt.toLowerCase() === needle) ??
+      SERVICE_OPTIONS.find((opt) =>
+        opt.toLowerCase().includes(needle.split('+').join(' '))
+      ) ??
+      ''
+    );
+  })();
+
+  /* ── Success state ── */
   if (state.success) {
     return (
-      <div className="bg-porcelain border border-charcoal-300/30 rounded-sm overflow-hidden">
-        {/* Gold top accent */}
-        <div className="h-1 bg-gradient-to-r from-accent-500 via-accent-600 to-accent-500" />
+      <div className="bg-surface border border-border rounded-2xl overflow-hidden shadow-[0_12px_32px_rgba(14,14,16,0.08)]">
+        {/* Copper accent bar */}
+        <div className="h-1 bg-gradient-to-r from-copper-500 via-copper-400 to-copper-500" />
 
         <div className="p-8 lg:p-14">
-          <div className="w-16 h-16 rounded-full bg-accent-50 border border-accent-500/40 flex items-center justify-center mb-8">
-            <Check size={28} className="text-accent-600" />
+          {/* Success icon */}
+          <div className="w-16 h-16 rounded-full bg-copper-500/[0.10] border border-copper-500/30 flex items-center justify-center mb-8">
+            <Check size={28} strokeWidth={2.5} className="text-copper-600" />
           </div>
 
-          <p className="type-caption text-accent-600 mb-3">
+          {/* Label */}
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-copper-600 mb-3">
             Enquiry Received
           </p>
-          <h3 className="font-display text-4xl lg:text-5xl text-primary-900 mb-6 leading-tight">
-            Thank You
+
+          {/* Headline */}
+          <h3 className="font-display text-3xl lg:text-4xl text-ink mb-6 leading-[1.1] tracking-[-0.015em]">
+            Thank you.
           </h3>
-          <p className="text-charcoal-700 leading-relaxed mb-8 max-w-lg text-base">
+
+          {/* Body */}
+          <p className="text-ink-muted leading-relaxed mb-8 max-w-lg text-base font-light">
             {state.message}
           </p>
 
-          <div className="pt-6 border-t border-charcoal-300/30">
-            <p className="text-[10px] uppercase tracking-widest text-charcoal-500 mb-3">
+          {/* Divider + phone */}
+          <div className="pt-6 border-t border-border">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-subtle mb-4">
               Need us sooner?
             </p>
             <a
-              href="tel:+254780957810"
-              className="inline-flex items-center gap-2 font-display text-2xl text-primary-900 hover:text-accent-600 transition-colors"
+              href={`tel:${BRAND.phones[0].replace(/\s/g, '')}`}
+              className="group inline-flex items-center gap-3 font-display text-2xl text-ink hover:text-copper-600 transition-colors duration-300"
             >
-              +254 780 957 810
-              <ArrowRight size={16} />
+              <Phone size={18} className="text-copper-500" />
+              <span className="tabular-nums">{BRAND.phones[0]}</span>
+              <ArrowRight
+                size={16}
+                className="text-ink-subtle transition-transform duration-300 ease-lux group-hover:translate-x-1"
+              />
             </a>
           </div>
         </div>
@@ -55,70 +104,86 @@ export function ContactForm() {
     );
   }
 
-  /* ── FORM STATE ── */
+  /* ── Form state ── */
   return (
-    <div className="bg-porcelain border border-charcoal-300/30 rounded-sm overflow-hidden shadow-sm">
-      {/* Gold top accent bar */}
-      <div className="h-1 bg-gradient-to-r from-accent-500 via-accent-600 to-accent-500" />
+    <div className="bg-surface border border-border rounded-2xl overflow-hidden shadow-[0_12px_32px_rgba(14,14,16,0.08)]">
+
+      {/* Copper accent bar */}
+      <div className="h-1 bg-gradient-to-r from-copper-500 via-copper-400 to-copper-500" />
 
       {/* Header */}
-      <div className="px-6 lg:px-12 pt-10 lg:pt-14 pb-8 lg:pb-10 border-b border-charcoal-300/20">
-        <p className="type-caption text-accent-600 mb-3">
+      <div className="px-6 lg:px-12 pt-10 lg:pt-12 pb-8 border-b border-border">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-copper-600 mb-4">
           Send Us a Message
         </p>
-        <h3 className="font-display text-3xl lg:text-4xl text-primary-900 leading-tight mb-4">
-          How Can We Help?
+        <h3 className="font-display text-3xl lg:text-4xl text-ink leading-[1.1] tracking-[-0.015em] mb-4">
+          How can we help?
         </h3>
-        <p className="text-sm text-charcoal-500 max-w-md leading-relaxed">
+        <p className="text-sm text-ink-muted max-w-md leading-relaxed font-light">
           Tell us your dates, vehicle preference, and any special requests.
           We respond within 2 hours during business hours.
         </p>
       </div>
 
-      {/* Preselected vehicle banner */}
-      {preselectedVehicleName && (
+      {/* ── Preselected context banner ── */}
+      {(preselectedVehicleName || normalizedService) && (
         <div className="px-6 lg:px-12 pt-8">
-          <div className="flex items-start gap-3 px-4 py-3 bg-accent-50 border border-accent-500/30 rounded-sm">
-            <Sparkles size={16} className="text-accent-600 mt-0.5 shrink-0" />
-            <div>
-              <p className="text-[10px] uppercase tracking-widest text-accent-700 mb-1">
-                Vehicle of Interest
+          <div className="flex items-start gap-3 px-4 py-4 bg-copper-500/[0.06] border border-copper-500/25 rounded-lg">
+            <Sparkles
+              size={16}
+              strokeWidth={2.5}
+              className="text-copper-600 mt-0.5 shrink-0"
+            />
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-copper-700 mb-1">
+                {preselectedVehicleName
+                  ? 'Vehicle of Interest'
+                  : 'Service of Interest'}
               </p>
-              <p className="text-primary-900 font-medium text-sm">
-                {preselectedVehicleName}
+              <p className="text-ink font-medium text-sm">
+                {preselectedVehicleName || normalizedService}
               </p>
             </div>
-            <input
-              type="hidden"
-              name="vehicle"
-              value={preselectedVehicleName}
-            />
           </div>
         </div>
       )}
 
-      {/* Form body */}
+      {/* ── Hidden fields: submit the resolved values ── */}
+      {preselectedVehicleName && (
+        <input
+          type="hidden"
+          name="vehicle"
+          value={preselectedVehicleName}
+        />
+      )}
+
+      {/* ── Form body ── */}
       <form action={formAction} className="p-6 lg:p-12">
         {/* Error banner */}
         {state.message && !state.success && (
-          <div className="mb-6 flex items-start gap-3 px-4 py-3 bg-red-50 border border-red-300 rounded-sm text-sm text-red-700">
+          <div
+            role="alert"
+            className="mb-6 flex items-start gap-3 px-4 py-3 bg-danger-soft border border-danger/30 rounded-lg text-sm text-danger"
+          >
             <AlertCircle size={18} className="mt-0.5 shrink-0" />
             <p>{state.message}</p>
           </div>
         )}
 
         <div className="space-y-6">
-          {/* Name + Phone side by side on desktop */}
+
+          {/* Name + Phone */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <LightField
+            <FormField
               label="Full Name"
               name="name"
               placeholder="e.g. John Kamau"
               required
               error={state.errors?.name?.[0]}
               defaultValue={state.fields?.name}
+              autoComplete="name"
             />
-            <LightField
+            <FormField
               label="Phone Number"
               name="phone"
               type="tel"
@@ -126,26 +191,29 @@ export function ContactForm() {
               required
               error={state.errors?.phone?.[0]}
               defaultValue={state.fields?.phone}
+              autoComplete="tel"
             />
           </div>
 
           {/* Email */}
-          <LightField
+          <FormField
             label="Email (Optional)"
             name="email"
             type="email"
             placeholder="you@example.com"
             error={state.errors?.email?.[0]}
             defaultValue={state.fields?.email}
+            autoComplete="email"
           />
 
           {/* Service */}
           <div>
-            <LightLabel label="Service Required" required />
+            <FormLabel label="Service Required" required htmlFor="service" />
             <select
+              id="service"
               name="service"
               required
-              defaultValue={state.fields?.service ?? ''}
+              defaultValue={state.fields?.service ?? normalizedService}
               className="booking-input"
             >
               <option value="" disabled>
@@ -158,7 +226,7 @@ export function ContactForm() {
               ))}
             </select>
             {state.errors?.service?.[0] && (
-              <p className="mt-1.5 text-[11px] text-red-600">
+              <p className="mt-1.5 text-[11px] text-danger">
                 {state.errors.service[0]}
               </p>
             )}
@@ -166,8 +234,9 @@ export function ContactForm() {
 
           {/* Message */}
           <div>
-            <LightLabel label="Your Message" required />
+            <FormLabel label="Your Message" required htmlFor="message" />
             <textarea
+              id="message"
               name="message"
               required
               rows={5}
@@ -176,7 +245,7 @@ export function ContactForm() {
               className="booking-input !h-auto py-3 resize-none"
             />
             {state.errors?.message?.[0] && (
-              <p className="mt-1.5 text-[11px] text-red-600">
+              <p className="mt-1.5 text-[11px] text-danger">
                 {state.errors.message[0]}
               </p>
             )}
@@ -188,26 +257,27 @@ export function ContactForm() {
           </div>
 
           {/* Privacy line */}
-          <p className="text-[11px] text-charcoal-500 leading-relaxed">
-            By submitting this form you agree to be contacted by Royride Car
-            Hire regarding your enquiry. We never share your details.
+          <p className="text-[11px] text-ink-subtle leading-relaxed">
+            By submitting this form you agree to be contacted by{' '}
+            {BRAND.fullName} regarding your enquiry. We never share your
+            details.
           </p>
         </div>
       </form>
 
-      {/* Trust strip */}
-      <div className="border-t border-charcoal-300/20 px-6 lg:px-12 py-5 bg-porcelain">
-        <div className="flex flex-wrap gap-x-6 gap-y-2 text-[10px] uppercase tracking-widest text-charcoal-500">
+      {/* ── Trust strip ── */}
+      <div className="border-t border-border px-6 lg:px-12 py-5 bg-surface-sunken">
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
           <span className="flex items-center gap-1.5">
-            <span className="text-accent-500">✓</span>
+            <Check size={11} strokeWidth={3} className="text-copper-500" />
             Response within 2 hours
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="text-accent-500">✓</span>
+            <Check size={11} strokeWidth={3} className="text-copper-500" />
             No payment required
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="text-accent-500">✓</span>
+            <Check size={11} strokeWidth={3} className="text-copper-500" />
             Your details stay private
           </span>
         </div>
@@ -216,8 +286,10 @@ export function ContactForm() {
   );
 }
 
-/* ─────────────────────────────────────────── */
-function LightField({
+/* ─────────────────────────────────────────────────────────────
+   FORM FIELD
+   ───────────────────────────────────────────────────────────── */
+function FormField({
   label,
   name,
   type = 'text',
@@ -225,6 +297,7 @@ function LightField({
   required,
   error,
   defaultValue,
+  autoComplete,
 }: {
   label: string;
   name: string;
@@ -233,10 +306,11 @@ function LightField({
   required?: boolean;
   error?: string;
   defaultValue?: string;
+  autoComplete?: string;
 }) {
   return (
     <div>
-      <LightLabel label={label} required={required} htmlFor={name} />
+      <FormLabel label={label} required={required} htmlFor={name} />
       <input
         id={name}
         name={name}
@@ -244,14 +318,18 @@ function LightField({
         placeholder={placeholder}
         required={required}
         defaultValue={defaultValue}
+        autoComplete={autoComplete}
         className="booking-input"
       />
-      {error && <p className="mt-1.5 text-[11px] text-red-600">{error}</p>}
+      {error && <p className="mt-1.5 text-[11px] text-danger">{error}</p>}
     </div>
   );
 }
 
-function LightLabel({
+/* ─────────────────────────────────────────────────────────────
+   FORM LABEL
+   ───────────────────────────────────────────────────────────── */
+function FormLabel({
   label,
   required,
   htmlFor,
@@ -263,14 +341,17 @@ function LightLabel({
   return (
     <label
       htmlFor={htmlFor}
-      className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.15em] text-charcoal-500 mb-3 font-medium"
+      className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-subtle mb-3"
     >
       {label}
-      {required && <span className="text-accent-600">*</span>}
+      {required && <span className="text-copper-600">*</span>}
     </label>
   );
 }
 
+/* ─────────────────────────────────────────────────────────────
+   SUBMIT BUTTON
+   ───────────────────────────────────────────────────────────── */
 function SubmitButton() {
   const { pending } = useFormStatus();
 
@@ -278,19 +359,34 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="group w-full inline-flex items-center justify-center gap-3 px-8 py-5 bg-accent-500 text-primary-900 text-xs font-bold uppercase tracking-[0.15em] rounded-sm transition-all duration-300 hover:bg-accent-600 hover:text-porcelain hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
+      className="group relative w-full inline-flex items-center justify-center gap-3 px-8 py-5 text-xs font-semibold uppercase tracking-[0.16em] text-obsidian-950 rounded-lg overflow-hidden transition-all duration-300 ease-lux hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+      style={{
+        backgroundImage:
+          'linear-gradient(135deg, #E3A468 0%, #D98A44 45%, #C2702E 100%)',
+        boxShadow:
+          '0 1px 2px rgba(168,90,34,0.20), 0 8px 24px rgba(194,112,46,0.28)',
+      }}
     >
       {pending ? (
         <>
-          <span className="inline-block w-4 h-4 border-2 border-primary-900/30 border-t-primary-900 rounded-full animate-spin" />
-          Sending…
+          <span className="inline-block w-4 h-4 border-2 border-obsidian-950/30 border-t-obsidian-950 rounded-full animate-spin" />
+          <span className="relative z-10">Sending…</span>
         </>
       ) : (
         <>
-          Send Enquiry
+          <span className="relative z-10">Send Enquiry</span>
           <ArrowRight
             size={16}
-            className="transition-transform group-hover:translate-x-1"
+            strokeWidth={2.5}
+            className="relative z-10 transition-transform duration-300 ease-lux group-hover:translate-x-1"
+          />
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-lux"
+            style={{
+              background:
+                'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%)',
+            }}
           />
         </>
       )}

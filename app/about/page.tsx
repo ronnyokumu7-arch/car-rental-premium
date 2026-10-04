@@ -3,19 +3,23 @@ import { AboutContent } from '../../components/marketing/AboutContent';
 import { buildPageMetadata } from '../../lib/metadata';
 
 export const metadata: Metadata = buildPageMetadata({
-  title: 'About Us',
+  title: 'About Royride — Car Hire in Nairobi Since 2019',
   description:
-    "Nairobi's trusted car hire since 2019. 46 vehicles, 17 partner owners, and a fleet ranging from economy saloons to executive SUVs — serving individuals, businesses, and expats across Kenya.",
+    'Meet the team behind Nairobi\'s trusted car hire fleet. Learn how Royride maintains its vehicles, vets its drivers, and has earned 4.9 stars on Google.',
   path: '/about',
   keywords: [
-    'about Royride car hire',
-    'car rental company Nairobi',
-    'trusted car hire Kenya',
+    'Royride Car Hire',
+    'about Royride',
+    'Nairobi car hire company',
+    'trusted car rental Nairobi',
     'car hire since 2019',
-    'Royride Car Hire Ltd',
   ],
 });
 
 export default function AboutPage() {
-  return <AboutContent />;
+  return (
+    <main id="main" className="relative">
+      <AboutContent />
+    </main>
+  );
 }

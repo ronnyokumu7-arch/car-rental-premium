@@ -2,37 +2,71 @@
 
 import { z } from 'zod';
 import { Resend } from 'resend';
+import { SERVICE_OPTIONS } from '../../lib/contact';
+import { BRAND } from '../../lib/constants';
+import { VEHICLES } from '../../lib/vehicles';
 
+/* ─────────────────────────────────────────────────────────────
+   CONTACT — server action
+   Receives the enquiry form, validates, sends via Resend.
+
+   Contracts:
+     • Validates with Zod 4
+     • Escapes all user input before injecting into HTML email
+     • Restores form fields on error (fields object)
+     • Never exposes the recipient address to the client
+     • Sends a branded HTML email using the current palette
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Resend setup ── */
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// ─────────────────────────────────────────────────────────────
-// Configure sender + recipient here.
-// The sender MUST be @royride.com (verified in Resend).
-// The recipient can be changed anytime without re-verification.
-// ─────────────────────────────────────────────────────────────
-const FROM_EMAIL = 'Royride Website <sales@royride.com>';
+const FROM_EMAIL = `Royride Website <sales@royride.com>`;
 
-// ⚠️ TEMPORARY: using a working inbox until carhire@royride.com is live.
-// Change to 'carhire@royride.com' once that inbox is set up.
+/* ⚠️ TEMPORARY: using a working inbox until carhire@royride.com is live.
+   Change to 'carhire@royride.com' once that inbox is set up. */
 const DESTINATION_EMAIL = 'ronnyokumu7@gmail.com';
 
+/* ── Schema ── */
 const contactSchema = z.object({
-  name: z.string().min(2, 'Please enter your full name'),
+  name: z
+    .string()
+    .trim()
+    .min(2, 'Please enter your full name')
+    .max(100, 'Name is too long'),
+
   phone: z
     .string()
+    .trim()
     .min(9, 'Please enter a valid phone number')
-    .regex(/^[0-9+\s()-]+$/, 'Please enter a valid phone number'),
+    .max(20, 'Phone number is too long')
+    .regex(
+      /^[0-9+\s()-]+$/,
+      'Please enter a valid phone number'
+    ),
+
   email: z
     .string()
-    .email('Please enter a valid email')
-    .optional()
-    .or(z.literal('')),
-  service: z.string().min(1, 'Please select a service'),
-  vehicle: z.string().optional(),
+    .trim()
+    .max(150, 'Email is too long')
+    .pipe(z.email('Please enter a valid email').or(z.literal('')))
+    .optional(),
+
+  service: z.enum(SERVICE_OPTIONS, {
+    error: 'Please select a service',
+  }),
+
+  vehicle: z
+    .string()
+    .trim()
+    .max(100, 'Vehicle name is too long')
+    .optional(),
+
   message: z
     .string()
+    .trim()
     .min(10, 'Please tell us a little about your requirement')
-    .max(1000),
+    .max(1000, 'Message is too long'),
 });
 
 export type ContactState = {
@@ -42,17 +76,31 @@ export type ContactState = {
   fields?: Record<string, string>;
 };
 
+/* ── HTML escape ── */
+function esc(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ACTION
+   ───────────────────────────────────────────────────────────── */
+
 export async function submitContact(
   _prev: ContactState,
   formData: FormData
 ): Promise<ContactState> {
   const raw = {
-    name: formData.get('name') as string,
-    phone: formData.get('phone') as string,
+    name: (formData.get('name') as string) || '',
+    phone: (formData.get('phone') as string) || '',
     email: (formData.get('email') as string) || '',
-    service: formData.get('service') as string,
+    service: (formData.get('service') as string) || '',
     vehicle: (formData.get('vehicle') as string) || '',
-    message: formData.get('message') as string,
+    message: (formData.get('message') as string) || '',
   };
 
   const parsed = contactSchema.safeParse(raw);
@@ -60,22 +108,39 @@ export async function submitContact(
   if (!parsed.success) {
     return {
       success: false,
-      errors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
+      errors: parsed.error.flatten().fieldErrors as Record<
+        string,
+        string[]
+      >,
       fields: raw,
     };
   }
 
   const data = parsed.data;
 
-  // Basic HTML escaping to prevent injection in the email body
-  const esc = (s: string) =>
-    s
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+  /* ── Verify the vehicle, if provided ──
+     Guards against spoofed IDs being sent in the form. If the
+     vehicle isn't in the fleet, we quietly omit it. */
+  const matchedVehicle = data.vehicle
+    ? VEHICLES.find(
+        (v) =>
+          v.name === data.vehicle ||
+          v.id === data.vehicle ||
+          v.slug === data.vehicle
+      )
+    : null;
 
+  const vehicleLine = matchedVehicle
+    ? `
+      <tr>
+        <td style="padding: 10px 0; font-weight: 600; color: #3F3F46; font-size: 14px;">Vehicle</td>
+        <td style="padding: 10px 0; font-size: 14px; color: #C2702E; font-weight: 500;">${esc(
+          matchedVehicle.name
+        )}</td>
+      </tr>`
+    : '';
+
+  /* ── Send via Resend ── */
   try {
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -83,45 +148,78 @@ export async function submitContact(
       replyTo: data.email || undefined,
       subject: `New enquiry: ${data.service} — ${data.name}`,
       html: `
-        <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; color: #1a1a1a; background: #faf9f7;">
-          <div style="border-left: 4px solid #c9a227; padding-left: 16px; margin-bottom: 28px;">
-            <h1 style="font-size: 22px; margin: 0 0 4px; color: #081529; letter-spacing: -0.3px;">New Website Enquiry</h1>
-            <p style="font-size: 12px; color: #6b6b6b; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Royride Car Hire</p>
+        <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; color: #0E0E10; background: #FCFBF8;">
+
+          <!-- Copper top bar -->
+          <div style="height: 4px; background: linear-gradient(90deg, #D98A44, #C2702E, #A85A22); border-radius: 2px; margin-bottom: 32px;"></div>
+
+          <!-- Header -->
+          <div style="border-left: 3px solid #C2702E; padding-left: 16px; margin-bottom: 32px;">
+            <h1 style="font-size: 22px; margin: 0 0 6px; color: #070708; letter-spacing: -0.3px; font-weight: 600;">
+              New Website Enquiry
+            </h1>
+            <p style="font-size: 11px; color: #71717A; margin: 0; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500;">
+              ${BRAND.fullName}
+            </p>
           </div>
 
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+          <!-- Data table -->
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 28px;">
             <tr>
-              <td style="padding: 10px 0; font-weight: 600; width: 130px; color: #3d3d3d; font-size: 14px;">Name</td>
-              <td style="padding: 10px 0; font-size: 14px;">${esc(data.name)}</td>
+              <td style="padding: 12px 0; font-weight: 600; width: 130px; color: #3F3F46; font-size: 13px; border-bottom: 1px solid #EFEAE0;">Name</td>
+              <td style="padding: 12px 0; font-size: 14px; border-bottom: 1px solid #EFEAE0;">${esc(
+                data.name
+              )}</td>
             </tr>
             <tr>
-              <td style="padding: 10px 0; font-weight: 600; color: #3d3d3d; font-size: 14px;">Phone</td>
-              <td style="padding: 10px 0; font-size: 14px;"><a href="tel:${esc(data.phone.replace(/\s/g, ''))}" style="color: #1a365d;">${esc(data.phone)}</a></td>
+              <td style="padding: 12px 0; font-weight: 600; color: #3F3F46; font-size: 13px; border-bottom: 1px solid #EFEAE0;">Phone</td>
+              <td style="padding: 12px 0; font-size: 14px; border-bottom: 1px solid #EFEAE0;">
+                <a href="tel:${esc(
+                  data.phone.replace(/\s/g, '')
+                )}" style="color: #C2702E; text-decoration: none; font-weight: 500;">${esc(
+                  data.phone
+                )}</a>
+              </td>
             </tr>
             <tr>
-              <td style="padding: 10px 0; font-weight: 600; color: #3d3d3d; font-size: 14px;">Email</td>
-              <td style="padding: 10px 0; font-size: 14px;">${data.email ? `<a href="mailto:${esc(data.email)}" style="color: #1a365d;">${esc(data.email)}</a>` : '—'}</td>
+              <td style="padding: 12px 0; font-weight: 600; color: #3F3F46; font-size: 13px; border-bottom: 1px solid #EFEAE0;">Email</td>
+              <td style="padding: 12px 0; font-size: 14px; border-bottom: 1px solid #EFEAE0;">
+                ${
+                  data.email
+                    ? `<a href="mailto:${esc(
+                        data.email
+                      )}" style="color: #C2702E; text-decoration: none;">${esc(
+                        data.email
+                      )}</a>`
+                    : '<span style="color: #A1A1AA;">—</span>'
+                }
+              </td>
             </tr>
             <tr>
-              <td style="padding: 10px 0; font-weight: 600; color: #3d3d3d; font-size: 14px;">Service</td>
-              <td style="padding: 10px 0; font-size: 14px;">${esc(data.service)}</td>
+              <td style="padding: 12px 0; font-weight: 600; color: #3F3F46; font-size: 13px; border-bottom: 1px solid #EFEAE0;">Service</td>
+              <td style="padding: 12px 0; font-size: 14px; border-bottom: 1px solid #EFEAE0;">${esc(
+                data.service
+              )}</td>
             </tr>
-            ${data.vehicle ? `
-            <tr>
-              <td style="padding: 10px 0; font-weight: 600; color: #3d3d3d; font-size: 14px;">Vehicle</td>
-              <td style="padding: 10px 0; font-size: 14px; color: #a8861f; font-weight: 500;">${esc(data.vehicle)}</td>
-            </tr>` : ''}
+            ${vehicleLine}
           </table>
 
-          <hr style="margin: 24px 0; border: none; border-top: 1px solid #e5e5e5;" />
+          <!-- Message -->
+          <div style="background: #F7F4EE; border-radius: 8px; padding: 20px; margin-bottom: 28px;">
+            <h2 style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #71717A; margin: 0 0 12px; font-weight: 600;">
+              Message
+            </h2>
+            <p style="line-height: 1.65; white-space: pre-wrap; font-size: 15px; color: #0E0E10; margin: 0;">${esc(
+              data.message
+            )}</p>
+          </div>
 
-          <h2 style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #6b6b6b; margin-bottom: 12px;">Message</h2>
-          <p style="line-height: 1.65; white-space: pre-wrap; font-size: 15px; color: #1a1a1a;">${esc(data.message)}</p>
-
-          <hr style="margin: 28px 0; border: none; border-top: 1px solid #e5e5e5;" />
-
-          <p style="font-size: 11px; color: #8a8a8a; margin: 0;">
-            Sent from royride.com contact form · ${new Date().toLocaleString('en-KE', { timeZone: 'Africa/Nairobi' })} EAT
+          <!-- Footer -->
+          <p style="font-size: 11px; color: #A1A1AA; margin: 0; padding-top: 20px; border-top: 1px solid #EFEAE0;">
+            Sent from royride.com contact form ·
+            ${new Date().toLocaleString('en-KE', {
+              timeZone: 'Africa/Nairobi',
+            })} EAT
           </p>
         </div>
       `,
@@ -131,8 +229,7 @@ export async function submitContact(
       console.error('Resend error:', error);
       return {
         success: false,
-        message:
-          'We could not submit your enquiry. Please try again or call us directly at +254 780 957 810.',
+        message: `We couldn't submit your enquiry. Please try again or call us directly at ${BRAND.phones[0]}.`,
         fields: raw,
       };
     }
@@ -140,8 +237,7 @@ export async function submitContact(
     console.error('Contact form error:', err);
     return {
       success: false,
-      message:
-        'Network error. Please try again or call us directly at +254 780 957 810.',
+      message: `Network error. Please try again or call us directly at ${BRAND.phones[0]}.`,
       fields: raw,
     };
   }

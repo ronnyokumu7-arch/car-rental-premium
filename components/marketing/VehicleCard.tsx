@@ -93,7 +93,7 @@ export function VehicleCard({
               alt={`${vehicle.name} — ${vehicle.category} available for hire in Nairobi`}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover transition-transform duration-[900ms] ease-lux group-hover:scale-[1.06]"
+              className="object-cover transition-transform duration-900ms ease-lux group-hover:scale-[1.06]"
               priority={priority ?? index === 0}
               loading={priority ?? index === 0 ? 'eager' : 'lazy'}
               quality={85}
@@ -125,7 +125,7 @@ export function VehicleCard({
             {/* Silhouette */}
             <svg
               viewBox="0 0 200 100"
-              className="absolute inset-0 w-full h-full p-8 text-white/35 transition-all duration-[700ms] ease-lux group-hover:text-white/60 group-hover:scale-[1.04]"
+className="absolute inset-0 w-full h-full p-8 text-white/35 transition-all duration-700 ease-lux group-hover:text-white/60 group-hover:scale-[1.04]"
               preserveAspectRatio="xMidYMid meet"
               aria-hidden="true"
             >

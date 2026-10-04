@@ -1,8 +1,18 @@
 import { CONTACT } from '../../lib/contact';
 
+/* ─────────────────────────────────────────────────────────────
+   CONTACT MAP
+   Embedded Google Map showing the Royride Utawala office.
+
+   Kept minimal and lazy-loaded. The map is a nice-to-have, not
+   a conversion surface — a delay here costs nothing.
+   ───────────────────────────────────────────────────────────── */
+
 export function ContactMap() {
   return (
-    <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[16/9] rounded-sm overflow-hidden border border-charcoal-300/30">
+    <div className="relative w-full aspect-[4/3] sm:aspect-[21/9] lg:aspect-[16/9] rounded-2xl overflow-hidden border border-border bg-surface-sunken">
+
+      {/* Map embed */}
       <iframe
         src={CONTACT.mapEmbedUrl}
         width="100%"
@@ -11,8 +21,14 @@ export function ContactMap() {
         allowFullScreen={false}
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
-        title="Royride Car Hire Location — Utawala, Nairobi"
+        title="Royride Car Hire location — Utawala, Nairobi"
         className="absolute inset-0"
+      />
+
+      {/* Subtle inner ring for depth */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 rounded-2xl pointer-events-none ring-1 ring-inset ring-black/[0.04]"
       />
     </div>
   );
