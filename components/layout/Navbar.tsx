@@ -192,7 +192,7 @@ export function Navbar() {
               </a>
 
               <Link
-                href="/contact"
+                href="/quote"
                 className="group relative inline-flex items-center gap-2 px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-obsidian-950 rounded-sm overflow-hidden transition-all duration-300 ease-lux hover:-translate-y-0.5"
                 style={{
                   backgroundImage:
@@ -201,7 +201,7 @@ export function Navbar() {
                     '0 1px 2px rgba(168,90,34,0.20), 0 8px 24px rgba(194,112,46,0.28)',
                 }}
               >
-                <span className="relative z-10">Book Now</span>
+                <span className="relative z-10">Get a Quote</span>
                 <ArrowUpRight
                   size={13}
                   className="relative z-10 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -313,7 +313,7 @@ export function Navbar() {
             </div>
 
             <Link
-              href="/contact"
+              href="/quote"
               className="group relative flex items-center justify-center gap-2 w-full px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-obsidian-950 rounded-sm overflow-hidden"
               style={{
                 backgroundImage:
@@ -321,7 +321,7 @@ export function Navbar() {
                 boxShadow: '0 8px 24px rgba(194,112,46,0.28)',
               }}
             >
-              <span className="relative z-10">Book Your Vehicle</span>
+              <span className="relative z-10">Get Your Quote</span>
               <ArrowUpRight size={14} className="relative z-10" />
             </Link>
           </div>
