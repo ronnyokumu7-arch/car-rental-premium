@@ -135,44 +135,44 @@ export function Hero() {
 
         {/* ── CTAs ── */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link
-            href="/vehicles"
-            className="group relative inline-flex items-center gap-2 px-8 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-obsidian-950 rounded-sm overflow-hidden transition-all duration-300 ease-lux hover:-translate-y-0.5"
-            style={{
-              backgroundImage:
-                'linear-gradient(135deg, #E3A468 0%, #D98A44 45%, #C2702E 100%)',
-              boxShadow:
-                '0 1px 2px rgba(168,90,34,0.20), 0 8px 28px rgba(194,112,46,0.32)',
-            }}
-          >
-            <span className="relative z-10">Explore the Fleet</span>
-            <ArrowRight
-              size={14}
-              strokeWidth={2.5}
-              className="relative z-10 transition-transform duration-300 ease-lux group-hover:translate-x-1"
-            />
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-lux"
-              style={{
-                background:
-                  'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%)',
-              }}
-            />
-          </Link>
+  <Link
+    href="/quote"
+    className="group relative inline-flex items-center gap-2 px-8 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-obsidian-950 rounded-sm overflow-hidden transition-all duration-300 ease-lux hover:-translate-y-0.5"
+    style={{
+      backgroundImage:
+        'linear-gradient(135deg, #E3A468 0%, #D98A44 45%, #C2702E 100%)',
+      boxShadow:
+        '0 1px 2px rgba(168,90,34,0.20), 0 8px 28px rgba(194,112,46,0.32)',
+    }}
+  >
+    <span className="relative z-10">Get a Quote</span>
+    <ArrowRight
+      size={14}
+      strokeWidth={2.5}
+      className="relative z-10 transition-transform duration-300 ease-lux group-hover:translate-x-1"
+    />
+    <span
+      aria-hidden="true"
+      className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-lux"
+      style={{
+        background:
+          'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%)',
+      }}
+    />
+  </Link>
 
-          <Link
-            href="/rental-calendar"
-            className="group inline-flex items-center gap-2 px-8 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-white border border-white/20 rounded-sm hover:border-copper-400/70 hover:bg-white/[0.03] transition-all duration-300 ease-lux hover:-translate-y-0.5"
-          >
-            <span>Rental Calendar</span>
-            <ArrowRight
-              size={14}
-              strokeWidth={2}
-              className="text-white/60 transition-all duration-300 ease-lux group-hover:text-copper-300 group-hover:translate-x-0.5"
-            />
-          </Link>
-        </div>
+  <Link
+    href="/vehicles"
+    className="group inline-flex items-center gap-2 px-8 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-white border border-white/20 rounded-sm hover:border-copper-400/70 hover:bg-white/[0.03] transition-all duration-300 ease-lux hover:-translate-y-0.5"
+  >
+    <span>Explore the Fleet</span>
+    <ArrowRight
+      size={14}
+      strokeWidth={2}
+      className="text-white/60 transition-all duration-300 ease-lux group-hover:text-copper-300 group-hover:translate-x-0.5"
+    />
+  </Link>
+</div>
       </div>
 
       {/* ═══════════════════════════════════════════════════════

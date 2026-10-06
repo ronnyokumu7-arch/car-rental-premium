@@ -140,7 +140,6 @@ export function StepContact({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <DeliveryOption
-              value="email"
               label="By email"
               hint="A copy you can save or forward"
               icon={<MailIcon size={18} />}
@@ -148,7 +147,6 @@ export function StepContact({
               onClick={() => setDelivery('email')}
             />
             <DeliveryOption
-              value="whatsapp"
               label="By WhatsApp"
               hint="Instant, opens in WhatsApp"
               icon={<MessageCircle size={18} />}
@@ -254,14 +252,12 @@ function ContactField({
    ───────────────────────────────────────────────────────────── */
 
 function DeliveryOption({
-  value,
   label,
   hint,
   icon,
   active,
   onClick,
 }: {
-  value: string;
   label: string;
   hint: string;
   icon: React.ReactNode;

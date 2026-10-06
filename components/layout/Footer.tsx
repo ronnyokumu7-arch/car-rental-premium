@@ -4,12 +4,26 @@ import { BRAND, NAV_LINKS } from '../../lib/constants';
 import { CONTACT } from '../../lib/contact';
 import { SocialLinks } from '../ui/SocialLinks';
 
+/* ─────────────────────────────────────────────────────────────
+   FOOTER
+   Closing mark for every page.
+
+   Top cluster:
+     • Brand lockup + statement (left)
+     • Get a Quote + Chat on WhatsApp CTAs (right)
+
+   Middle: Explore · Contact · Follow Us
+   Bottom: Legal strip
+   Signature: Oversized domain wordmark
+   ───────────────────────────────────────────────────────────── */
+
 export function Footer() {
   const year = new Date().getFullYear();
 
   return (
     <footer className="relative bg-obsidian-950 text-white/70 overflow-hidden">
-      {/* ── Ambient copper glow (top-left) — warms the black ── */}
+
+      {/* Ambient copper glow (top-left) */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
@@ -18,7 +32,8 @@ export function Footer() {
             'radial-gradient(ellipse 900px 500px at 15% -10%, rgba(194,112,46,0.18) 0%, transparent 60%)',
         }}
       />
-      {/* ── Cool obsidian counter-glow (bottom-right) — depth ── */}
+
+      {/* Cool obsidian counter-glow (bottom-right) */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
@@ -27,20 +42,23 @@ export function Footer() {
             'radial-gradient(ellipse 700px 400px at 100% 110%, rgba(63,63,70,0.35) 0%, transparent 60%)',
         }}
       />
-      {/* ── Grain overlay ── */}
+
+      {/* Grain */}
       <div className="grain-overlay absolute inset-0 opacity-[0.06] mix-blend-overlay pointer-events-none" />
-      {/* ── Hairline top border for definition against page ── */}
+
+      {/* Copper top hairline */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-copper-500/30 to-transparent" />
 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
 
         {/* ══════════════════════════════════════════════════
-            TOP — Brand statement + WhatsApp CTA
+            TOP — Brand statement + dual CTA cluster
             ══════════════════════════════════════════════════ */}
         <div className="pt-20 lg:pt-28 pb-14 lg:pb-20 border-b border-white/[0.06]">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+
             {/* Left — Brand lockup + statement */}
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-6">
               <Link href="/" className="inline-flex flex-col leading-none group">
                 <span className="font-display text-3xl lg:text-4xl tracking-[0.3em] text-white transition-colors duration-500 group-hover:text-copper-200">
                   {BRAND.name}
@@ -56,28 +74,57 @@ export function Footer() {
               </p>
             </div>
 
-            {/* Right — WhatsApp CTA, upgraded to feel like a real button */}
-            <div className="lg:col-span-5 lg:text-right">
+            {/* Right — CTA cluster */}
+            <div className="lg:col-span-6 lg:text-right">
               <p className="text-[10px] uppercase tracking-[0.24em] text-white/40 mb-5 font-medium">
-                Fastest Response
+                Ready to move?
               </p>
-              <a
-                href={`https://wa.me/${CONTACT.whatsapp}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative inline-flex items-center gap-3 pl-6 pr-2 py-2 text-[11px] font-semibold tracking-[0.18em] uppercase text-white border border-white/15 rounded-full transition-all duration-400 ease-lux hover:border-copper-400/70 hover:bg-copper-500/[0.08] hover:-translate-y-0.5"
-              >
-                <span>Chat on WhatsApp</span>
-                <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-copper-500 text-obsidian-950 transition-all duration-400 ease-lux group-hover:bg-copper-400 group-hover:rotate-45">
-                  <ArrowUpRight size={14} strokeWidth={2.5} />
-                </span>
-              </a>
+
+              <div className="flex flex-col sm:flex-row lg:justify-end items-stretch sm:items-center gap-3">
+                {/* Primary — Get a Quote */}
+                <Link
+                  href="/quote"
+                  className="group relative inline-flex items-center justify-center gap-3 pl-6 pr-2 py-2 text-[11px] font-semibold tracking-[0.18em] uppercase text-obsidian-950 rounded-full overflow-hidden transition-all duration-400 ease-lux hover:-translate-y-0.5"
+                  style={{
+                    backgroundImage:
+                      'linear-gradient(135deg, #E3A468 0%, #D98A44 45%, #C2702E 100%)',
+                    boxShadow:
+                      '0 1px 2px rgba(168,90,34,0.20), 0 8px 24px rgba(194,112,46,0.28)',
+                  }}
+                >
+                  <span className="relative z-10">Get a Quote</span>
+                  <span className="relative z-10 inline-flex items-center justify-center w-9 h-9 rounded-full bg-obsidian-950 text-copper-300 transition-all duration-400 ease-lux group-hover:rotate-45">
+                    <ArrowUpRight size={14} strokeWidth={2.5} />
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-lux"
+                    style={{
+                      background:
+                        'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%)',
+                    }}
+                  />
+                </Link>
+
+                {/* Secondary — Chat on WhatsApp */}
+                <a
+                  href={`https://wa.me/${CONTACT.whatsapp}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative inline-flex items-center justify-center gap-3 pl-6 pr-2 py-2 text-[11px] font-semibold tracking-[0.18em] uppercase text-white border border-white/15 rounded-full transition-all duration-400 ease-lux hover:border-copper-400/70 hover:bg-copper-500/[0.08] hover:-translate-y-0.5"
+                >
+                  <span>Chat on WhatsApp</span>
+                  <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-copper-500 text-obsidian-950 transition-all duration-400 ease-lux group-hover:bg-copper-400 group-hover:rotate-45">
+                    <ArrowUpRight size={14} strokeWidth={2.5} />
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
 
         {/* ══════════════════════════════════════════════════
-            MIDDLE — Navigation + Contact + Social
+            MIDDLE — Explore · Contact · Follow Us
             ══════════════════════════════════════════════════ */}
         <div className="py-14 lg:py-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-14">
 
@@ -103,6 +150,36 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
+
+              {/* Extra pages not in the navbar */}
+              <li>
+                <Link
+                  href="/quote"
+                  className="group relative inline-flex items-center text-sm text-copper-400 hover:text-copper-300 transition-colors duration-300"
+                >
+                  <span className="relative">
+                    Get a Quote
+                    <span
+                      aria-hidden="true"
+                      className="absolute -bottom-0.5 left-0 right-0 h-px bg-copper-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-lux"
+                    />
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/rental-calendar"
+                  className="group relative inline-flex items-center text-sm text-white/70 hover:text-white transition-colors duration-300"
+                >
+                  <span className="relative">
+                    Rental Calendar
+                    <span
+                      aria-hidden="true"
+                      className="absolute -bottom-0.5 left-0 right-0 h-px bg-copper-400 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-lux"
+                    />
+                  </span>
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -128,7 +205,7 @@ export function Footer() {
                   <Phone size={15} className="mt-0.5 shrink-0 text-copper-400/70" />
                   <a
                     href={`tel:${phone.replace(/\s/g, '')}`}
-                    className="text-white/70 hover:text-copper-300 transition-colors duration-300 tracking-wide"
+                    className="text-white/70 hover:text-copper-300 transition-colors duration-300 tracking-wide tabular-nums"
                   >
                     {phone}
                   </a>
@@ -175,7 +252,7 @@ export function Footer() {
         </div>
 
         {/* ══════════════════════════════════════════════════
-            SIGNATURE — Oversized domain as closing mark
+            SIGNATURE — Oversized domain
             ══════════════════════════════════════════════════ */}
         <div className="pb-16 lg:pb-20 pt-4 text-center">
           <Link
@@ -183,7 +260,6 @@ export function Footer() {
             aria-label={`${BRAND.name} — Home`}
             className="group inline-block relative"
           >
-            {/* Copper underglow that reveals on hover */}
             <span
               aria-hidden="true"
               className="absolute inset-0 blur-3xl opacity-0 group-hover:opacity-40 transition-opacity duration-700 ease-lux pointer-events-none"

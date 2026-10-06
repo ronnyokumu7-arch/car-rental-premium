@@ -201,7 +201,7 @@ export function Navbar() {
                     '0 1px 2px rgba(168,90,34,0.20), 0 8px 24px rgba(194,112,46,0.28)',
                 }}
               >
-                <span className="relative z-10">Get a Quote</span>
+                <span className="relative z-10">Rent a Car</span>
                 <ArrowUpRight
                   size={13}
                   className="relative z-10 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"

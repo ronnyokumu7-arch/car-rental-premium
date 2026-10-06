@@ -27,7 +27,7 @@ import {
   getReturnFee,
   requiresQuote as locationRequiresQuote,
 } from './locations';
-import { getVehicle, type Vehicle } from './vehicles';
+import { getVehicle } from './vehicles';
 
 /* ─────────────────────────────────────────────────────────────
    TYPES

@@ -5,7 +5,6 @@ import { motion } from 'motion/react';
 import { Check, Users, Luggage, Fuel, Car } from 'lucide-react';
 import {
   getVisibleVehicles,
-  getVehicle,
   formatPrice,
   type Vehicle,
 } from '../../lib/vehicles';
