@@ -38,7 +38,7 @@ const PATHS = [
     description:
       'Airport transfers, corporate travel, events. Sit back — we drive.',
     cta: 'Request a quote',
-    href: '/contact?service=chauffeured',
+    href: '/quote',
     mode: 'secondary' as const,
   },
 ];

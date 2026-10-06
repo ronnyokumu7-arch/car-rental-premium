@@ -470,7 +470,7 @@ export function VehicleModal({ vehicle, onClose }: VehicleModalProps) {
                 </div>
 
                 <Link
-                  href={`/contact?vehicle=${vehicle.id}`}
+                  href={`/quote?vehicle=${vehicle.id}`}
                   className="group relative flex items-center justify-center gap-2 w-full px-6 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-obsidian-950 rounded-md overflow-hidden transition-all duration-300 ease-lux hover:-translate-y-0.5"
                   style={{
                     backgroundImage:

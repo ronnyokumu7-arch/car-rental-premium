@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useFormState } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
@@ -36,21 +37,18 @@ import { StepReview } from './StepReview';
      4. Contact     — name, phone, email, delivery method
      5. Review      — final summary + send CTA
 
+   Query params (read once on mount):
+     ?service=airport-transfer → skip step 1, start on step 2
+     ?service=car-hire         → skip step 1, start on step 2
+     ?vehicle=prado-j150       → pre-select the vehicle (used at step 3)
+
+   After mount, the wizard owns all state — the URL is a one-way
+   hint, not a two-way sync.
+
    Layout:
      • Desktop:  two-column — wizard left (7/12), sticky
                  summary panel right (5/12)
      • Mobile:   single column, summary panel renders below
-
-   State:
-     All wizard state lives here. Steps are pure presentational
-     components that receive slices of state and setters.
-
-   Location defaults:
-     Pickup and return locations are pre-filled with the
-     DEFAULT_PICKUP_LOCATION and DEFAULT_RETURN_LOCATION from
-     lib/locations.ts. Users can change them, but the defaults
-     are valid on their own — a user can complete step 2 by
-     filling only the two dates.
    ───────────────────────────────────────────────────────────── */
 
 type Step = 1 | 2 | 3 | 4 | 5;
@@ -58,14 +56,32 @@ type Step = 1 | 2 | 3 | 4 | 5;
 const initialState: SendQuoteState = {};
 
 export function QuoteWizard() {
+  const searchParams = useSearchParams();
+
+  /* ── Query-param prefill (read once on mount) ── */
+  const serviceParam = searchParams.get('service');
+  const vehicleParam = searchParams.get('vehicle');
+
+  const initialService: QuoteService | null =
+    serviceParam === 'airport-transfer' || serviceParam === 'car-hire'
+      ? (serviceParam as QuoteService)
+      : null;
+
+  const initialVehicleId = vehicleParam || '';
+
+  /* If a service was passed in the URL, skip step 1 */
+  const initialStep: Step = initialService ? 2 : 1;
+
   /* ── Wizard state ── */
-  const [step, setStep] = useState<Step>(1);
+  const [step, setStep] = useState<Step>(initialStep);
   const [submitting, setSubmitting] = useState(false);
 
-  const [service, setService] = useState<QuoteService | null>(null);
+  const [service, setService] = useState<QuoteService | null>(
+    initialService
+  );
 
   /* Car-hire — locations default to Utawala collection */
-  const [vehicleId, setVehicleId] = useState('');
+  const [vehicleId, setVehicleId] = useState(initialVehicleId);
   const [pickupLocation, setPickupLocation] = useState<string>(
     DEFAULT_PICKUP_LOCATION
   );
@@ -528,9 +544,6 @@ export function QuoteWizard() {
 
       {/* ═══════════════════════════════════════════
           HIDDEN SUBMIT FORM
-          Owns the server action. The visible send button
-          (rendered above) uses `form="quote-submit-form"`
-          to submit it without being a child of this form.
           ═══════════════════════════════════════════ */}
       <form
         action={formAction}
