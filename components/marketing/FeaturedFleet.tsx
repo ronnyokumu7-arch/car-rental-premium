@@ -13,13 +13,13 @@ import { getVisibleVehicles } from '../../lib/vehicles';
    Purpose:
      • Right below the service picker, show the actual assets
      • Popular first, then cheapest — users see the range
-     • Auto-advance on mobile, static grid on desktop
+     • Manual swipe on mobile, static grid on desktop
      • Reuses VehicleCard — the flagship card from /vehicles
+
+   No auto-advance. Users control the pace.
 
    Featured set: popular first, then price ascending, top 6.
    ───────────────────────────────────────────────────────────── */
-
-const AUTOPLAY_INTERVAL = 5500;
 
 export function FeaturedFleet() {
   /* ── Featured selection ── */
@@ -33,30 +33,13 @@ export function FeaturedFleet() {
     return list.slice(0, 6);
   }, []);
 
+  const totalVisible = useMemo(
+    () => getVisibleVehicles().length,
+    []
+  );
+
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-
-  /* ── Auto-advance on mobile only ── */
-  useEffect(() => {
-    const carousel = carouselRef.current;
-    if (!carousel) return;
-
-    const timer = window.setInterval(() => {
-      const isScrollable = carousel.scrollWidth > carousel.clientWidth;
-      if (!isScrollable) return;
-
-      setActiveIndex((prev) => {
-        const next = (prev + 1) % featured.length;
-        carousel.scrollTo({
-          left: next * carousel.clientWidth,
-          behavior: 'smooth',
-        });
-        return next;
-      });
-    }, AUTOPLAY_INTERVAL);
-
-    return () => window.clearInterval(timer);
-  }, [featured.length]);
 
   /* ── Sync active index to scroll position ── */
   useEffect(() => {
@@ -77,6 +60,7 @@ export function FeaturedFleet() {
       carousel.removeEventListener('scroll', handleScroll);
   }, [featured.length]);
 
+  /* ── Manual jump to index (dots) ── */
   const scrollToIndex = useCallback((index: number) => {
     const carousel = carouselRef.current;
     if (!carousel) return;
@@ -111,7 +95,7 @@ export function FeaturedFleet() {
             href="/vehicles"
             className="hidden md:inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink hover:text-copper-600 transition-colors duration-300 group whitespace-nowrap"
           >
-            View all {getVisibleVehicles().length} vehicles
+            View all {totalVisible} vehicles
             <ArrowRight
               size={14}
               strokeWidth={2.5}
@@ -180,7 +164,7 @@ export function FeaturedFleet() {
             href="/vehicles"
             className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-copper-600 hover:text-copper-700 transition-colors duration-300 group"
           >
-            View all {getVisibleVehicles().length} vehicles
+            View all {totalVisible} vehicles
             <ArrowRight
               size={14}
               strokeWidth={2.5}

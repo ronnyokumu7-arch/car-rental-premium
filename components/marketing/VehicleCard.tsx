@@ -6,6 +6,7 @@ import {
   Fuel,
   Cog,
   Sparkles,
+  ArrowRight,
   ArrowUpRight,
 } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -21,10 +22,10 @@ import { type Vehicle, formatPrice } from '../../lib/vehicles';
    Design language:
      • Ivory surface, obsidian text, copper accents
      • Cinematic image treatment with layered gradients
-     • Quiet hover — border warms, shadow deepens, image scales
-     • Compact spec strip — icon + value inline, hairline dividers
+     • Compact spec strip — no borders, inline items
      • Price sits directly below the vehicle name
-     • No mode pills on the card — filters on /vehicles handle that
+     • Full-width ghost CTA: "View details"
+     • Hover-revealed arrow in the image's top-right corner
    ───────────────────────────────────────────────────────────── */
 
 interface VehicleCardProps {
@@ -77,7 +78,6 @@ export function VehicleCard({
           ═══════════════════════════════════════════ */}
       <div className="relative w-full aspect-[16/10] overflow-hidden transform-gpu bg-obsidian-950 shrink-0">
 
-        {/* Base gradient fallback */}
         <div
           aria-hidden="true"
           className="absolute inset-0"
@@ -195,8 +195,8 @@ export function VehicleCard({
           </span>
         </p>
 
-        {/* ═══ Spec strip — inline items with hairline dividers ═══ */}
-        <div className="flex items-center gap-3 border-y border-border py-3.5 mt-auto">
+        {/* ═══ Spec strip — no borders, inline, muted ═══ */}
+        <div className="flex items-center gap-3 py-1">
           <Spec
             icon={<Users size={13} />}
             value={`${vehicle.seats} seats`}
@@ -220,6 +220,29 @@ export function VehicleCard({
             }
           />
         </div>
+
+        {/* ═══ CTA — full-width ghost pill ═══ */}
+        <div className="mt-auto pt-5">
+          <span
+            className="
+              group/cta inline-flex items-center justify-center gap-2 w-full
+              px-4 py-3
+              text-[11px] font-semibold uppercase tracking-[0.16em]
+              text-copper-600
+              border border-copper-500/30 rounded-full
+              transition-all duration-300 ease-lux
+              hover:border-copper-500/70 hover:bg-copper-500/[0.05]
+              group-hover:border-copper-500/50
+            "
+          >
+            <span>View details</span>
+            <ArrowRight
+              size={13}
+              strokeWidth={2.5}
+              className="transition-transform duration-300 ease-lux group-hover/cta:translate-x-0.5"
+            />
+          </span>
+        </div>
       </div>
     </motion.article>
   );
@@ -227,7 +250,7 @@ export function VehicleCard({
 
 /* ─────────────────────────────────────────────────────────────
    SPEC
-   One inline item — icon + muted value. No separate label.
+   Icon + value inline. No separate label.
    ───────────────────────────────────────────────────────────── */
 function Spec({
   icon,
