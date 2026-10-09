@@ -215,7 +215,7 @@ export async function sendQuote(
         to: [data.contact.email],
         bcc: [DESTINATION_EMAIL],
         replyTo: DESTINATION_EMAIL,
-        subject: `Your Royride quote ${quote.id} — ${formatKES(quote.breakdown.total)}`,
+        subject: `Here's your quote ${quote.id} — ${formatKES(quote.breakdown.total)}`,
         html: buildQuoteEmailHtml(quote),
       });
 
@@ -427,9 +427,9 @@ function buildQuoteEmailHtml(quote: Quote): string {
         Hi ${esc(request.contact.name.split(' ')[0])},
       </p>
       <p style="font-size: 15px; color: #3F3F46; line-height: 1.6; margin-bottom: 28px;">
-        Thanks for the enquiry — here's your estimate. Reply to this email
-        or call us directly and we'll confirm within 2 hours during business
-        hours.
+        Thanks for the enquiry. Just as promised, here's your estimated quote. Reply to this email
+        or call us so we can confirm the exact numbers (within 2 hours during business
+        hours).
       </p>
 
       <!-- Trip details -->

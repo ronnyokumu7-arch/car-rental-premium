@@ -1,9 +1,25 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Star } from 'lucide-react';
+import { ArrowRight, Star, ArrowUpRight } from 'lucide-react';
 import { TRUST_STATS } from '../../lib/testimonials';
 import { getFleetSize } from '../../lib/vehicles';
+
+/* ─────────────────────────────────────────────────────────────
+   HERO
+   Full-width editorial statement. Single focal point.
+
+   CTAs use the footer's pill design:
+     • Rounded-full, copper gradient (primary) or ghost (secondary)
+     • Circular arrow badge on the right
+     • Lifts and rotates on hover
+
+   Mobile:
+     • Only the primary CTA renders (full-width cap at 20rem)
+
+   Desktop:
+     • Both CTAs side-by-side
+   ───────────────────────────────────────────────────────────── */
 
 export function Hero() {
   const handleScrollToBooking = () => {
@@ -20,9 +36,9 @@ export function Hero() {
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-obsidian-950 flex items-center">
 
-      {/* ═══════════════════════════════════════════════════════
-          LAYER 1 — Base gradient (obsidian → iron)
-          ═══════════════════════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════════
+          LAYER 1 — Base gradient
+          ═══════════════════════════════════════════ */}
       <div
         aria-hidden="true"
         className="absolute inset-0"
@@ -32,11 +48,7 @@ export function Hero() {
         }}
       />
 
-      {/* ═══════════════════════════════════════════════════════
-          LAYER 2 — Copper ambient glow (upper-center-right)
-          Now that the carousel is gone, the warm light pulls
-          toward the empty space above the headline.
-          ═══════════════════════════════════════════════════════ */}
+      {/* LAYER 2 — Copper ambient glow (upper-right) */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
@@ -46,10 +58,7 @@ export function Hero() {
         }}
       />
 
-      {/* ═══════════════════════════════════════════════════════
-          LAYER 3 — Cool counter-glow (lower-left)
-          Balanced lighting = cinematic depth
-          ═══════════════════════════════════════════════════════ */}
+      {/* LAYER 3 — Cool counter-glow (lower-left) */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
@@ -59,9 +68,7 @@ export function Hero() {
         }}
       />
 
-      {/* ═══════════════════════════════════════════════════════
-          LAYER 4 — Vignette (focus center, darken edges)
-          ═══════════════════════════════════════════════════════ */}
+      {/* LAYER 4 — Vignette */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
@@ -71,22 +78,18 @@ export function Hero() {
         }}
       />
 
-      {/* ═══════════════════════════════════════════════════════
-          LAYER 5 — Grain (filmic texture)
-          ═══════════════════════════════════════════════════════ */}
+      {/* LAYER 5 — Grain */}
       <div className="grain-overlay absolute inset-0 opacity-[0.08] mix-blend-overlay pointer-events-none" />
 
-      {/* ═══════════════════════════════════════════════════════
-          LAYER 6 — Copper hairline (bottom edge)
-          ═══════════════════════════════════════════════════════ */}
+      {/* LAYER 6 — Copper bottom hairline */}
       <div
         aria-hidden="true"
         className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-copper-500/25 to-transparent"
       />
 
-      {/* ═══════════════════════════════════════════════════════
-          CONTENT — centered column, single focal point
-          ═══════════════════════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════════
+          CONTENT
+          ═══════════════════════════════════════════ */}
       <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-8 pt-32 pb-28 w-full text-center">
 
         {/* ── Eyebrow ── */}
@@ -133,51 +136,75 @@ export function Hero() {
           <span>Since {TRUST_STATS.founded}</span>
         </div>
 
-        {/* ── CTAs ── */}
+        {/* ═══════════════════════════════════════════
+            CTAs
+            • Mobile:  primary only, max-w-xs centered
+            • Desktop: both, side-by-side
+            ═══════════════════════════════════════════ */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-  <Link
-    href="/quote"
-    className="group relative inline-flex items-center gap-2 px-8 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-obsidian-950 rounded-sm overflow-hidden transition-all duration-300 ease-lux hover:-translate-y-0.5"
-    style={{
-      backgroundImage:
-        'linear-gradient(135deg, #E3A468 0%, #D98A44 45%, #C2702E 100%)',
-      boxShadow:
-        '0 1px 2px rgba(168,90,34,0.20), 0 8px 28px rgba(194,112,46,0.32)',
-    }}
-  >
-    <span className="relative z-10">Get a Quote</span>
-    <ArrowRight
-      size={14}
-      strokeWidth={2.5}
-      className="relative z-10 transition-transform duration-300 ease-lux group-hover:translate-x-1"
-    />
-    <span
-      aria-hidden="true"
-      className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-lux"
-      style={{
-        background:
-          'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%)',
-      }}
-    />
-  </Link>
 
-  <Link
-    href="/vehicles"
-    className="group inline-flex items-center gap-2 px-8 py-4 text-xs font-semibold uppercase tracking-[0.16em] text-white border border-white/20 rounded-sm hover:border-copper-400/70 hover:bg-white/[0.03] transition-all duration-300 ease-lux hover:-translate-y-0.5"
-  >
-    <span>Explore the Fleet</span>
-    <ArrowRight
-      size={14}
-      strokeWidth={2}
-      className="text-white/60 transition-all duration-300 ease-lux group-hover:text-copper-300 group-hover:translate-x-0.5"
-    />
-  </Link>
-</div>
+          {/* ── Primary: Get a Quote ── */}
+          <Link
+            href="/quote"
+            className="
+              group relative inline-flex items-center justify-between gap-3
+              w-full max-w-xs sm:w-auto sm:max-w-none
+              pl-6 pr-2 py-2
+              text-[11px] font-semibold uppercase tracking-[0.18em]
+              text-obsidian-950 rounded-full
+              overflow-hidden
+              transition-all duration-400 ease-lux
+              hover:-translate-y-0.5
+            "
+            style={{
+              backgroundImage:
+                'linear-gradient(135deg, #E3A468 0%, #D98A44 45%, #C2702E 100%)',
+              boxShadow:
+                '0 1px 2px rgba(168,90,34,0.20), 0 8px 24px rgba(194,112,46,0.28)',
+            }}
+          >
+            <span className="relative z-10 whitespace-nowrap">
+              Get a Quote
+            </span>
+            <span className="relative z-10 inline-flex items-center justify-center w-9 h-9 rounded-full bg-obsidian-950 text-copper-300 transition-all duration-400 ease-lux group-hover:rotate-45 shrink-0">
+              <ArrowUpRight size={14} strokeWidth={2.5} />
+            </span>
+            {/* Sheen sweep */}
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-lux"
+              style={{
+                background:
+                  'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%)',
+              }}
+            />
+          </Link>
+
+          {/* ── Secondary: Explore the Fleet — hidden on mobile ── */}
+          <Link
+            href="/vehicles"
+            className="
+              group relative hidden sm:inline-flex items-center justify-between gap-3
+              pl-6 pr-2 py-2
+              text-[11px] font-semibold uppercase tracking-[0.18em]
+              text-white
+              border border-white/20 rounded-full
+              transition-all duration-400 ease-lux
+              hover:border-copper-400/70 hover:bg-copper-500/[0.05]
+              hover:-translate-y-0.5
+            "
+          >
+            <span className="whitespace-nowrap">Explore the Fleet</span>
+            <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-copper-500 text-obsidian-950 transition-all duration-400 ease-lux group-hover:bg-copper-400 group-hover:rotate-45 shrink-0">
+              <ArrowUpRight size={14} strokeWidth={2.5} />
+            </span>
+          </Link>
+        </div>
       </div>
 
-      {/* ═══════════════════════════════════════════════════════
-          Scroll cue — bottom center
-          ═══════════════════════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════════
+          SCROLL CUE
+          ═══════════════════════════════════════════ */}
       <button
         onClick={handleScrollToBooking}
         aria-label="Scroll to booking form"

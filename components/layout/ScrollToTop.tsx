@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { ArrowUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -8,14 +9,27 @@ import { motion, AnimatePresence } from 'motion/react';
    SCROLL TO TOP
    Appears once the user has scrolled past 600px.
 
-   Hides ONLY when a modal is open (body[data-modal-open]).
+   Hidden when:
+     • The current route is in SUPPRESSED_ROUTES
+       (wizard-style pages where focus should stay on the task)
+     • A modal is open (body[data-modal-open])
+
    Deliberately does NOT hide on footer-visible — the button is
-   a utility, and users may want it at any scroll position.
+   a utility and users may want it at any scroll position.
    ───────────────────────────────────────────────────────────── */
 
+/* Routes where the FAB is intentionally suppressed */
+const SUPPRESSED_ROUTES = ['/quote'];
+
 export function ScrollToTop() {
+  const pathname = usePathname();
   const [scrolledEnough, setScrolledEnough] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+
+  /* ── Route suppression ── */
+  const routeSuppressed = SUPPRESSED_ROUTES.some((r) =>
+    pathname.startsWith(r)
+  );
 
   /* ── Scroll threshold ── */
   useEffect(() => {
@@ -39,7 +53,7 @@ export function ScrollToTop() {
     return () => observer.disconnect();
   }, []);
 
-  const visible = scrolledEnough && !modalOpen;
+  const visible = scrolledEnough && !modalOpen && !routeSuppressed;
 
   const handleClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
