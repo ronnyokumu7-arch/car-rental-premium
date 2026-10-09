@@ -19,18 +19,11 @@ import { getFleetSize } from '../../lib/vehicles';
 
    Desktop:
      • Both CTAs side-by-side
+
+   No scroll cue — the booking tabs below act as the "next step."
    ───────────────────────────────────────────────────────────── */
 
 export function Hero() {
-  const handleScrollToBooking = () => {
-    const target = document.getElementById('booking-widget');
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
-    }
-  };
-
   const fleetSize = getFleetSize();
 
   return (
@@ -90,7 +83,7 @@ export function Hero() {
       {/* ═══════════════════════════════════════════
           CONTENT
           ═══════════════════════════════════════════ */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-8 pt-32 pb-28 w-full text-center">
+      <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-8 pt-32 pb-20 w-full text-center">
 
         {/* ── Eyebrow ── */}
         <div className="inline-flex items-center gap-3 mb-8">
@@ -201,33 +194,6 @@ export function Hero() {
           </Link>
         </div>
       </div>
-
-      {/* ═══════════════════════════════════════════
-          SCROLL CUE
-          ═══════════════════════════════════════════ */}
-      <button
-        onClick={handleScrollToBooking}
-        aria-label="Scroll to booking form"
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3 text-white/40 hover:text-white/80 transition-colors duration-300 cursor-pointer group"
-      >
-        <span className="text-[9px] uppercase tracking-[0.28em] font-medium">
-          Scroll
-        </span>
-        <span className="flex items-center justify-center w-10 h-10 rounded-full border border-white/15 group-hover:border-copper-400/60 group-hover:bg-copper-500/[0.08] transition-all duration-400 ease-lux animate-bounce-soft">
-          <svg
-            width="12"
-            height="16"
-            viewBox="0 0 14 20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M7 2v16M1 12l6 6 6-6" />
-          </svg>
-        </span>
-      </button>
     </section>
   );
 }

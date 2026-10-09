@@ -23,7 +23,7 @@ import { AirportTransferTab } from './AirportTransferTab';
    BOOKING BAR — collapsible shell
 
    Collapsed (default):
-     Two service tabs sit over the hero edge as a picker.
+     Two service tabs sit below the hero as a picker.
      Tapping a tab expands the widget AND sets the active tab.
 
    Expanded:
@@ -34,10 +34,17 @@ import { AirportTransferTab } from './AirportTransferTab';
    Auto-expand:
      ?service= or ?vehicle= query params open the bar on mount.
 
+   Responsive layout:
+     • Mobile  — full-bleed edge-to-edge. No card chrome. The tab
+                 strip spans the full viewport width, hairline-
+                 separated top and bottom. Straight to the edges.
+     • Desktop — centered card, `max-w-6xl`, rounded corners,
+                 overlap over the hero's bottom edge, layered
+                 shadow.
+
    Contracts:
      • Two server actions, one per tab
      • Only the active tab's action is wired to the form
-     • body[data-modal-open] pattern not used here (bar isn't a modal)
    ───────────────────────────────────────────────────────────── */
 
 type Tab = 'car-hire' | 'airport-transfer';
@@ -109,131 +116,147 @@ export function BookingBar() {
     <section
       id="booking-widget"
       className={`
-        relative z-20 px-6 lg:px-8 scroll-mt-24
-        ${expanded ? '-mt-24 lg:-mt-28 mb-16 lg:mb-24' : '-mt-12 lg:-mt-14 mb-10 lg:mb-14'}
+        relative z-20 scroll-mt-24
         transition-[margin] duration-500 ease-lux
+        ${
+          expanded
+            ? 'mt-0 lg:-mt-28 mb-16 lg:mb-24'
+            : 'mt-0 lg:-mt-14 mb-10 lg:mb-14'
+        }
       `}
     >
-      <div className="max-w-6xl mx-auto">
+      {/* Padding: 0 on mobile (edge-to-edge), 8 on desktop */}
+      <div className="px-0 lg:px-8">
+        <div className="max-w-6xl mx-auto">
 
-        <FeedbackBanner
-          success={activeState.success}
-          message={activeState.message}
-        />
+          <FeedbackBanner
+            success={activeState.success}
+            message={activeState.message}
+          />
 
-        <form
-          action={activeAction}
-          className="bg-surface border border-border rounded-2xl shadow-[0_24px_64px_rgba(14,14,16,0.12)] overflow-hidden"
-        >
-          {/* ═══════════════════════════════════════════
-              TAB STRIP
-              Same tiles in both states. Active state
-              differs. Close button appears when expanded.
-              ═══════════════════════════════════════════ */}
-          <div className="relative bg-surface-sunken border-b border-border">
-            <div
-              role="tablist"
-              aria-label="Booking mode"
-              className="flex items-stretch gap-2 p-2 sm:p-3 pr-12 sm:pr-14"
-            >
-              <ServiceTile
-                active={expanded && isCarHire}
-                expanded={expanded}
-                onClick={() => handleTabClick('car-hire')}
-                icon={<Car size={16} strokeWidth={2} />}
-                label="Car Hire"
-              />
-              <ServiceTile
-                active={expanded && !isCarHire}
-                expanded={expanded}
-                onClick={() => handleTabClick('airport-transfer')}
-                icon={<Plane size={16} strokeWidth={2} />}
-                label="Airport Transfer"
-              />
+          <form
+            action={activeAction}
+            className="
+              bg-surface overflow-hidden
+              border-y border-border
+              lg:border lg:rounded-2xl
+              lg:shadow-[0_24px_64px_rgba(14,14,16,0.12)]
+            "
+          >
+            {/* ═══════════════════════════════════════════
+                TAB STRIP
+                ═══════════════════════════════════════════ */}
+            <div className="relative bg-surface-sunken border-b border-border">
+              <div
+                role="tablist"
+                aria-label="Booking mode"
+                className="flex items-stretch gap-2 p-2 pr-12 sm:p-3 sm:pr-14"
+              >
+                <ServiceTile
+                  active={expanded && isCarHire}
+                  expanded={expanded}
+                  onClick={() => handleTabClick('car-hire')}
+                  icon={<Car size={16} strokeWidth={2} />}
+                  label="Car Hire"
+                />
+                <ServiceTile
+                  active={expanded && !isCarHire}
+                  expanded={expanded}
+                  onClick={() => handleTabClick('airport-transfer')}
+                  icon={<Plane size={16} strokeWidth={2} />}
+                  label="Airport Transfer"
+                />
+              </div>
+
+              {/* Close button — only when expanded */}
+              <AnimatePresence>
+                {expanded && (
+                  <motion.button
+                    type="button"
+                    onClick={handleClose}
+                    aria-label="Close booking widget"
+                    initial={{ opacity: 0, scale: 0.7 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.7 }}
+                    transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                    className="
+                      absolute top-1/2 -translate-y-1/2 right-3 sm:right-4
+                      flex items-center justify-center w-9 h-9 rounded-full
+                      text-ink-subtle hover:text-ink hover:bg-surface
+                      transition-colors duration-200
+                      focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 focus-visible:ring-offset-2
+                    "
+                  >
+                    <X size={16} strokeWidth={2.5} />
+                  </motion.button>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* Close button — only when expanded */}
-            <AnimatePresence>
+            {/* ═══════════════════════════════════════════
+                COLLAPSIBLE FORM BODY
+                ═══════════════════════════════════════════ */}
+            <AnimatePresence initial={false}>
               {expanded && (
-                <motion.button
-                  type="button"
-                  onClick={handleClose}
-                  aria-label="Close booking widget"
-                  initial={{ opacity: 0, scale: 0.7 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.7 }}
-                  transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                  className="
-                    absolute top-1/2 -translate-y-1/2 right-3 sm:right-4
-                    flex items-center justify-center w-9 h-9 rounded-full
-                    text-ink-subtle hover:text-ink hover:bg-surface
-                    transition-colors duration-200
-                    focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 focus-visible:ring-offset-2
-                  "
+                <motion.div
+                  key="form-body"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  className="overflow-hidden"
                 >
-                  <X size={16} strokeWidth={2.5} />
-                </motion.button>
+                  <div className="px-6 lg:px-10 py-6 lg:py-8">
+                    {isCarHire ? (
+                      <CarHireTab onReadyChange={handleCarHireReady} />
+                    ) : (
+                      <AirportTransferTab
+                        onReadyChange={handleTransferReady}
+                      />
+                    )}
+                  </div>
+
+                  <SummaryBar
+                    label={
+                      isCarHire
+                        ? 'Car hire request'
+                        : 'Airport transfer request'
+                    }
+                    value={
+                      ready ? 'Ready to send' : 'Complete required fields'
+                    }
+                  >
+                    <SubmitButton
+                      ready={ready}
+                      label={
+                        isCarHire
+                          ? 'Check Availability'
+                          : 'Request Transfer'
+                      }
+                    />
+                  </SummaryBar>
+                </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </form>
 
           {/* ═══════════════════════════════════════════
-              COLLAPSIBLE FORM BODY
+              TRUST STRIP — visible only when expanded
               ═══════════════════════════════════════════ */}
           <AnimatePresence initial={false}>
             {expanded && (
               <motion.div
-                key="form-body"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="overflow-hidden"
+                key="trust-strip"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
               >
-                <div className="px-6 lg:px-10 py-6 lg:py-8">
-                  {isCarHire ? (
-                    <CarHireTab onReadyChange={handleCarHireReady} />
-                  ) : (
-                    <AirportTransferTab
-                      onReadyChange={handleTransferReady}
-                    />
-                  )}
-                </div>
-
-                <SummaryBar
-                  label={
-                    isCarHire
-                      ? 'Car hire request'
-                      : 'Airport transfer request'
-                  }
-                  value={ready ? 'Ready to send' : 'Complete required fields'}
-                >
-                  <SubmitButton
-                    ready={ready}
-                    label={isCarHire ? 'Check Availability' : 'Request Transfer'}
-                  />
-                </SummaryBar>
+                <TrustStrip />
               </motion.div>
             )}
           </AnimatePresence>
-        </form>
-
-        {/* ═══════════════════════════════════════════
-            TRUST STRIP — visible only when expanded
-            ═══════════════════════════════════════════ */}
-        <AnimatePresence initial={false}>
-          {expanded && (
-            <motion.div
-              key="trust-strip"
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <TrustStrip />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        </div>
       </div>
     </section>
   );
@@ -241,9 +264,8 @@ export function BookingBar() {
 
 /* ─────────────────────────────────────────────────────────────
    SERVICE TILE
-   Used both as a collapsed picker and as the expanded tab.
-   Same shape in both states — only the active/hover styling
-   changes based on `expanded`.
+   Same shape in both states — only padding and active styling
+   change based on `expanded`.
    ───────────────────────────────────────────────────────────── */
 function ServiceTile({
   active,
@@ -296,7 +318,6 @@ function ServiceTile({
 
       <span className="truncate">{label}</span>
 
-      {/* Active underline — only when expanded */}
       {active && expanded && (
         <span
           aria-hidden="true"
