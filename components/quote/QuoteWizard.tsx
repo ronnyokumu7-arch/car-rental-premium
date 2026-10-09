@@ -4,11 +4,12 @@ import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useFormState } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { sendQuote, type SendQuoteState } from '../../app/actions/sendQuote';
 import {
   buildQuoteBreakdown,
   isContactReady,
+  formatKES,
   type QuoteService,
   type QuoteDeliveryMethod,
   type QuoteRequest,
@@ -45,16 +46,23 @@ import { StepReview } from './StepReview';
    Layout:
      • Desktop:  two-column — wizard left (7/12), sticky
                  summary panel right (5/12)
-     • Mobile:   single column, summary panel renders below
+     • Mobile:   single column, summary panel hidden; the running
+                 total lives in the fixed bottom CTA bar instead
 
    Navigation:
-     • Fixed bottom CTA bar with Back / Continue
+     • Fixed bottom CTA bar with Back / Total / Continue
      • Always visible while the wizard is active
      • Hides when the success state takes over
 
    Scroll behavior:
      • Step changes scroll to the top of the wizard (not page)
      • Dropdown interactions do NOT trigger scrolling
+
+   Step counter:
+     • Complete steps: copper outline circle with a check icon
+     • Active step:    filled copper circle, subtle copper ring
+     • Future steps:   muted gray, no fill
+     • No obsidian/black pill anywhere
    ───────────────────────────────────────────────────────────── */
 
 type Step = 1 | 2 | 3 | 4 | 5;
@@ -129,15 +137,11 @@ export function QuoteWizard() {
     const el = wizardRef.current;
     if (!el) return;
 
-    /* Scroll so the wizard content is near the top of the viewport,
-       leaving room for the fixed navbar */
     const top = el.getBoundingClientRect().top + window.scrollY - 100;
     window.scrollTo({ top, behavior: 'smooth' });
   }, [step]);
 
-  /* ── Server-action side effects ──
-     • Reset the submitting flag when a response comes back
-     • On error while on step 5, bounce back to step 4 */
+  /* ── Server-action side effects ── */
   useEffect(() => {
     if (!state.message && !state.success) return;
 
@@ -148,7 +152,7 @@ export function QuoteWizard() {
     }
   }, [state, step]);
 
-  /* ── Live quote request — recomputed on every relevant change ── */
+  /* ── Live quote request ── */
   const request: QuoteRequest = useMemo(
     () => ({
       service: service ?? 'car-hire',
@@ -193,13 +197,13 @@ export function QuoteWizard() {
     ]
   );
 
-  /* ── Live breakdown for the summary panel ── */
+  /* ── Live breakdown ── */
   const breakdown = useMemo(
     () => buildQuoteBreakdown(request),
     [request]
   );
 
-  /* ── Step readiness — controls the "Continue" button ── */
+  /* ── Step readiness ── */
   const canAdvance = useMemo(() => {
     switch (step) {
       case 1:
@@ -289,7 +293,7 @@ export function QuoteWizard() {
       !(s.skipFor === 'airport-transfer' && service === 'airport-transfer')
   );
 
-  /* ── Success state — full takeover ── */
+  /* ── Success state ── */
   if (state.success && state.quote) {
     return (
       <QuoteSuccess
@@ -357,7 +361,6 @@ export function QuoteWizard() {
       >
         <div className="max-w-7xl mx-auto">
 
-          {/* Progress indicator */}
           <ProgressBar
             steps={visibleSteps}
             current={step}
@@ -366,7 +369,6 @@ export function QuoteWizard() {
             }}
           />
 
-          {/* Two-column layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mt-10 lg:mt-14">
 
             {/* Wizard main column */}
@@ -445,7 +447,6 @@ export function QuoteWizard() {
                 </motion.div>
               </AnimatePresence>
 
-              {/* Error banner — shown when the server action rejects */}
               {state.message && !state.success && (
                 <div
                   role="alert"
@@ -457,8 +458,10 @@ export function QuoteWizard() {
               )}
             </div>
 
-            {/* Summary panel column */}
-            <aside className="lg:col-span-5 lg:sticky lg:top-28 lg:self-start">
+            {/* ═══════════════════════════════════════
+                Summary panel — HIDDEN ON MOBILE
+                ═══════════════════════════════════════ */}
+            <aside className="hidden lg:block lg:col-span-5 lg:sticky lg:top-28 lg:self-start">
               <QuoteSummaryPanel request={request} breakdown={breakdown} />
             </aside>
           </div>
@@ -467,9 +470,7 @@ export function QuoteWizard() {
 
       {/* ═══════════════════════════════════════════
           FIXED BOTTOM CTA BAR
-          Always visible while the wizard is active.
-          z-40 sits above content but below the mobile
-          drawer (z-95) and the reviews widget (z-80).
+          Layout:  [← Back]  ·  KES 14,000  ·  [Continue →]
           ═══════════════════════════════════════════ */}
       <div
         className="
@@ -480,14 +481,15 @@ export function QuoteWizard() {
         "
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3 lg:py-4 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4 flex items-center justify-between gap-3 sm:gap-4">
+
           {/* Back */}
           <button
             type="button"
             onClick={goBack}
             disabled={step === 1 || submitting}
             className={`
-              inline-flex items-center gap-2 px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] rounded-md transition-all duration-300 ease-lux
+              shrink-0 inline-flex items-center gap-2 px-4 sm:px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] rounded-md transition-all duration-300 ease-lux
               ${
                 step === 1 || submitting
                   ? 'text-ink-subtle cursor-not-allowed'
@@ -496,13 +498,18 @@ export function QuoteWizard() {
             `}
           >
             <ArrowLeft size={14} strokeWidth={2.5} />
-            Back
+            <span className="hidden sm:inline">Back</span>
           </button>
 
-          {/* Step label — hidden on very small screens */}
-          <p className="hidden sm:block text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-subtle">
-            Step {step} of 5
-          </p>
+          {/* Running total — the running "receipt" */}
+          <div className="flex-1 min-w-0 text-center">
+            <p className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-subtle mb-0.5">
+              {breakdown.total > 0 ? 'Estimated total' : 'Your estimate'}
+            </p>
+            <p className="font-display text-base sm:text-lg text-ink leading-none tabular-nums tracking-[-0.01em] truncate">
+              {breakdown.total > 0 ? formatKES(breakdown.total) : '—'}
+            </p>
+          </div>
 
           {/* Continue / Send */}
           {step < 5 ? (
@@ -511,7 +518,7 @@ export function QuoteWizard() {
               onClick={goNext}
               disabled={!canAdvance}
               className={`
-                group relative inline-flex items-center gap-2 px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] rounded-md overflow-hidden transition-all duration-300 ease-lux
+                shrink-0 group relative inline-flex items-center gap-2 px-5 sm:px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] rounded-md overflow-hidden transition-all duration-300 ease-lux
                 ${
                   canAdvance
                     ? 'text-obsidian-950 hover:-translate-y-0.5'
@@ -543,7 +550,7 @@ export function QuoteWizard() {
               disabled={submitting}
               onClick={() => setSubmitting(true)}
               className={`
-                group relative inline-flex items-center gap-2 px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] text-obsidian-950 rounded-md overflow-hidden transition-all duration-300 ease-lux
+                shrink-0 group relative inline-flex items-center gap-2 px-5 sm:px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] text-obsidian-950 rounded-md overflow-hidden transition-all duration-300 ease-lux
                 ${
                   submitting
                     ? 'opacity-70 cursor-wait'
@@ -564,7 +571,7 @@ export function QuoteWizard() {
                 </>
               ) : (
                 <>
-                  <span className="relative z-10">Send quote</span>
+                  <span className="relative z-10">Send</span>
                   <ArrowRight
                     size={14}
                     strokeWidth={2.5}
@@ -631,6 +638,10 @@ export function QuoteWizard() {
 
 /* ─────────────────────────────────────────────────────────────
    PROGRESS BAR
+   Complete: copper outline ring with check icon
+   Active:   filled copper circle + soft copper ring around pill
+   Future:   muted gray circle with number
+   No black pill anywhere.
    ───────────────────────────────────────────────────────────── */
 function ProgressBar({
   steps,
@@ -662,27 +673,34 @@ function ProgressBar({
                   transition-all duration-300 ease-lux
                   ${
                     isActive
-                      ? 'bg-obsidian-900 text-white shadow-[0_4px_12px_rgba(14,14,16,0.15)]'
+                      ? 'text-copper-700 bg-copper-500/[0.06] ring-1 ring-copper-500/40'
                       : isComplete
                         ? 'text-copper-600 hover:bg-copper-500/[0.06] cursor-pointer'
                         : 'text-ink-subtle cursor-not-allowed'
                   }
                 `}
               >
+                {/* Circle */}
                 <span
                   className={`
                     flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold tabular-nums
+                    transition-all duration-300 ease-lux
                     ${
                       isActive
                         ? 'bg-copper-500 text-obsidian-950'
                         : isComplete
-                          ? 'bg-copper-500/20 text-copper-700'
+                          ? 'bg-transparent border-2 border-copper-500 text-copper-600'
                           : 'bg-surface-sunken text-ink-subtle'
                     }
                   `}
                 >
-                  {s.n}
+                  {isComplete ? (
+                    <Check size={11} strokeWidth={3.5} />
+                  ) : (
+                    s.n
+                  )}
                 </span>
+
                 <span className="hidden sm:inline">{s.label}</span>
               </button>
 
