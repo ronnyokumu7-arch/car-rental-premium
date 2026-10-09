@@ -15,23 +15,20 @@ import { Select, type SelectOption } from '../ui/Select';
    CAR HIRE TAB
    A quick availability check — not a booking form.
 
-   Purpose:
-     "Do you have a car for my dates?"
-   Not:
-     "Let's spec out your booking."
-
    Fields (visible):
      • Pickup date
      • Return date
-     • Vehicle type
-     • Price range
+     • Vehicle type   ┐ in a sunken panel
+     • Price range    ┘
 
-   Location defaults are submitted as hidden inputs. The server
-   action (submitBooking) requires them, and defaults are valid.
-   The customer never sees them.
+   Location defaults come from hidden inputs. The user never
+   sees them.
 
-   Detailed enquiry → /quote
-   Detailed fleet filter → /vehicles
+   Default price range: min – 9,000 (excludes the Prado at
+   14,000 — users who want it slide the range up).
+
+   Date pickers use the site theme via color-scheme +
+   accent-color in globals.css.
    ───────────────────────────────────────────────────────────── */
 
 /* Vehicle type options */
@@ -49,11 +46,14 @@ const VEHICLE_TYPE_OPTIONS: SelectOption[] = [
 const PRICE_RANGE = getPriceRange();
 const PRICE_STEP = 500;
 
+/* Default ceiling for the price slider. Excludes the Prado
+   so the "quick check" starts with the everyday fleet. */
+const DEFAULT_PRICE_MAX = 9000;
+
 /* ─────────────────────────────────────────────────────────────
    PURE HELPERS
    ───────────────────────────────────────────────────────────── */
 
-/** Days between two ISO date strings. Returns null for invalid ranges. */
 function daysBetween(pickup: string, dropoff: string): number | null {
   if (!pickup || !dropoff) return null;
   const a = new Date(pickup).getTime();
@@ -78,7 +78,7 @@ export function CarHireTab({
   const [vehicleType, setVehicleType] = useState('');
   const [priceRange, setPriceRange] = useState<[number, number]>([
     PRICE_RANGE.min,
-    PRICE_RANGE.max,
+    Math.min(DEFAULT_PRICE_MAX, PRICE_RANGE.max),
   ]);
 
   /* Today's date — stable for the session */
@@ -104,9 +104,9 @@ export function CarHireTab({
   return (
     <>
       {/* ═══════════════════════════════════════════
-          ROW 1 — Dates + vehicle type
+          DATES — plain surface
           ═══════════════════════════════════════════ */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 mb-6">
         <FieldWrapper label="Pickup Date" icon={<Calendar size={14} />}>
           <input
             name="pickupDate"
@@ -138,88 +138,93 @@ export function CarHireTab({
             required
           />
         </FieldWrapper>
-
-        <FieldWrapper label="Vehicle Type" icon={<Car size={14} />}>
-          <Select
-            name="vehicleType"
-            value={vehicleType}
-            onChange={setVehicleType}
-            options={VEHICLE_TYPE_OPTIONS}
-            sheetTitle="Vehicle type"
-            ariaLabel="Choose a vehicle type"
-          />
-        </FieldWrapper>
       </div>
 
       {/* ═══════════════════════════════════════════
-          ROW 2 — Price range
+          REFINEMENTS — sunken panel
+          Vehicle type + price range grouped together.
           ═══════════════════════════════════════════ */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <label className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-ink-subtle">
-            <Tag size={14} className="text-ink-subtle" />
-            Price Range (per day)
-          </label>
-          <span className="text-[11px] font-semibold text-ink tabular-nums">
-            KES {priceRange[0].toLocaleString('en-KE')} –{' '}
-            {priceRange[1].toLocaleString('en-KE')}
-          </span>
+      <div className="relative -mx-6 lg:-mx-10 px-6 lg:px-10 py-6 bg-surface-sunken border-y border-border">
+        {/* ── Vehicle type ── */}
+        <div className="mb-6">
+          <FieldWrapper label="Vehicle Type" icon={<Car size={14} />}>
+            <Select
+              name="vehicleType"
+              value={vehicleType}
+              onChange={setVehicleType}
+              options={VEHICLE_TYPE_OPTIONS}
+              sheetTitle="Vehicle type"
+              ariaLabel="Choose a vehicle type"
+            />
+          </FieldWrapper>
         </div>
 
-        <div className="px-1 pt-2">
-          <Range
-            values={priceRange}
-            step={PRICE_STEP}
-            min={PRICE_RANGE.min}
-            max={PRICE_RANGE.max}
-            onChange={(values) =>
-              setPriceRange([values[0], values[1]])
-            }
-            renderTrack={({ props, children }) => (
-              <div
-                {...props}
-                className="price-range-track"
-                style={props.style}
-              >
-                <div
-                  className="price-range-track-active"
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: `${rangeLeftPct}%`,
-                    right: `${rangeRightPct}%`,
-                  }}
-                />
-                {children}
-              </div>
-            )}
-            renderThumb={({ props, index }) => {
-              const { key, ...rest } = props;
-              return (
-                <div
-                  key={key}
-                  {...rest}
-                  className="price-range-thumb"
-                  aria-label={
-                    index === 0
-                      ? 'Minimum daily price'
-                      : 'Maximum daily price'
-                  }
-                />
-              );
-            }}
-          />
-        </div>
+        {/* ── Price range ── */}
+        <div className="pt-6 border-t border-border">
+          <div className="flex items-center justify-between mb-3">
+            <label className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-ink-subtle">
+              <Tag size={14} className="text-ink-subtle" />
+              Price Range (per day)
+            </label>
+            <span className="text-[11px] font-semibold text-ink tabular-nums">
+              KES {priceRange[0].toLocaleString('en-KE')} –{' '}
+              {priceRange[1].toLocaleString('en-KE')}
+            </span>
+          </div>
 
-        <input type="hidden" name="minPrice" value={priceRange[0]} />
-        <input type="hidden" name="maxPrice" value={priceRange[1]} />
+          <div className="px-1 pt-2">
+            <Range
+              values={priceRange}
+              step={PRICE_STEP}
+              min={PRICE_RANGE.min}
+              max={PRICE_RANGE.max}
+              onChange={(values) =>
+                setPriceRange([values[0], values[1]])
+              }
+              renderTrack={({ props, children }) => (
+                <div
+                  {...props}
+                  className="price-range-track"
+                  style={props.style}
+                >
+                  <div
+                    className="price-range-track-active"
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      bottom: 0,
+                      left: `${rangeLeftPct}%`,
+                      right: `${rangeRightPct}%`,
+                    }}
+                  />
+                  {children}
+                </div>
+              )}
+              renderThumb={({ props, index }) => {
+                const { key, ...rest } = props;
+                return (
+                  <div
+                    key={key}
+                    {...rest}
+                    className="price-range-thumb"
+                    aria-label={
+                      index === 0
+                        ? 'Minimum daily price'
+                        : 'Maximum daily price'
+                    }
+                  />
+                );
+              }}
+            />
+          </div>
+
+          <input type="hidden" name="minPrice" value={priceRange[0]} />
+          <input type="hidden" name="maxPrice" value={priceRange[1]} />
+        </div>
       </div>
 
       {/* ═══════════════════════════════════════════
           HIDDEN FIELDS
-          Location defaults required by submitBooking.
-          The user never sees or thinks about these.
           ═══════════════════════════════════════════ */}
       <input
         type="hidden"

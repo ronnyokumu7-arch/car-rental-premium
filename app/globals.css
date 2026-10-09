@@ -250,19 +250,39 @@
     border-radius: 0.5rem;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    /* Native picker theming — makes date/time popovers use
+       dark mode + copper accent on Chrome/Firefox/Edge. */
+    color-scheme: light;
+    accent-color: var(--copper);
   }
+
+  .dark .booking-input {
+    color-scheme: dark;
+  }
+
   .booking-input:focus {
     border-color: var(--copper);
     box-shadow: 0 0 0 4px var(--copper-glow);
   }
-  .booking-input::placeholder { color: var(--ink-subtle); }
-  .booking-input::-webkit-calendar-picker-indicator {
-    opacity: 0.55;
-    cursor: pointer;
-    filter: invert(0); /* dark icon on light */
+
+  .booking-input::placeholder {
+    color: var(--ink-subtle);
   }
+
+  /* Date/time picker calendar icon — copper tinted */
+  .booking-input::-webkit-calendar-picker-indicator {
+    opacity: 0.7;
+    cursor: pointer;
+    filter: invert(48%) sepia(38%) saturate(1234%) hue-rotate(340deg) brightness(92%) contrast(88%);
+  }
+
+  .booking-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+
   .dark .booking-input::-webkit-calendar-picker-indicator {
-    filter: invert(1); /* light icon on dark */
+    filter: invert(72%) sepia(30%) saturate(600%) hue-rotate(340deg) brightness(95%) contrast(85%);
   }
 }
 
