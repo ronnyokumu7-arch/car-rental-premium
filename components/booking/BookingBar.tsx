@@ -10,12 +10,7 @@ import {
   submitAirportTransfer,
   type AirportTransferState,
 } from '../../app/actions/airportTransfer';
-import {
-  FeedbackBanner,
-  SubmitButton,
-  SummaryBar,
-  TrustStrip,
-} from './shared';
+import { FeedbackBanner, SubmitButton, SummaryBar } from './shared';
 import { CarHireTab } from './CarHireTab';
 import { AirportTransferTab } from './AirportTransferTab';
 
@@ -29,22 +24,20 @@ import { AirportTransferTab } from './AirportTransferTab';
    Expanded:
      Tab strip stays at the top with a close button on the right.
      Form body appears below. Summary bar at the bottom.
-     TrustStrip below the card.
 
    Auto-expand:
      ?service= or ?vehicle= query params open the bar on mount.
 
    Responsive layout:
-     • Mobile  — full-bleed edge-to-edge. No card chrome. The tab
-                 strip spans the full viewport width, hairline-
-                 separated top and bottom. Straight to the edges.
-     • Desktop — centered card, `max-w-6xl`, rounded corners,
-                 overlap over the hero's bottom edge, layered
-                 shadow.
+     • Mobile  — full-bleed edge-to-edge. No card chrome.
+     • Desktop — centered card, max-w-6xl, rounded corners,
+                 overlaps the hero's bottom edge.
 
-   Contracts:
-     • Two server actions, one per tab
-     • Only the active tab's action is wired to the form
+   Design:
+     • Compact tabs (56px collapsed, ~44px expanded)
+     • Soft rounded corners
+     • No hard dividers — tabs flow into the section below
+     • TrustStrip removed (redundant with hero + FeaturedFleet)
    ───────────────────────────────────────────────────────────── */
 
 type Tab = 'car-hire' | 'airport-transfer';
@@ -120,8 +113,8 @@ export function BookingBar() {
         transition-[margin] duration-500 ease-lux
         ${
           expanded
-            ? 'mt-0 lg:-mt-28 mb-16 lg:mb-24'
-            : 'mt-0 lg:-mt-14 mb-10 lg:mb-14'
+            ? 'mt-0 lg:-mt-24 mb-12 lg:mb-16'
+            : 'mt-0 lg:-mt-16 mb-8 lg:mb-10'
         }
       `}
     >
@@ -138,33 +131,36 @@ export function BookingBar() {
             action={activeAction}
             className="
               bg-surface overflow-hidden
-              border-y border-border
-              lg:border lg:rounded-2xl
+              lg:rounded-2xl
+              lg:border lg:border-border
               lg:shadow-[0_24px_64px_rgba(14,14,16,0.12)]
             "
           >
             {/* ═══════════════════════════════════════════
                 TAB STRIP
+                No bottom border — flows into the form body
+                when expanded, flows into the section below
+                when collapsed.
                 ═══════════════════════════════════════════ */}
-            <div className="relative bg-surface-sunken border-b border-border">
+            <div className="relative bg-surface">
               <div
                 role="tablist"
                 aria-label="Booking mode"
-                className="flex items-stretch gap-2 p-2 pr-12 sm:p-3 sm:pr-14"
+                className="flex items-stretch gap-2 p-2 pr-12 sm:p-2.5 sm:pr-14"
               >
                 <ServiceTile
                   active={expanded && isCarHire}
                   expanded={expanded}
                   onClick={() => handleTabClick('car-hire')}
-                  icon={<Car size={16} strokeWidth={2} />}
-                  label="Hire a Car"
+                  icon={<Car size={15} strokeWidth={2} />}
+                  label="Car Hire"
                 />
                 <ServiceTile
                   active={expanded && !isCarHire}
                   expanded={expanded}
                   onClick={() => handleTabClick('airport-transfer')}
-                  icon={<Plane size={16} strokeWidth={2} />}
-                  label="JKIA Pickup"
+                  icon={<Plane size={15} strokeWidth={2} />}
+                  label="Airport Transfer"
                 />
               </div>
 
@@ -182,7 +178,7 @@ export function BookingBar() {
                     className="
                       absolute top-1/2 -translate-y-1/2 right-3 sm:right-4
                       flex items-center justify-center w-9 h-9 rounded-full
-                      text-ink-subtle hover:text-ink hover:bg-surface
+                      text-ink-subtle hover:text-ink hover:bg-surface-sunken
                       transition-colors duration-200
                       focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 focus-visible:ring-offset-2
                     "
@@ -206,7 +202,7 @@ export function BookingBar() {
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   className="overflow-hidden"
                 >
-                  <div className="px-6 lg:px-10 py-6 lg:py-8">
+                  <div className="border-t border-border px-6 lg:px-10 py-6 lg:py-8">
                     {isCarHire ? (
                       <CarHireTab onReadyChange={handleCarHireReady} />
                     ) : (
@@ -239,23 +235,6 @@ export function BookingBar() {
               )}
             </AnimatePresence>
           </form>
-
-          {/* ═══════════════════════════════════════════
-              TRUST STRIP — visible only when expanded
-              ═══════════════════════════════════════════ */}
-          <AnimatePresence initial={false}>
-            {expanded && (
-              <motion.div
-                key="trust-strip"
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <TrustStrip />
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
     </section>
@@ -264,8 +243,14 @@ export function BookingBar() {
 
 /* ─────────────────────────────────────────────────────────────
    SERVICE TILE
-   Same shape in both states — only padding and active styling
-   change based on `expanded`.
+   Compact tabs. Two sizes:
+     • Collapsed — 56px (inviting, spacious)
+     • Expanded  — ~44px (compact, functional)
+   Active state:
+     • Copper border + soft copper tint
+     • Icon badge becomes filled copper
+   Inactive hover:
+     • Warms toward copper
    ───────────────────────────────────────────────────────────── */
 function ServiceTile({
   active,
@@ -287,28 +272,29 @@ function ServiceTile({
       aria-selected={active}
       onClick={onClick}
       className={`
-        group relative flex-1 flex items-center justify-center gap-2.5
-        px-4 sm:px-6
-        ${expanded ? 'py-3' : 'py-5 sm:py-6'}
-        rounded-xl border
-        text-[11px] sm:text-xs font-semibold uppercase tracking-[0.16em]
+        group relative flex-1 flex items-center justify-center gap-2
+        px-3 sm:px-5
+        ${expanded ? 'py-2.5' : 'py-3.5 sm:py-4'}
+        rounded-lg border
+        text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.16em]
         transition-all duration-300 ease-lux
         focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 focus-visible:ring-offset-2
         ${
           active
-            ? 'bg-surface border-copper-500 text-ink shadow-[0_4px_16px_rgba(194,112,46,0.15)]'
-            : 'bg-surface/50 border-border text-ink-muted hover:bg-surface hover:border-copper-500/40 hover:text-ink'
+            ? 'bg-copper-500/[0.06] border-copper-500/60 text-ink'
+            : 'bg-surface border-border text-ink-muted hover:bg-copper-500/[0.03] hover:border-copper-500/40 hover:text-ink'
         }
       `}
     >
-      {/* Icon in a small copper-tinted circle */}
+      {/* Icon badge */}
       <span
         className={`
-          flex items-center justify-center shrink-0 rounded-full transition-all duration-300 ease-lux
+          flex items-center justify-center shrink-0 rounded-md transition-all duration-300 ease-lux
+          ${expanded ? 'w-6 h-6' : 'w-7 h-7'}
           ${
             active
-              ? 'w-8 h-8 bg-copper-500 text-obsidian-950'
-              : 'w-8 h-8 bg-copper-500/[0.10] border border-copper-500/25 text-copper-600 group-hover:scale-105'
+              ? 'bg-copper-500 text-obsidian-950'
+              : 'bg-copper-500/[0.10] border border-copper-500/25 text-copper-600 group-hover:bg-copper-500/[0.15]'
           }
         `}
         aria-hidden="true"
@@ -317,13 +303,6 @@ function ServiceTile({
       </span>
 
       <span className="truncate">{label}</span>
-
-      {active && expanded && (
-        <span
-          aria-hidden="true"
-          className="absolute -bottom-px left-4 right-4 h-px bg-gradient-to-r from-transparent via-copper-500/60 to-transparent"
-        />
-      )}
     </button>
   );
 }

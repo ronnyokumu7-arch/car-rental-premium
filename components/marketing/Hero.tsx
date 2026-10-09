@@ -15,7 +15,8 @@ import { getFleetSize } from '../../lib/vehicles';
      • Lifts and rotates on hover
 
    Mobile:
-     • Only the primary CTA renders (full-width cap at 20rem)
+     • Only the primary CTA renders
+     • Full-width up to 20rem, centered
 
    Desktop:
      • Both CTAs side-by-side
@@ -83,7 +84,7 @@ export function Hero() {
       {/* ═══════════════════════════════════════════
           CONTENT
           ═══════════════════════════════════════════ */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-8 pt-32 pb-20 w-full text-center">
+      <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-8 pt-32 pb-16 w-full text-center">
 
         {/* ── Eyebrow ── */}
         <div className="inline-flex items-center gap-3 mb-8">
@@ -112,7 +113,7 @@ export function Hero() {
         </p>
 
         {/* ── Trust strip ── */}
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-12 text-[11px] uppercase tracking-[0.16em] text-white/50 font-medium">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-10 text-[11px] uppercase tracking-[0.16em] text-white/50 font-medium">
           <span className="inline-flex items-center gap-1.5">
             <Star size={11} className="fill-copper-400 text-copper-400" />
             {TRUST_STATS.rating} on Google
