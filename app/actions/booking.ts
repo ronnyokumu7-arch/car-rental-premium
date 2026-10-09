@@ -1,13 +1,33 @@
 'use server';
 
 import { z } from 'zod';
-import {
-  LOCATIONS,
-  getPickupFee,
-  getReturnFee,
-  formatFee,
-  requiresQuote,
-} from '../../lib/locations';
+import { LOCATIONS } from '../../lib/locations';
+
+/* ─────────────────────────────────────────────────────────────
+   BOOKING — availability check
+
+   NOT a booking. This action captures a quick "do you have a
+   car for these dates?" enquiry. The detailed quotation flow
+   lives at /quote (submitQuote in app/actions/sendQuote.ts).
+
+   The form sends only:
+     • pickupDate    (required)
+     • dropoffDate   (required)
+     • vehicleType   (required)
+     • minPrice/maxPrice (optional, for filtering)
+     • pickupLocation / returnLocation / seats (hidden defaults)
+
+   The location fields are invisible to the user but still
+   required by the schema — they're populated by hidden inputs
+   on the client with Utawala defaults.
+
+   TODO (later):
+     • Persist to DB
+     • Send notification email
+     • Trigger WhatsApp/SMS to concierge
+
+   No simulated latency. The action returns immediately.
+   ───────────────────────────────────────────────────────────── */
 
 const bookingSchema = z
   .object({
@@ -40,7 +60,7 @@ const bookingSchema = z
       return dropoff >= pickup;
     },
     {
-      message: 'Dropoff date must be on or after pickup date',
+      message: 'Return date must be on or after pickup date',
       path: ['dropoffDate'],
     }
   );
@@ -72,52 +92,33 @@ export async function submitBooking(
   if (!parsed.success) {
     return {
       success: false,
-      errors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
+      errors: parsed.error.flatten().fieldErrors as Record<
+        string,
+        string[]
+      >,
       fields: raw,
     };
   }
 
   const data = parsed.data;
 
-  // Look up human-readable location labels + fees
+  /* ── Human-readable pickup label ── */
   const pickupLocationLabel =
     LOCATIONS.find((l) => l.value === data.pickupLocation)?.label ??
     data.pickupLocation;
 
-  const returnLocationLabel =
-    data.returnLocation === 'same-as-pickup'
-      ? 'Same as pickup'
-      : LOCATIONS.find((l) => l.value === data.returnLocation)?.label ??
-        data.returnLocation;
+  /* ─────────────────────────────────────────────────────────────
+     TODO: Wire to real backend (see header comment)
+     ───────────────────────────────────────────────────────────── */
 
-  const pickupFee = getPickupFee(data.pickupLocation);
-  const returnFee = getReturnFee(data.returnLocation, data.pickupLocation);
-  const quoteRequired = requiresQuote(
-    data.pickupLocation,
-    data.returnLocation
-  );
-
-  // ─────────────────────────────────────────────────────────────
-  // TODO: Wire to real backend
-  //   - Save to database (Supabase / Postgres)
-  //   - Send notification email (Resend / SendGrid)
-  //   - Trigger WhatsApp/SMS to +254 780 957 810
-  // ─────────────────────────────────────────────────────────────
-
-  // Simulate network latency for realistic UX
-  await new Promise((resolve) => setTimeout(resolve, 900));
-
-  // Compose the success message with details
-  const feeLine = quoteRequired
-    ? 'Delivery fee: quote on request.'
-    : `Delivery: ${formatFee(pickupFee)}${returnFee > 0 ? ` + collection: ${formatFee(returnFee)}` : ''}.`;
-
+  /* ── Compose confirmation ── */
+  const vehicleLabel = data.vehicleType.toLowerCase();
   const seatLine =
     data.seats && data.seats !== 'any' ? ` · ${data.seats} seats` : '';
 
   return {
     success: true,
-    message: `Thank you. We've received your request for a ${data.vehicleType.toLowerCase()}${seatLine}. Pickup from ${pickupLocationLabel}, return to ${returnLocationLabel}. ${feeLine} Our team will call you within 2 hours to confirm.`,
+    message: `Thank you. We've received your request for a ${vehicleLabel}${seatLine}, pickup from ${pickupLocationLabel}. Our concierge will call you within 2 hours to confirm availability.`,
     fields: raw,
   };
 }

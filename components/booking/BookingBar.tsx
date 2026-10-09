@@ -27,15 +27,14 @@ import { getFleetSize } from '../../lib/vehicles';
      Tab strip at top with a close button on the right.
      Form body below. Summary bar at the bottom.
 
-   Trust line:
-     • 4.9 on Google · 46 vehicles in fleet · Since 2019
-     • Anchors the tabs — makes the picker feel like a real
-       decision point with proof behind it
-     • Visible in both collapsed and expanded states
+   Purpose:
+     Quick availability check — not a booking.
+     Detailed enquiry → /quote
+     Detailed fleet filter → /vehicles
 
    Responsive layout:
      • Mobile  — full-bleed edge-to-edge. Tabs use the full
-                 width when collapsed. Padding is reserved for
+                 width when collapsed. Padding reserved for
                  the close button only when expanded.
      • Desktop — centered card, max-w-6xl, rounded corners.
    ───────────────────────────────────────────────────────────── */
@@ -119,7 +118,6 @@ export function BookingBar() {
         }
       `}
     >
-      {/* Padding: 0 on mobile (edge-to-edge), 8 on desktop */}
       <div className="px-0 lg:px-8">
         <div className="max-w-6xl mx-auto">
 
@@ -139,9 +137,6 @@ export function BookingBar() {
           >
             {/* ═══════════════════════════════════════════
                 TAB STRIP
-                Padding on the right reserves space for the
-                close button ONLY when expanded. When collapsed
-                the tabs use the full width.
                 ═══════════════════════════════════════════ */}
             <div className="relative bg-surface">
               <div
@@ -195,10 +190,25 @@ export function BookingBar() {
 
             {/* ═══════════════════════════════════════════
                 TRUST LINE
-                Anchors the tabs. Visible in both states.
+                Horizontal scroll on mobile (edge-to-edge,
+                no wrapping). Centered on desktop.
                 ═══════════════════════════════════════════ */}
             <div className="bg-surface border-t border-border">
-              <div className="flex items-center justify-center flex-wrap gap-x-5 gap-y-1.5 py-3 px-4 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
+              {/* Mobile: horizontal scroll */}
+              <div className="sm:hidden flex items-center gap-x-4 overflow-x-auto scrollbar-hide px-6 py-3 snap-x snap-mandatory">
+                <TrustItem icon={<Star size={10} className="fill-copper-500 text-copper-500" />}>
+                  {TRUST_STATS.rating} on Google
+                </TrustItem>
+                <Divider />
+                <TrustItem>{fleetSize} vehicles in fleet</TrustItem>
+                <Divider />
+                <TrustItem>Since {TRUST_STATS.founded}</TrustItem>
+                <Divider />
+                <TrustItem>Nairobi · Kenya</TrustItem>
+              </div>
+
+              {/* Desktop: centered, no scroll */}
+              <div className="hidden sm:flex items-center justify-center gap-x-5 py-3 px-6 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
                 <span className="inline-flex items-center gap-1.5">
                   <Star
                     size={10}
@@ -245,11 +255,15 @@ export function BookingBar() {
                   <SummaryBar
                     label={
                       isCarHire
-                        ? 'Car hire request'
+                        ? 'Availability check'
                         : 'Airport transfer request'
                     }
                     value={
-                      ready ? 'Ready to send' : 'Complete required fields'
+                      ready
+                        ? 'Ready to send'
+                        : isCarHire
+                          ? 'Add dates to see availability'
+                          : 'Complete required fields'
                     }
                   >
                     <SubmitButton
@@ -268,6 +282,37 @@ export function BookingBar() {
         </div>
       </div>
     </section>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TRUST ITEM
+   Small inline item used in the mobile scroll strip.
+   ───────────────────────────────────────────────────────────── */
+function TrustItem({
+  icon,
+  children,
+}: {
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <span className="inline-flex items-center gap-1.5 shrink-0 snap-start text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-subtle whitespace-nowrap">
+      {icon}
+      {children}
+    </span>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DIVIDER
+   ───────────────────────────────────────────────────────────── */
+function Divider() {
+  return (
+    <span
+      aria-hidden="true"
+      className="w-px h-3 bg-border-strong shrink-0"
+    />
   );
 }
 

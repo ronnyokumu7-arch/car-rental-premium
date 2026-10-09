@@ -4,46 +4,37 @@ import { useState, useMemo, useEffect } from 'react';
 import { Calendar, Car, Tag } from 'lucide-react';
 import { Range } from 'react-range';
 import {
-  LOCATIONS,
   DEFAULT_PICKUP_LOCATION,
   DEFAULT_RETURN_LOCATION,
-  getPickupFee,
-  getReturnFee,
-  requiresQuote,
-  buildReturnOptions,
-  getPickupLabel,
-  getPickupFeeLabel,
-  getReturnFeeLabel,
 } from '../../lib/locations';
 import { getPriceRange } from '../../lib/vehicles';
-import {
-  FieldWrapper,
-  LocationField,
-  PillButton,
-  ConciergeHeader,
-  CarSeatsIcon,
-} from './shared';
+import { FieldWrapper } from './shared';
 import { Select, type SelectOption } from '../ui/Select';
 
 /* ─────────────────────────────────────────────────────────────
    CAR HIRE TAB
-   Default view of the booking bar.
+   A quick availability check — not a booking form.
 
-   Layout:
-     • Concierge summary (live)
-     • Essentials: locations + dates (always visible)
-     • Preferences: vehicle type, seats, price (collapsed)
-     • Hidden fields for the server action
+   Purpose:
+     "Do you have a car for my dates?"
+   Not:
+     "Let's spec out your booking."
+
+   Fields (visible):
+     • Pickup date
+     • Return date
+     • Vehicle type
+     • Price range
+
+   Location defaults are submitted as hidden inputs. The server
+   action (submitBooking) requires them, and defaults are valid.
+   The customer never sees them.
+
+   Detailed enquiry → /quote
+   Detailed fleet filter → /vehicles
    ───────────────────────────────────────────────────────────── */
 
-const SEAT_OPTIONS = [
-  { value: 'any', label: 'Any' },
-  { value: '5',   label: '5' },
-  { value: '7',   label: '7' },
-  { value: '8+',  label: '8+' },
-] as const;
-
-/* Vehicle type options mapped for Select */
+/* Vehicle type options */
 const VEHICLE_TYPE_OPTIONS: SelectOption[] = [
   { value: '',          label: 'Any vehicle type' },
   { value: 'Sedan',     label: 'Sedan' },
@@ -72,16 +63,6 @@ function daysBetween(pickup: string, dropoff: string): number | null {
   return days > 0 ? days : null;
 }
 
-/** Short location name for the concierge header. */
-function getShortLocation(value: string, pickupValue?: string): string {
-  if (value === 'same-as-pickup') {
-    return pickupValue ? getShortLocation(pickupValue) : 'Same as pickup';
-  }
-  const loc = LOCATIONS.find((l) => l.value === value);
-  if (!loc) return value;
-  return loc.label.split('|')[0].trim();
-}
-
 /* ─────────────────────────────────────────────────────────────
    COMPONENT
    ───────────────────────────────────────────────────────────── */
@@ -92,61 +73,27 @@ export function CarHireTab({
   onReadyChange?: (ready: boolean) => void;
 }) {
   /* ── Form state ── */
-  const [pickupLocation, setPickupLocation] = useState(DEFAULT_PICKUP_LOCATION);
-  const [returnLocation, setReturnLocation] = useState(DEFAULT_RETURN_LOCATION);
   const [pickupDate, setPickupDate] = useState('');
   const [dropoffDate, setDropoffDate] = useState('');
   const [vehicleType, setVehicleType] = useState('');
-  const [seats, setSeats] = useState('any');
   const [priceRange, setPriceRange] = useState<[number, number]>([
     PRICE_RANGE.min,
     PRICE_RANGE.max,
   ]);
-  const [showPreferences, setShowPreferences] = useState(false);
 
   /* Today's date — stable for the session */
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
-  /* ── Derived state ── */
-  const returnOptions = useMemo(
-    () => buildReturnOptions(pickupLocation),
-    [pickupLocation]
-  );
-
-  const pickupFee = getPickupFee(pickupLocation);
-  const returnFee = getReturnFee(returnLocation, pickupLocation);
-  const needsQuote = requiresQuote(pickupLocation, returnLocation);
-  const totalFees = pickupFee + returnFee;
-
+  /* ── Derived readiness ── */
   const days = daysBetween(pickupDate, dropoffDate);
   const ready = Boolean(days);
 
-  const hasPreferences =
-    Boolean(vehicleType) ||
-    seats !== 'any' ||
-    priceRange[0] !== PRICE_RANGE.min ||
-    priceRange[1] !== PRICE_RANGE.max;
-
-  /* ── Notify parent when readiness changes ── */
+  /* ── Notify parent ── */
   useEffect(() => {
     onReadyChange?.(ready);
   }, [ready, onReadyChange]);
 
-  /* ── Concierge summary segments ── */
-  const summarySegments = useMemo(
-    () => [
-      days ? `${days} day${days === 1 ? '' : 's'}` : null,
-      `${getShortLocation(pickupLocation)} → ${getShortLocation(
-        returnLocation,
-        pickupLocation
-      )}`,
-      vehicleType || null,
-      seats !== 'any' ? `${seats} seats` : null,
-    ],
-    [days, pickupLocation, returnLocation, vehicleType, seats]
-  );
-
-  /* ── Range track offsets (memoized) ── */
+  /* ── Range track offsets ── */
   const [rangeLeftPct, rangeRightPct] = useMemo(() => {
     const span = PRICE_RANGE.max - PRICE_RANGE.min || 1;
     const left = ((priceRange[0] - PRICE_RANGE.min) / span) * 100;
@@ -157,36 +104,9 @@ export function CarHireTab({
   return (
     <>
       {/* ═══════════════════════════════════════════
-          Concierge header — live summary
+          ROW 1 — Dates + vehicle type
           ═══════════════════════════════════════════ */}
-      <ConciergeHeader segments={summarySegments} />
-
-      {/* ═══════════════════════════════════════════
-          ESSENTIALS — locations + dates
-          ═══════════════════════════════════════════ */}
-
-      {/* Locations */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 mb-5">
-        <LocationField
-          label={getPickupLabel(pickupLocation)}
-          subLabel={getPickupFeeLabel(pickupLocation)}
-          name="pickupLocation"
-          value={pickupLocation}
-          onChange={setPickupLocation}
-          options={LOCATIONS}
-        />
-        <LocationField
-          label="Return Location"
-          subLabel={getReturnFeeLabel(returnLocation, pickupLocation)}
-          name="returnLocation"
-          value={returnLocation}
-          onChange={setReturnLocation}
-          options={returnOptions}
-        />
-      </div>
-
-      {/* Dates */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 mb-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 mb-6">
         <FieldWrapper label="Pickup Date" icon={<Calendar size={14} />}>
           <input
             name="pickupDate"
@@ -218,154 +138,100 @@ export function CarHireTab({
             required
           />
         </FieldWrapper>
+
+        <FieldWrapper label="Vehicle Type" icon={<Car size={14} />}>
+          <Select
+            name="vehicleType"
+            value={vehicleType}
+            onChange={setVehicleType}
+            options={VEHICLE_TYPE_OPTIONS}
+            sheetTitle="Vehicle type"
+            ariaLabel="Choose a vehicle type"
+          />
+        </FieldWrapper>
       </div>
 
       {/* ═══════════════════════════════════════════
-          PROGRESSIVE DISCLOSURE — Refine your search
+          ROW 2 — Price range
           ═══════════════════════════════════════════ */}
-      <button
-        type="button"
-        onClick={() => setShowPreferences((v) => !v)}
-        aria-expanded={showPreferences}
-        aria-controls="car-hire-preferences"
-        className="group inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-ink-subtle hover:text-copper-600 transition-colors duration-300 mb-6"
-      >
-        <span
-          className={`inline-block transition-transform duration-300 ease-lux ${
-            showPreferences ? 'rotate-90' : ''
-          }`}
-          aria-hidden="true"
-        >
-          <svg
-            width="10"
-            height="10"
-            viewBox="0 0 12 12"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M4 2l4 4-4 4" />
-          </svg>
-        </span>
-        <span>
-          {showPreferences ? 'Hide preferences' : 'Refine your search'}
-        </span>
-        {hasPreferences && (
-          <span
-            className="w-1.5 h-1.5 rounded-full bg-copper-500"
-            aria-label="Preferences applied"
-          />
-        )}
-      </button>
-
-      {showPreferences && (
-        <div id="car-hire-preferences" className="pb-2">
-          {/* Vehicle type + Seats */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <FieldWrapper label="Vehicle Type" icon={<Car size={14} />}>
-              <Select
-                name="vehicleType"
-                value={vehicleType}
-                onChange={setVehicleType}
-                options={VEHICLE_TYPE_OPTIONS}
-                sheetTitle="Vehicle type"
-                ariaLabel="Choose a vehicle type"
-              />
-            </FieldWrapper>
-
-            <div>
-              <label className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-ink-subtle mb-3">
-                <CarSeatsIcon size={16} className="text-ink-subtle" />
-                Seats
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {SEAT_OPTIONS.map((opt) => (
-                  <PillButton
-                    key={opt.value}
-                    active={seats === opt.value}
-                    pressed={seats === opt.value}
-                    onClick={() => setSeats(opt.value)}
-                  >
-                    {opt.label}
-                  </PillButton>
-                ))}
-              </div>
-              <input type="hidden" name="seats" value={seats} />
-            </div>
-          </div>
-
-          {/* Price Range */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <label className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-ink-subtle">
-                <Tag size={14} className="text-ink-subtle" />
-                Price Range (per day)
-              </label>
-              <span className="text-[11px] font-semibold text-ink tabular-nums">
-                KES {priceRange[0].toLocaleString('en-KE')} –{' '}
-                {priceRange[1].toLocaleString('en-KE')}
-              </span>
-            </div>
-
-            <div className="px-1 pt-3">
-              <Range
-                values={priceRange}
-                step={PRICE_STEP}
-                min={PRICE_RANGE.min}
-                max={PRICE_RANGE.max}
-                onChange={(values) =>
-                  setPriceRange([values[0], values[1]])
-                }
-                renderTrack={({ props, children }) => (
-                  <div
-                    {...props}
-                    className="price-range-track"
-                    style={props.style}
-                  >
-                    <div
-                      className="price-range-track-active"
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        bottom: 0,
-                        left: `${rangeLeftPct}%`,
-                        right: `${rangeRightPct}%`,
-                      }}
-                    />
-                    {children}
-                  </div>
-                )}
-                renderThumb={({ props, index }) => {
-                  const { key, ...rest } = props;
-                  return (
-                    <div
-                      key={key}
-                      {...rest}
-                      className="price-range-thumb"
-                      aria-label={
-                        index === 0
-                          ? 'Minimum daily price'
-                          : 'Maximum daily price'
-                      }
-                    />
-                  );
-                }}
-              />
-            </div>
-
-            <input type="hidden" name="minPrice" value={priceRange[0]} />
-            <input type="hidden" name="maxPrice" value={priceRange[1]} />
-          </div>
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <label className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-ink-subtle">
+            <Tag size={14} className="text-ink-subtle" />
+            Price Range (per day)
+          </label>
+          <span className="text-[11px] font-semibold text-ink tabular-nums">
+            KES {priceRange[0].toLocaleString('en-KE')} –{' '}
+            {priceRange[1].toLocaleString('en-KE')}
+          </span>
         </div>
-      )}
 
-      {/* ── Hidden fields for the server action ── */}
-      <input type="hidden" name="pickupFee" value={pickupFee} />
-      <input type="hidden" name="returnFee" value={returnFee} />
-      <input type="hidden" name="needsQuote" value={String(needsQuote)} />
-      <input type="hidden" name="totalFees" value={totalFees} />
+        <div className="px-1 pt-2">
+          <Range
+            values={priceRange}
+            step={PRICE_STEP}
+            min={PRICE_RANGE.min}
+            max={PRICE_RANGE.max}
+            onChange={(values) =>
+              setPriceRange([values[0], values[1]])
+            }
+            renderTrack={({ props, children }) => (
+              <div
+                {...props}
+                className="price-range-track"
+                style={props.style}
+              >
+                <div
+                  className="price-range-track-active"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: `${rangeLeftPct}%`,
+                    right: `${rangeRightPct}%`,
+                  }}
+                />
+                {children}
+              </div>
+            )}
+            renderThumb={({ props, index }) => {
+              const { key, ...rest } = props;
+              return (
+                <div
+                  key={key}
+                  {...rest}
+                  className="price-range-thumb"
+                  aria-label={
+                    index === 0
+                      ? 'Minimum daily price'
+                      : 'Maximum daily price'
+                  }
+                />
+              );
+            }}
+          />
+        </div>
+
+        <input type="hidden" name="minPrice" value={priceRange[0]} />
+        <input type="hidden" name="maxPrice" value={priceRange[1]} />
+      </div>
+
+      {/* ═══════════════════════════════════════════
+          HIDDEN FIELDS
+          Location defaults required by submitBooking.
+          The user never sees or thinks about these.
+          ═══════════════════════════════════════════ */}
+      <input
+        type="hidden"
+        name="pickupLocation"
+        value={DEFAULT_PICKUP_LOCATION}
+      />
+      <input
+        type="hidden"
+        name="returnLocation"
+        value={DEFAULT_RETURN_LOCATION}
+      />
+      <input type="hidden" name="seats" value="any" />
     </>
   );
 }
