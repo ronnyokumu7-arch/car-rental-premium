@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { Hero } from '../components/marketing/Hero';
 import { BookingBar } from '../components/booking/BookingBar';
 import { TrustBar } from '../components/marketing/TrustBar';
@@ -32,7 +33,9 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <BookingBar />
+      <Suspense fallback={<BookingBarFallback />}>
+        <BookingBar />
+      </Suspense>
       <TrustBar />
       <AboutSnapshot />
       <LatestUpdates />
@@ -42,5 +45,32 @@ export default function Home() {
       <Testimonials />
       <FinalCTA />
     </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────
+   FALLBACK
+   Rendered while BookingBar hydrates. Preserves the collapsed
+   bar's footprint so there's no layout shift.
+   ───────────────────────────────────────────────────────────── */
+function BookingBarFallback() {
+  return (
+    <section
+      className="
+        relative z-20 -mt-12 lg:-mt-14 mb-10 lg:mb-14
+        px-6 lg:px-8
+      "
+    >
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-surface border border-border rounded-2xl shadow-[0_24px_64px_rgba(14,14,16,0.12)] overflow-hidden">
+          <div className="bg-surface-sunken border-b border-border">
+            <div className="flex items-stretch gap-2 p-2 sm:p-3">
+              <div className="flex-1 h-[60px] sm:h-[76px] bg-surface/50 border border-border rounded-xl" />
+              <div className="flex-1 h-[60px] sm:h-[76px] bg-surface/50 border border-border rounded-xl" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
