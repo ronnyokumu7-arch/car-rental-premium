@@ -14,25 +14,21 @@ import { type Vehicle, formatPrice } from '../../lib/vehicles';
 
 /* ─────────────────────────────────────────────────────────────
    VEHICLE CARD
-   The most-viewed component after the navbar. Used in:
-     • /vehicles grid
-     • FeaturedFleet carousel (homepage)
-     • Any future "related vehicles" surface
+   The most-viewed component after the navbar.
 
-   Design language:
-     • Ivory surface, obsidian text, copper accents
-     • Cinematic image treatment with layered gradients
-     • Compact spec strip — no borders, inline items
-     • Price sits directly below the vehicle name
-     • Full-width ghost CTA: "View details"
-     • Hover-revealed arrow in the image's top-right corner
+   Design:
+     • Compact layout — image, name, price, spec strip, text link
+     • No bordered boxes, no description, no mode pills
+     • Mount animation (no whileInView) — cards render immediately
+       when the page loads, with a subtle stagger
+
+   Used in: /vehicles grid, FeaturedFleet carousel
    ───────────────────────────────────────────────────────────── */
 
 interface VehicleCardProps {
   vehicle: Vehicle;
   index?: number;
   onViewDetails?: () => void;
-  /** Set true for LCP priority loading */
   priority?: boolean;
 }
 
@@ -46,12 +42,11 @@ export function VehicleCard({
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: 0.5,
-        delay: index * 0.06,
+        duration: 0.4,
+        delay: Math.min(index, 5) * 0.05,
         ease: [0.22, 1, 0.36, 1],
       }}
       onClick={onViewDetails}
@@ -187,7 +182,7 @@ export function VehicleCard({
           {vehicle.name}
         </h3>
 
-        {/* Price — directly below the name */}
+        {/* Price */}
         <p className="font-display text-lg lg:text-xl text-ink leading-none tabular-nums mb-5">
           {formatPrice(vehicle.dailyRate)}
           <span className="font-sans text-[11px] text-ink-subtle ml-1.5 tracking-wide">
@@ -195,7 +190,7 @@ export function VehicleCard({
           </span>
         </p>
 
-        {/* ═══ Spec strip — no borders, inline, muted ═══ */}
+        {/* Spec strip — no borders, inline */}
         <div className="flex items-center gap-3 py-1">
           <Spec
             icon={<Users size={13} />}
@@ -221,25 +216,22 @@ export function VehicleCard({
           />
         </div>
 
-        {/* ═══ CTA — full-width ghost pill ═══ */}
+        {/* CTA — text link, left-aligned */}
         <div className="mt-auto pt-5">
           <span
             className="
-              group/cta inline-flex items-center justify-center gap-2 w-full
-              px-4 py-3
+              inline-flex items-center gap-2
               text-[11px] font-semibold uppercase tracking-[0.16em]
               text-copper-600
-              border border-copper-500/30 rounded-full
-              transition-all duration-300 ease-lux
-              hover:border-copper-500/70 hover:bg-copper-500/[0.05]
-              group-hover:border-copper-500/50
+              transition-colors duration-300
+              group-hover:text-copper-700
             "
           >
             <span>View details</span>
             <ArrowRight
               size={13}
               strokeWidth={2.5}
-              className="transition-transform duration-300 ease-lux group-hover/cta:translate-x-0.5"
+              className="transition-transform duration-300 ease-lux group-hover:translate-x-0.5"
             />
           </span>
         </div>
@@ -250,7 +242,6 @@ export function VehicleCard({
 
 /* ─────────────────────────────────────────────────────────────
    SPEC
-   Icon + value inline. No separate label.
    ───────────────────────────────────────────────────────────── */
 function Spec({
   icon,

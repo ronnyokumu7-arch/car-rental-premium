@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useFormState } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Car, Plane, X } from 'lucide-react';
+import { Car, Plane, X, Star } from 'lucide-react';
 import { submitBooking, type BookingState } from '../../app/actions/booking';
 import {
   submitAirportTransfer,
@@ -13,31 +13,31 @@ import {
 import { FeedbackBanner, SubmitButton, SummaryBar } from './shared';
 import { CarHireTab } from './CarHireTab';
 import { AirportTransferTab } from './AirportTransferTab';
+import { TRUST_STATS } from '../../lib/testimonials';
+import { getFleetSize } from '../../lib/vehicles';
 
 /* ─────────────────────────────────────────────────────────────
    BOOKING BAR — collapsible shell
 
    Collapsed (default):
      Two service tabs sit below the hero as a picker.
-     Tapping a tab expands the widget AND sets the active tab.
+     A compact trust line sits beneath the tabs.
 
    Expanded:
-     Tab strip stays at the top with a close button on the right.
-     Form body appears below. Summary bar at the bottom.
+     Tab strip at top with a close button on the right.
+     Form body below. Summary bar at the bottom.
 
-   Auto-expand:
-     ?service= or ?vehicle= query params open the bar on mount.
+   Trust line:
+     • 4.9 on Google · 46 vehicles in fleet · Since 2019
+     • Anchors the tabs — makes the picker feel like a real
+       decision point with proof behind it
+     • Visible in both collapsed and expanded states
 
    Responsive layout:
-     • Mobile  — full-bleed edge-to-edge. No card chrome.
-     • Desktop — centered card, max-w-6xl, rounded corners,
-                 overlaps the hero's bottom edge.
-
-   Design:
-     • Compact tabs (56px collapsed, ~44px expanded)
-     • Soft rounded corners
-     • No hard dividers — tabs flow into the section below
-     • TrustStrip removed (redundant with hero + FeaturedFleet)
+     • Mobile  — full-bleed edge-to-edge. Tabs use the full
+                 width when collapsed. Padding is reserved for
+                 the close button only when expanded.
+     • Desktop — centered card, max-w-6xl, rounded corners.
    ───────────────────────────────────────────────────────────── */
 
 type Tab = 'car-hire' | 'airport-transfer';
@@ -47,6 +47,7 @@ const initialTransferState: AirportTransferState = {};
 
 export function BookingBar() {
   const searchParams = useSearchParams();
+  const fleetSize = getFleetSize();
 
   /* ── Expanded state ── */
   const [expanded, setExpanded] = useState(false);
@@ -138,15 +139,18 @@ export function BookingBar() {
           >
             {/* ═══════════════════════════════════════════
                 TAB STRIP
-                No bottom border — flows into the form body
-                when expanded, flows into the section below
-                when collapsed.
+                Padding on the right reserves space for the
+                close button ONLY when expanded. When collapsed
+                the tabs use the full width.
                 ═══════════════════════════════════════════ */}
             <div className="relative bg-surface">
               <div
                 role="tablist"
                 aria-label="Booking mode"
-                className="flex items-stretch gap-2 p-2 pr-12 sm:p-2.5 sm:pr-14"
+                className={`
+                  flex items-stretch gap-2 p-2
+                  ${expanded ? 'pr-12 sm:pr-14' : ''}
+                `}
               >
                 <ServiceTile
                   active={expanded && isCarHire}
@@ -187,6 +191,32 @@ export function BookingBar() {
                   </motion.button>
                 )}
               </AnimatePresence>
+            </div>
+
+            {/* ═══════════════════════════════════════════
+                TRUST LINE
+                Anchors the tabs. Visible in both states.
+                ═══════════════════════════════════════════ */}
+            <div className="bg-surface border-t border-border">
+              <div className="flex items-center justify-center flex-wrap gap-x-5 gap-y-1.5 py-3 px-4 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
+                <span className="inline-flex items-center gap-1.5">
+                  <Star
+                    size={10}
+                    className="fill-copper-500 text-copper-500"
+                  />
+                  {TRUST_STATS.rating} on Google
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="w-px h-3 bg-border-strong"
+                />
+                <span>{fleetSize} vehicles in fleet</span>
+                <span
+                  aria-hidden="true"
+                  className="w-px h-3 bg-border-strong"
+                />
+                <span>Since {TRUST_STATS.founded}</span>
+              </div>
             </div>
 
             {/* ═══════════════════════════════════════════
@@ -243,14 +273,6 @@ export function BookingBar() {
 
 /* ─────────────────────────────────────────────────────────────
    SERVICE TILE
-   Compact tabs. Two sizes:
-     • Collapsed — 56px (inviting, spacious)
-     • Expanded  — ~44px (compact, functional)
-   Active state:
-     • Copper border + soft copper tint
-     • Icon badge becomes filled copper
-   Inactive hover:
-     • Warms toward copper
    ───────────────────────────────────────────────────────────── */
 function ServiceTile({
   active,
@@ -286,7 +308,6 @@ function ServiceTile({
         }
       `}
     >
-      {/* Icon badge */}
       <span
         className={`
           flex items-center justify-center shrink-0 rounded-md transition-all duration-300 ease-lux

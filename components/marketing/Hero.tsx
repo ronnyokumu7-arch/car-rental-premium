@@ -1,38 +1,28 @@
 'use client';
 
 import Link from 'next/link';
-import { Star, ArrowUpRight } from 'lucide-react';
-import { TRUST_STATS } from '../../lib/testimonials';
-import { getFleetSize } from '../../lib/vehicles';
+import { ArrowUpRight } from 'lucide-react';
 
 /* ─────────────────────────────────────────────────────────────
    HERO
    Full-width editorial statement. Single focal point.
 
-   CTAs use the footer's pill design:
-     • Rounded-full, copper gradient (primary) or ghost (secondary)
-     • Circular arrow badge on the right
-     • Lifts and rotates on hover
+   The trust strip (4.9 · 46 vehicles · Since 2019) now lives
+   in the BookingBar, right below the service tabs. The hero
+   stays purely editorial.
 
-   Mobile:
-     • Only the primary CTA renders
-     • Full-width up to 20rem, centered
+   CTAs:
+     • Primary — Get a Quote (pill, copper gradient, arrow badge)
+     • Secondary — Explore the Fleet (ghost pill, hidden on mobile)
 
-   Desktop:
-     • Both CTAs side-by-side
-
-   No scroll cue — the booking tabs below act as the "next step."
+   No scroll cue — the tabs below act as the next step.
    ───────────────────────────────────────────────────────────── */
 
 export function Hero() {
-  const fleetSize = getFleetSize();
-
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-obsidian-950 flex items-center">
 
-      {/* ═══════════════════════════════════════════
-          LAYER 1 — Base gradient
-          ═══════════════════════════════════════════ */}
+      {/* LAYER 1 — Base gradient */}
       <div
         aria-hidden="true"
         className="absolute inset-0"
@@ -42,7 +32,7 @@ export function Hero() {
         }}
       />
 
-      {/* LAYER 2 — Copper ambient glow (upper-right) */}
+      {/* LAYER 2 — Copper ambient glow */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
@@ -52,7 +42,7 @@ export function Hero() {
         }}
       />
 
-      {/* LAYER 3 — Cool counter-glow (lower-left) */}
+      {/* LAYER 3 — Cool counter-glow */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
@@ -81,12 +71,10 @@ export function Hero() {
         className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-copper-500/25 to-transparent"
       />
 
-      {/* ═══════════════════════════════════════════
-          CONTENT
-          ═══════════════════════════════════════════ */}
+      {/* CONTENT */}
       <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-8 pt-32 pb-16 w-full text-center">
 
-        {/* ── Eyebrow ── */}
+        {/* Eyebrow */}
         <div className="inline-flex items-center gap-3 mb-8">
           <span className="w-8 h-px bg-copper-500/60" aria-hidden="true" />
           <p className="text-[10px] uppercase tracking-[0.32em] text-copper-300 font-semibold">
@@ -95,7 +83,7 @@ export function Hero() {
           <span className="w-8 h-px bg-copper-500/60" aria-hidden="true" />
         </div>
 
-        {/* ── Headline ── */}
+        {/* Headline */}
         <h1 className="font-display text-white leading-[0.95] mb-8 text-[clamp(2.75rem,8vw,6.5rem)] tracking-[-0.025em]">
           Private, clean,
           <br />
@@ -106,38 +94,16 @@ export function Hero() {
           </span>
         </h1>
 
-        {/* ── Subhead ── */}
+        {/* Subhead */}
         <p className="text-lg lg:text-xl text-white/65 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
           Rent private cars in Nairobi — short-term, long-term, and
           chauffeur-driven. Delivered to your door, anywhere in Kenya.
         </p>
 
-        {/* ── Trust strip ── */}
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mb-10 text-[11px] uppercase tracking-[0.16em] text-white/50 font-medium">
-          <span className="inline-flex items-center gap-1.5">
-            <Star size={11} className="fill-copper-400 text-copper-400" />
-            {TRUST_STATS.rating} on Google
-          </span>
-          <span
-            className="w-px h-3 bg-white/15 hidden sm:block"
-            aria-hidden="true"
-          />
-          <span>{fleetSize} vehicles in fleet</span>
-          <span
-            className="w-px h-3 bg-white/15 hidden sm:block"
-            aria-hidden="true"
-          />
-          <span>Since {TRUST_STATS.founded}</span>
-        </div>
-
-        {/* ═══════════════════════════════════════════
-            CTAs
-            • Mobile:  primary only, max-w-xs centered
-            • Desktop: both, side-by-side
-            ═══════════════════════════════════════════ */}
+        {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
 
-          {/* ── Primary: Get a Quote ── */}
+          {/* Primary: Get a Quote */}
           <Link
             href="/quote"
             className="
@@ -163,7 +129,6 @@ export function Hero() {
             <span className="relative z-10 inline-flex items-center justify-center w-9 h-9 rounded-full bg-obsidian-950 text-copper-300 transition-all duration-400 ease-lux group-hover:rotate-45 shrink-0">
               <ArrowUpRight size={14} strokeWidth={2.5} />
             </span>
-            {/* Sheen sweep */}
             <span
               aria-hidden="true"
               className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-lux"
@@ -174,7 +139,7 @@ export function Hero() {
             />
           </Link>
 
-          {/* ── Secondary: Explore the Fleet — hidden on mobile ── */}
+          {/* Secondary: Explore the Fleet — hidden on mobile */}
           <Link
             href="/vehicles"
             className="
