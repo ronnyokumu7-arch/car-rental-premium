@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Star, ArrowUpRight } from 'lucide-react';
+import { Star, ArrowUpRight } from 'lucide-react';
 import { TRUST_STATS } from '../../lib/testimonials';
 import { getFleetSize } from '../../lib/vehicles';
 
