@@ -11,17 +11,16 @@ import { TRUST_STATS } from '../../lib/testimonials';
    Floating pill → expands into a review panel.
 
    Visibility rules:
-     • Hidden on /quote (users are in a task flow, don't distract)
+     • Hidden on /quote (task flow — don't distract)
+     • Hidden before scrolling past the hero
      • Hidden when footer is in view
      • Hidden when a modal is open (body[data-modal-open="true"])
-     • Auto-opens once per browser session after 8s
+     • Auto-opens once per browser session after 8s (only if visible)
 
-   Future: this component morphs into a contact CTA
-   (WhatsApp / Call / Directions). Keep the shell reusable.
+   Future: morphs into a contact CTA. Keep the shell reusable.
    ───────────────────────────────────────────────────────────── */
 
-/* Featured reviews — curated 2-item teaser.
-   Full list lives in lib/testimonials.ts and /about. */
+/* Featured reviews — curated 2-item teaser */
 const WIDGET_REVIEWS = [
   {
     id: 'kilonzo',
@@ -46,9 +45,15 @@ const GOOGLE_REVIEWS_URL = 'https://maps.app.goo.gl/MwewVWCk5ACe9r9w9';
 /* Routes where the widget is intentionally suppressed */
 const SUPPRESSED_ROUTES = ['/quote'];
 
+/* Scroll threshold — fraction of viewport height before the
+   widget is allowed to appear. Hero is min-h-screen, so 0.8
+   means "just before the hero fully exits." */
+const PAST_HERO_THRESHOLD = 0.8;
+
 export function GoogleReviewsWidget() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
   const [footerVisible, setFooterVisible] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -56,6 +61,17 @@ export function GoogleReviewsWidget() {
   const routeSuppressed = SUPPRESSED_ROUTES.some((r) =>
     pathname.startsWith(r)
   );
+
+  /* ── Scroll — past hero ── */
+  useEffect(() => {
+    const onScroll = () => {
+      const threshold = window.innerHeight * PAST_HERO_THRESHOLD;
+      setPastHero(window.scrollY > threshold);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   /* ── Escape closes the panel ── */
   useEffect(() => {
@@ -67,16 +83,18 @@ export function GoogleReviewsWidget() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  /* ── Auto-open once per session (skip on suppressed routes) ── */
+  /* ── Auto-open once per session ── */
   useEffect(() => {
     if (routeSuppressed) return;
+    if (!pastHero) return;
     if (sessionStorage.getItem('royride-reviews-shown')) return;
+
     const timer = setTimeout(() => {
       setOpen(true);
       sessionStorage.setItem('royride-reviews-shown', '1');
     }, 8000);
     return () => clearTimeout(timer);
-  }, [routeSuppressed]);
+  }, [routeSuppressed, pastHero]);
 
   /* ── Hide when footer enters viewport ── */
   useEffect(() => {
@@ -92,7 +110,8 @@ export function GoogleReviewsWidget() {
 
   /* ── Hide when any modal is open ── */
   useEffect(() => {
-    const sync = () => setModalOpen(document.body.dataset.modalOpen === 'true');
+    const sync = () =>
+      setModalOpen(document.body.dataset.modalOpen === 'true');
     sync();
     const observer = new MutationObserver(sync);
     observer.observe(document.body, {
@@ -104,10 +123,18 @@ export function GoogleReviewsWidget() {
 
   /* ── Collapse the panel when the widget hides ── */
   useEffect(() => {
-    if (footerVisible || modalOpen || routeSuppressed) setOpen(false);
-  }, [footerVisible, modalOpen, routeSuppressed]);
+    if (
+      footerVisible ||
+      modalOpen ||
+      routeSuppressed ||
+      !pastHero
+    ) {
+      setOpen(false);
+    }
+  }, [footerVisible, modalOpen, routeSuppressed, pastHero]);
 
-  const hidden = footerVisible || modalOpen || routeSuppressed;
+  const hidden =
+    footerVisible || modalOpen || routeSuppressed || !pastHero;
 
   return (
     <AnimatePresence>
@@ -126,9 +153,7 @@ export function GoogleReviewsWidget() {
         >
           <AnimatePresence mode="wait">
             {!open ? (
-              /* ═══════════════════════════════════════════
-                 Trigger pill
-                 ═══════════════════════════════════════════ */
+              /* Trigger pill */
               <motion.button
                 key="pill"
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -139,7 +164,6 @@ export function GoogleReviewsWidget() {
                 aria-label="See Google reviews"
                 className="group relative flex items-center gap-3 pl-2 pr-4 py-2 bg-obsidian-950 border border-white/12 rounded-full shadow-[0_8px_24px_rgba(14,14,16,0.32)] hover:border-copper-400/60 hover:-translate-y-0.5 transition-all duration-300 ease-lux"
               >
-                {/* Copper pulse ring */}
                 <span className="absolute inset-0 rounded-full pointer-events-none">
                   <motion.span
                     animate={{
@@ -157,7 +181,6 @@ export function GoogleReviewsWidget() {
                   />
                 </span>
 
-                {/* Google G — white pill on obsidian */}
                 <span className="relative flex items-center justify-center w-8 h-8 rounded-full bg-white shrink-0">
                   <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
                     <path
@@ -195,9 +218,7 @@ export function GoogleReviewsWidget() {
                 </span>
               </motion.button>
             ) : (
-              /* ═══════════════════════════════════════════
-                 Expanded panel
-                 ═══════════════════════════════════════════ */
+              /* Expanded panel */
               <motion.div
                 key="panel"
                 initial={{ opacity: 0, y: 16, scale: 0.96 }}

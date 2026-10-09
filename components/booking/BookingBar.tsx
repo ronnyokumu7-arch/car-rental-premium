@@ -19,24 +19,22 @@ import { getFleetSize } from '../../lib/vehicles';
 /* ─────────────────────────────────────────────────────────────
    BOOKING BAR — collapsible shell
 
-   Collapsed (default):
-     Two service tabs sit below the hero as a picker.
-     A compact trust line sits beneath the tabs.
+   Desktop (lg+):
+     Collapsed by default — two service tabs as a picker.
+     Tapping a tab expands the widget AND sets the active tab.
+     Close button appears when expanded.
 
-   Expanded:
-     Tab strip at top with a close button on the right.
-     Form body below. Summary bar at the bottom.
+   Mobile (<lg):
+     No tabs. The Car Hire form is always expanded.
+     Airport transfers are reachable via /quote or dedicated ads.
+     No close button — the form is the section.
 
-   Purpose:
-     Quick availability check — not a booking.
-     Detailed enquiry → /quote
-     Detailed fleet filter → /vehicles
+   Trust line:
+     Centered, wraps naturally. No borders, no scroll.
 
-   Responsive layout:
-     • Mobile  — full-bleed edge-to-edge. Tabs use the full
-                 width when collapsed. Padding reserved for
-                 the close button only when expanded.
-     • Desktop — centered card, max-w-6xl, rounded corners.
+   Auto-expand:
+     ?service= or ?vehicle= query params open the bar on mount.
+     On mobile, the service param determines which tab is active.
    ───────────────────────────────────────────────────────────── */
 
 type Tab = 'car-hire' | 'airport-transfer';
@@ -51,10 +49,24 @@ export function BookingBar() {
   /* ── Expanded state ── */
   const [expanded, setExpanded] = useState(false);
 
-  /* ── Auto-expand if URL params are present ── */
+  /* ── Auto-expand + service detection ── */
   useEffect(() => {
+    const isMobile = window.matchMedia('(max-width: 1023px)').matches;
     const service = searchParams.get('service');
     const vehicle = searchParams.get('vehicle');
+
+    if (isMobile) {
+      /* Mobile: always expanded. Respect service param if present. */
+      setExpanded(true);
+      if (service === 'airport-transfer') {
+        setTab('airport-transfer');
+      } else {
+        setTab('car-hire');
+      }
+      return;
+    }
+
+    /* Desktop: expand only when params are present */
     if (service || vehicle) {
       setExpanded(true);
       if (service === 'airport-transfer') {
@@ -94,13 +106,13 @@ export function BookingBar() {
   const activeState = isCarHire ? carHireState : transferState;
   const activeAction = isCarHire ? carHireAction : transferAction;
 
-  /* ── Tab click — expands + switches ── */
+  /* ── Tab click — expands + switches (desktop only) ── */
   const handleTabClick = useCallback((newTab: Tab) => {
     setTab(newTab);
     setExpanded(true);
   }, []);
 
-  /* ── Collapse ── */
+  /* ── Collapse (desktop only) ── */
   const handleClose = useCallback(() => {
     setExpanded(false);
   }, []);
@@ -136,15 +148,15 @@ export function BookingBar() {
             "
           >
             {/* ═══════════════════════════════════════════
-                TAB STRIP
+                TAB STRIP — DESKTOP ONLY
                 ═══════════════════════════════════════════ */}
-            <div className="relative bg-surface">
+            <div className="relative bg-surface hidden lg:block">
               <div
                 role="tablist"
                 aria-label="Booking mode"
                 className={`
                   flex items-stretch gap-2 p-2
-                  ${expanded ? 'pr-12 sm:pr-14' : ''}
+                  ${expanded ? 'pr-14' : ''}
                 `}
               >
                 <ServiceTile
@@ -163,7 +175,7 @@ export function BookingBar() {
                 />
               </div>
 
-              {/* Close button — only when expanded */}
+              {/* Close button */}
               <AnimatePresence>
                 {expanded && (
                   <motion.button
@@ -175,7 +187,7 @@ export function BookingBar() {
                     exit={{ opacity: 0, scale: 0.7 }}
                     transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
                     className="
-                      absolute top-1/2 -translate-y-1/2 right-3 sm:right-4
+                      absolute top-1/2 -translate-y-1/2 right-4
                       flex items-center justify-center w-9 h-9 rounded-full
                       text-ink-subtle hover:text-ink hover:bg-surface-sunken
                       transition-colors duration-200
@@ -190,42 +202,31 @@ export function BookingBar() {
 
             {/* ═══════════════════════════════════════════
                 TRUST LINE
-                Horizontal scroll on mobile (edge-to-edge,
-                no wrapping). Centered on desktop.
+                Centered, wraps naturally. No borders.
                 ═══════════════════════════════════════════ */}
-            <div className="bg-surface border-t border-border">
-              {/* Mobile: horizontal scroll */}
-              <div className="sm:hidden flex items-center gap-x-4 overflow-x-auto scrollbar-hide px-6 py-3 snap-x snap-mandatory">
-                <TrustItem icon={<Star size={10} className="fill-copper-500 text-copper-500" />}>
-                  {TRUST_STATS.rating} on Google
-                </TrustItem>
-                <Divider />
-                <TrustItem>{fleetSize} vehicles in fleet</TrustItem>
-                <Divider />
-                <TrustItem>Since {TRUST_STATS.founded}</TrustItem>
-                <Divider />
-                <TrustItem>Nairobi · Kenya</TrustItem>
-              </div>
-
-              {/* Desktop: centered, no scroll */}
-              <div className="hidden sm:flex items-center justify-center gap-x-5 py-3 px-6 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
-                <span className="inline-flex items-center gap-1.5">
+            <div className="bg-surface">
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 py-4 lg:py-4 px-6 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
+                <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
                   <Star
                     size={10}
-                    className="fill-copper-500 text-copper-500"
+                    className="fill-copper-500 text-copper-500 shrink-0"
                   />
                   {TRUST_STATS.rating} on Google
                 </span>
                 <span
                   aria-hidden="true"
-                  className="w-px h-3 bg-border-strong"
+                  className="w-px h-3 bg-border-strong hidden sm:inline-block"
                 />
-                <span>{fleetSize} vehicles in fleet</span>
+                <span className="whitespace-nowrap">
+                  {fleetSize} vehicles in fleet
+                </span>
                 <span
                   aria-hidden="true"
-                  className="w-px h-3 bg-border-strong"
+                  className="w-px h-3 bg-border-strong hidden sm:inline-block"
                 />
-                <span>Since {TRUST_STATS.founded}</span>
+                <span className="whitespace-nowrap">
+                  Since {TRUST_STATS.founded}
+                </span>
               </div>
             </div>
 
@@ -286,38 +287,7 @@ export function BookingBar() {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   TRUST ITEM
-   Small inline item used in the mobile scroll strip.
-   ───────────────────────────────────────────────────────────── */
-function TrustItem({
-  icon,
-  children,
-}: {
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <span className="inline-flex items-center gap-1.5 shrink-0 snap-start text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-subtle whitespace-nowrap">
-      {icon}
-      {children}
-    </span>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────
-   DIVIDER
-   ───────────────────────────────────────────────────────────── */
-function Divider() {
-  return (
-    <span
-      aria-hidden="true"
-      className="w-px h-3 bg-border-strong shrink-0"
-    />
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────
-   SERVICE TILE
+   SERVICE TILE — desktop only
    ───────────────────────────────────────────────────────────── */
 function ServiceTile({
   active,
@@ -340,10 +310,10 @@ function ServiceTile({
       onClick={onClick}
       className={`
         group relative flex-1 flex items-center justify-center gap-2
-        px-3 sm:px-5
-        ${expanded ? 'py-2.5' : 'py-3.5 sm:py-4'}
+        px-5
+        ${expanded ? 'py-2.5' : 'py-4'}
         rounded-lg border
-        text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.16em]
+        text-[11px] font-semibold uppercase tracking-[0.16em]
         transition-all duration-300 ease-lux
         focus:outline-none focus-visible:ring-2 focus-visible:ring-copper-500 focus-visible:ring-offset-2
         ${
