@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Star, X, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TRUST_STATS } from '../../lib/testimonials';
@@ -9,7 +10,8 @@ import { TRUST_STATS } from '../../lib/testimonials';
    GOOGLE REVIEWS WIDGET
    Floating pill → expands into a review panel.
 
-   Visibility rules (same as ScrollToTop):
+   Visibility rules:
+     • Hidden on /quote (users are in a task flow, don't distract)
      • Hidden when footer is in view
      • Hidden when a modal is open (body[data-modal-open="true"])
      • Auto-opens once per browser session after 8s
@@ -41,10 +43,19 @@ const WIDGET_REVIEWS = [
 
 const GOOGLE_REVIEWS_URL = 'https://maps.app.goo.gl/MwewVWCk5ACe9r9w9';
 
+/* Routes where the widget is intentionally suppressed */
+const SUPPRESSED_ROUTES = ['/quote'];
+
 export function GoogleReviewsWidget() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [footerVisible, setFooterVisible] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+
+  /* ── Route suppression ── */
+  const routeSuppressed = SUPPRESSED_ROUTES.some((r) =>
+    pathname.startsWith(r)
+  );
 
   /* ── Escape closes the panel ── */
   useEffect(() => {
@@ -56,15 +67,16 @@ export function GoogleReviewsWidget() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  /* ── Auto-open once per session ── */
+  /* ── Auto-open once per session (skip on suppressed routes) ── */
   useEffect(() => {
+    if (routeSuppressed) return;
     if (sessionStorage.getItem('royride-reviews-shown')) return;
     const timer = setTimeout(() => {
       setOpen(true);
       sessionStorage.setItem('royride-reviews-shown', '1');
     }, 8000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [routeSuppressed]);
 
   /* ── Hide when footer enters viewport ── */
   useEffect(() => {
@@ -90,13 +102,12 @@ export function GoogleReviewsWidget() {
     return () => observer.disconnect();
   }, []);
 
-  /* ── When user scrolls to footer or a modal opens,
-        collapse the panel too (not just hide the pill) ── */
+  /* ── Collapse the panel when the widget hides ── */
   useEffect(() => {
-    if (footerVisible || modalOpen) setOpen(false);
-  }, [footerVisible, modalOpen]);
+    if (footerVisible || modalOpen || routeSuppressed) setOpen(false);
+  }, [footerVisible, modalOpen, routeSuppressed]);
 
-  const hidden = footerVisible || modalOpen;
+  const hidden = footerVisible || modalOpen || routeSuppressed;
 
   return (
     <AnimatePresence>
@@ -116,7 +127,7 @@ export function GoogleReviewsWidget() {
           <AnimatePresence mode="wait">
             {!open ? (
               /* ═══════════════════════════════════════════
-                 Trigger pill — obsidian with copper pulse
+                 Trigger pill
                  ═══════════════════════════════════════════ */
               <motion.button
                 key="pill"
@@ -185,7 +196,7 @@ export function GoogleReviewsWidget() {
               </motion.button>
             ) : (
               /* ═══════════════════════════════════════════
-                 Expanded panel — obsidian header, ivory body
+                 Expanded panel
                  ═══════════════════════════════════════════ */
               <motion.div
                 key="panel"
@@ -197,14 +208,12 @@ export function GoogleReviewsWidget() {
                 role="dialog"
                 aria-label="Google reviews"
               >
-                {/* ── Obsidian header ── */}
+                {/* Obsidian header */}
                 <div className="relative bg-obsidian-950 px-5 py-4 overflow-hidden">
-                  {/* Copper top hairline */}
                   <div
                     aria-hidden="true"
                     className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-copper-500/40 to-transparent"
                   />
-                  {/* Warm glow */}
                   <div
                     aria-hidden="true"
                     className="absolute inset-0 pointer-events-none"
@@ -217,11 +226,7 @@ export function GoogleReviewsWidget() {
 
                   <div className="relative flex items-center gap-3">
                     <span className="flex items-center justify-center w-9 h-9 rounded-full bg-white shrink-0">
-                      <svg
-                        viewBox="0 0 24 24"
-                        className="w-5 h-5"
-                        aria-hidden="true"
-                      >
+                      <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
                         <path
                           fill="#4285F4"
                           d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -272,7 +277,7 @@ export function GoogleReviewsWidget() {
                   </div>
                 </div>
 
-                {/* ── Ivory body — reviews ── */}
+                {/* Ivory body — reviews */}
                 <div className="p-5 space-y-5 max-h-[45vh] overflow-y-auto scrollbar-hide">
                   {WIDGET_REVIEWS.map((review) => (
                     <div key={review.id}>
@@ -302,7 +307,7 @@ export function GoogleReviewsWidget() {
                   ))}
                 </div>
 
-                {/* ── Ivory body — CTA footer ── */}
+                {/* Ivory body — CTA footer */}
                 <div className="border-t border-ivory-200 px-5 py-3">
                   <a
                     href={GOOGLE_REVIEWS_URL}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useFormState } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -42,13 +42,19 @@ import { StepReview } from './StepReview';
      ?service=car-hire         → skip step 1, start on step 2
      ?vehicle=prado-j150       → pre-select the vehicle (used at step 3)
 
-   After mount, the wizard owns all state — the URL is a one-way
-   hint, not a two-way sync.
-
    Layout:
      • Desktop:  two-column — wizard left (7/12), sticky
                  summary panel right (5/12)
      • Mobile:   single column, summary panel renders below
+
+   Navigation:
+     • Fixed bottom CTA bar with Back / Continue
+     • Always visible while the wizard is active
+     • Hides when the success state takes over
+
+   Scroll behavior:
+     • Step changes scroll to the top of the wizard (not page)
+     • Dropdown interactions do NOT trigger scrolling
    ───────────────────────────────────────────────────────────── */
 
 type Step = 1 | 2 | 3 | 4 | 5;
@@ -68,8 +74,6 @@ export function QuoteWizard() {
       : null;
 
   const initialVehicleId = vehicleParam || '';
-
-  /* If a service was passed in the URL, skip step 1 */
   const initialStep: Step = initialService ? 2 : 1;
 
   /* ── Wizard state ── */
@@ -114,6 +118,23 @@ export function QuoteWizard() {
   /* ── Server action ── */
   const [state, formAction] = useFormState(sendQuote, initialState);
 
+  /* ── Scroll to wizard on step change (not on any render) ── */
+  const wizardRef = useRef<HTMLDivElement>(null);
+  const previousStep = useRef<Step>(step);
+
+  useEffect(() => {
+    if (previousStep.current === step) return;
+    previousStep.current = step;
+
+    const el = wizardRef.current;
+    if (!el) return;
+
+    /* Scroll so the wizard content is near the top of the viewport,
+       leaving room for the fixed navbar */
+    const top = el.getBoundingClientRect().top + window.scrollY - 100;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }, [step]);
+
   /* ── Server-action side effects ──
      • Reset the submitting flag when a response comes back
      • On error while on step 5, bounce back to step 4 */
@@ -124,7 +145,6 @@ export function QuoteWizard() {
 
     if (!state.success && step === 5) {
       setStep(4);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [state, step]);
 
@@ -241,7 +261,6 @@ export function QuoteWizard() {
       }
       return Math.min(prev + 1, 5) as Step;
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [service]);
 
   const goBack = useCallback(() => {
@@ -251,7 +270,6 @@ export function QuoteWizard() {
       }
       return Math.max(prev - 1, 1) as Step;
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [service]);
 
   /* ── Step labels ── */
@@ -333,7 +351,10 @@ export function QuoteWizard() {
       {/* ═══════════════════════════════════════════
           WIZARD BODY
           ═══════════════════════════════════════════ */}
-      <section className="bg-background py-12 lg:py-16 px-6 lg:px-8">
+      <section
+        ref={wizardRef}
+        className="bg-background py-12 lg:py-16 px-6 lg:px-8 pb-40 lg:pb-44"
+      >
         <div className="max-w-7xl mx-auto">
 
           {/* Progress indicator */}
@@ -434,104 +455,6 @@ export function QuoteWizard() {
                   <p>{state.message}</p>
                 </div>
               )}
-
-              {/* Navigation buttons */}
-              <div className="flex items-center justify-between gap-4 mt-10 pt-6 border-t border-border">
-                <button
-                  type="button"
-                  onClick={goBack}
-                  disabled={step === 1 || submitting}
-                  className={`
-                    inline-flex items-center gap-2 px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] rounded-md transition-all duration-300 ease-lux
-                    ${
-                      step === 1 || submitting
-                        ? 'text-ink-subtle cursor-not-allowed'
-                        : 'text-ink border border-border hover:border-copper-500/50 hover:text-copper-600'
-                    }
-                  `}
-                >
-                  <ArrowLeft size={14} strokeWidth={2.5} />
-                  Back
-                </button>
-
-                {step < 5 ? (
-                  <button
-                    type="button"
-                    onClick={goNext}
-                    disabled={!canAdvance}
-                    className={`
-                      group relative inline-flex items-center gap-2 px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] rounded-md overflow-hidden transition-all duration-300 ease-lux
-                      ${
-                        canAdvance
-                          ? 'text-obsidian-950 hover:-translate-y-0.5'
-                          : 'text-ink-subtle bg-surface-sunken border border-border cursor-not-allowed'
-                      }
-                    `}
-                    style={
-                      canAdvance
-                        ? {
-                            backgroundImage:
-                              'linear-gradient(135deg, #E3A468 0%, #D98A44 45%, #C2702E 100%)',
-                            boxShadow:
-                              '0 1px 2px rgba(168,90,34,0.20), 0 8px 24px rgba(194,112,46,0.28)',
-                          }
-                        : undefined
-                    }
-                  >
-                    <span className="relative z-10">Continue</span>
-                    <ArrowRight
-                      size={14}
-                      strokeWidth={2.5}
-                      className="relative z-10 transition-transform duration-300 ease-lux group-hover:translate-x-0.5"
-                    />
-                  </button>
-                ) : (
-                  <button
-                    type="submit"
-                    form="quote-submit-form"
-                    disabled={submitting}
-                    onClick={() => setSubmitting(true)}
-                    className={`
-                      group relative inline-flex items-center gap-2 px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] text-obsidian-950 rounded-md overflow-hidden transition-all duration-300 ease-lux
-                      ${
-                        submitting
-                          ? 'opacity-70 cursor-wait'
-                          : 'hover:-translate-y-0.5'
-                      }
-                    `}
-                    style={{
-                      backgroundImage:
-                        'linear-gradient(135deg, #E3A468 0%, #D98A44 45%, #C2702E 100%)',
-                      boxShadow:
-                        '0 1px 2px rgba(168,90,34,0.20), 0 8px 24px rgba(194,112,46,0.28)',
-                    }}
-                  >
-                    {submitting ? (
-                      <>
-                        <span className="inline-block w-4 h-4 border-2 border-obsidian-950/30 border-t-obsidian-950 rounded-full animate-spin" />
-                        <span className="relative z-10">Sending…</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="relative z-10">Send quote</span>
-                        <ArrowRight
-                          size={14}
-                          strokeWidth={2.5}
-                          className="relative z-10 transition-transform duration-300 ease-lux group-hover:translate-x-0.5"
-                        />
-                        <span
-                          aria-hidden="true"
-                          className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-lux"
-                          style={{
-                            background:
-                              'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%)',
-                          }}
-                        />
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
             </div>
 
             {/* Summary panel column */}
@@ -541,6 +464,126 @@ export function QuoteWizard() {
           </div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════
+          FIXED BOTTOM CTA BAR
+          Always visible while the wizard is active.
+          z-40 sits above content but below the mobile
+          drawer (z-95) and the reviews widget (z-80).
+          ═══════════════════════════════════════════ */}
+      <div
+        className="
+          fixed bottom-0 left-0 right-0 z-40
+          bg-background/95 backdrop-blur-lg
+          border-t border-border
+          shadow-[0_-4px_24px_rgba(14,14,16,0.06)]
+        "
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      >
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3 lg:py-4 flex items-center justify-between gap-4">
+          {/* Back */}
+          <button
+            type="button"
+            onClick={goBack}
+            disabled={step === 1 || submitting}
+            className={`
+              inline-flex items-center gap-2 px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] rounded-md transition-all duration-300 ease-lux
+              ${
+                step === 1 || submitting
+                  ? 'text-ink-subtle cursor-not-allowed'
+                  : 'text-ink border border-border hover:border-copper-500/50 hover:text-copper-600 bg-surface'
+              }
+            `}
+          >
+            <ArrowLeft size={14} strokeWidth={2.5} />
+            Back
+          </button>
+
+          {/* Step label — hidden on very small screens */}
+          <p className="hidden sm:block text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-subtle">
+            Step {step} of 5
+          </p>
+
+          {/* Continue / Send */}
+          {step < 5 ? (
+            <button
+              type="button"
+              onClick={goNext}
+              disabled={!canAdvance}
+              className={`
+                group relative inline-flex items-center gap-2 px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] rounded-md overflow-hidden transition-all duration-300 ease-lux
+                ${
+                  canAdvance
+                    ? 'text-obsidian-950 hover:-translate-y-0.5'
+                    : 'text-ink-subtle bg-surface-sunken border border-border cursor-not-allowed'
+                }
+              `}
+              style={
+                canAdvance
+                  ? {
+                      backgroundImage:
+                        'linear-gradient(135deg, #E3A468 0%, #D98A44 45%, #C2702E 100%)',
+                      boxShadow:
+                        '0 1px 2px rgba(168,90,34,0.20), 0 8px 24px rgba(194,112,46,0.28)',
+                    }
+                  : undefined
+              }
+            >
+              <span className="relative z-10">Continue</span>
+              <ArrowRight
+                size={14}
+                strokeWidth={2.5}
+                className="relative z-10 transition-transform duration-300 ease-lux group-hover:translate-x-0.5"
+              />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              form="quote-submit-form"
+              disabled={submitting}
+              onClick={() => setSubmitting(true)}
+              className={`
+                group relative inline-flex items-center gap-2 px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.16em] text-obsidian-950 rounded-md overflow-hidden transition-all duration-300 ease-lux
+                ${
+                  submitting
+                    ? 'opacity-70 cursor-wait'
+                    : 'hover:-translate-y-0.5'
+                }
+              `}
+              style={{
+                backgroundImage:
+                  'linear-gradient(135deg, #E3A468 0%, #D98A44 45%, #C2702E 100%)',
+                boxShadow:
+                  '0 1px 2px rgba(168,90,34,0.20), 0 8px 24px rgba(194,112,46,0.28)',
+              }}
+            >
+              {submitting ? (
+                <>
+                  <span className="inline-block w-4 h-4 border-2 border-obsidian-950/30 border-t-obsidian-950 rounded-full animate-spin" />
+                  <span className="relative z-10">Sending…</span>
+                </>
+              ) : (
+                <>
+                  <span className="relative z-10">Send quote</span>
+                  <ArrowRight
+                    size={14}
+                    strokeWidth={2.5}
+                    className="relative z-10 transition-transform duration-300 ease-lux group-hover:translate-x-0.5"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-lux"
+                    style={{
+                      background:
+                        'linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%)',
+                    }}
+                  />
+                </>
+              )}
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* ═══════════════════════════════════════════
           HIDDEN SUBMIT FORM
