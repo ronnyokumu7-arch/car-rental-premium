@@ -15,23 +15,22 @@ import { Select, type SelectOption } from '../ui/Select';
    CAR HIRE TAB
    A quick availability check — not a booking form.
 
-   Fields (visible):
-     • Pickup date
-     • Return date
-     • Vehicle type   ┐ in a sunken panel
-     • Price range    ┘
+   Layout:
+     • Row 1 (white surface):  Pickup date · Return date
+     • Row 2 (sunken surface): Vehicle type · Price range
+
+   The sunken refinement zone's background is provided by the
+   BookingBar's form body wrapper — this component sits plainly
+   on whatever surface it's rendered into. That way the sunken
+   band extends continuously down to the summary bar with no
+   visible seams.
 
    Location defaults come from hidden inputs. The user never
    sees them.
 
-   Default price range: min – 9,000 (excludes the Prado at
-   14,000 — users who want it slide the range up).
-
-   Date pickers use the site theme via color-scheme +
-   accent-color in globals.css.
+   Default price range: min – 9,000 (excludes the Prado).
    ───────────────────────────────────────────────────────────── */
 
-/* Vehicle type options */
 const VEHICLE_TYPE_OPTIONS: SelectOption[] = [
   { value: '',          label: 'Any vehicle type' },
   { value: 'Sedan',     label: 'Sedan' },
@@ -42,17 +41,11 @@ const VEHICLE_TYPE_OPTIONS: SelectOption[] = [
   { value: 'Van',       label: 'Van' },
 ];
 
-/* Computed once at module load — the fleet doesn't change at runtime. */
 const PRICE_RANGE = getPriceRange();
 const PRICE_STEP = 500;
-
-/* Default ceiling for the price slider. Excludes the Prado
-   so the "quick check" starts with the everyday fleet. */
 const DEFAULT_PRICE_MAX = 9000;
 
-/* ─────────────────────────────────────────────────────────────
-   PURE HELPERS
-   ───────────────────────────────────────────────────────────── */
+/* ── Pure helpers ── */
 
 function daysBetween(pickup: string, dropoff: string): number | null {
   if (!pickup || !dropoff) return null;
@@ -63,16 +56,14 @@ function daysBetween(pickup: string, dropoff: string): number | null {
   return days > 0 ? days : null;
 }
 
-/* ─────────────────────────────────────────────────────────────
-   COMPONENT
-   ───────────────────────────────────────────────────────────── */
+/* ── Component ── */
 
 export function CarHireTab({
   onReadyChange,
 }: {
   onReadyChange?: (ready: boolean) => void;
 }) {
-  /* ── Form state ── */
+  /* ── State ── */
   const [pickupDate, setPickupDate] = useState('');
   const [dropoffDate, setDropoffDate] = useState('');
   const [vehicleType, setVehicleType] = useState('');
@@ -81,19 +72,15 @@ export function CarHireTab({
     Math.min(DEFAULT_PRICE_MAX, PRICE_RANGE.max),
   ]);
 
-  /* Today's date — stable for the session */
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
 
-  /* ── Derived readiness ── */
   const days = daysBetween(pickupDate, dropoffDate);
   const ready = Boolean(days);
 
-  /* ── Notify parent ── */
   useEffect(() => {
     onReadyChange?.(ready);
   }, [ready, onReadyChange]);
 
-  /* ── Range track offsets ── */
   const [rangeLeftPct, rangeRightPct] = useMemo(() => {
     const span = PRICE_RANGE.max - PRICE_RANGE.min || 1;
     const left = ((priceRange[0] - PRICE_RANGE.min) / span) * 100;
@@ -104,9 +91,9 @@ export function CarHireTab({
   return (
     <>
       {/* ═══════════════════════════════════════════
-          DATES — plain surface
+          ROW 1 — Dates
           ═══════════════════════════════════════════ */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
         <FieldWrapper label="Pickup Date" icon={<Calendar size={14} />}>
           <input
             name="pickupDate"
@@ -141,11 +128,11 @@ export function CarHireTab({
       </div>
 
       {/* ═══════════════════════════════════════════
-          REFINEMENTS — sunken panel
-          Vehicle type + price range grouped together.
+          ROW 2 — Refinements
+          No background of its own — the parent provides
+          the continuous sunken band down to the summary bar.
           ═══════════════════════════════════════════ */}
-      <div className="relative -mx-6 lg:-mx-10 px-6 lg:px-10 py-6 bg-surface-sunken border-y border-border">
-        {/* ── Vehicle type ── */}
+      <div className="mt-6 pt-6 border-t border-border">
         <div className="mb-6">
           <FieldWrapper label="Vehicle Type" icon={<Car size={14} />}>
             <Select
@@ -159,7 +146,6 @@ export function CarHireTab({
           </FieldWrapper>
         </div>
 
-        {/* ── Price range ── */}
         <div className="pt-6 border-t border-border">
           <div className="flex items-center justify-between mb-3">
             <label className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-ink-subtle">
@@ -223,9 +209,7 @@ export function CarHireTab({
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════
-          HIDDEN FIELDS
-          ═══════════════════════════════════════════ */}
+      {/* ── Hidden fields ── */}
       <input
         type="hidden"
         name="pickupLocation"

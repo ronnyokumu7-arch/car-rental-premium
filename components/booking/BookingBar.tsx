@@ -29,8 +29,12 @@ import { getFleetSize } from '../../lib/vehicles';
      Airport transfers are reachable via /quote or dedicated ads.
      No close button — the form is the section.
 
-   Trust line:
-     Centered, wraps naturally. No borders, no scroll.
+   Sunken band:
+     The bottom of the form (refinements + SummaryBar) sits on
+     one continuous sunken surface. There is no white gap between
+     the refinements and the action row. The band starts inside
+     CarHireTab / AirportTransferTab and continues through the
+     SummaryBar below.
 
    Auto-expand:
      ?service= or ?vehicle= query params open the bar on mount.
@@ -56,7 +60,6 @@ export function BookingBar() {
     const vehicle = searchParams.get('vehicle');
 
     if (isMobile) {
-      /* Mobile: always expanded. Respect service param if present. */
       setExpanded(true);
       if (service === 'airport-transfer') {
         setTab('airport-transfer');
@@ -66,7 +69,6 @@ export function BookingBar() {
       return;
     }
 
-    /* Desktop: expand only when params are present */
     if (service || vehicle) {
       setExpanded(true);
       if (service === 'airport-transfer') {
@@ -202,10 +204,9 @@ export function BookingBar() {
 
             {/* ═══════════════════════════════════════════
                 TRUST LINE
-                Centered, wraps naturally. No borders.
                 ═══════════════════════════════════════════ */}
             <div className="bg-surface">
-              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 py-4 lg:py-4 px-6 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 py-4 px-6 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
                 <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
                   <Star
                     size={10}
@@ -243,7 +244,9 @@ export function BookingBar() {
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   className="overflow-hidden"
                 >
-                  <div className="border-t border-border px-6 lg:px-10 py-6 lg:py-8">
+                  {/* ── Top: white surface — dates row for car hire,
+                        form fields for airport transfer ── */}
+                  <div className="border-t border-border px-6 lg:px-10 pt-6 lg:pt-8 pb-6 lg:pb-8">
                     {isCarHire ? (
                       <CarHireTab onReadyChange={handleCarHireReady} />
                     ) : (
@@ -253,29 +256,32 @@ export function BookingBar() {
                     )}
                   </div>
 
-                  <SummaryBar
-                    label={
-                      isCarHire
-                        ? 'Availability check'
-                        : 'Airport transfer request'
-                    }
-                    value={
-                      ready
-                        ? 'Ready to send'
-                        : isCarHire
-                          ? 'Add dates to see availability'
-                          : 'Complete required fields'
-                    }
-                  >
-                    <SubmitButton
-                      ready={ready}
+                  {/* ── Bottom: sunken band — summary bar ── */}
+                  <div className="bg-surface-sunken border-t border-border">
+                    <SummaryBar
                       label={
                         isCarHire
-                          ? 'Check Availability'
-                          : 'Request Transfer'
+                          ? 'Availability check'
+                          : 'Airport transfer request'
                       }
-                    />
-                  </SummaryBar>
+                      value={
+                        ready
+                          ? 'Ready to send'
+                          : isCarHire
+                            ? 'Add dates to see availability'
+                            : 'Complete required fields'
+                      }
+                    >
+                      <SubmitButton
+                        ready={ready}
+                        label={
+                          isCarHire
+                            ? 'Check Availability'
+                            : 'Request Transfer'
+                        }
+                      />
+                    </SummaryBar>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

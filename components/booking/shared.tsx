@@ -54,7 +54,7 @@ export function FieldWrapper({
 }
 
 /* ═══════════════════════════════════════════════════════
-   PILL BUTTON — seat counts, passenger counts, vehicle types
+   PILL BUTTON
    ═══════════════════════════════════════════════════════ */
 export function PillButton({
   children,
@@ -66,7 +66,6 @@ export function PillButton({
   children: ReactNode;
   onClick?: () => void;
   active?: boolean;
-  /** aria-pressed — set when this is a toggle. */
   pressed?: boolean;
   type?: 'button' | 'submit';
 }) {
@@ -95,7 +94,7 @@ export function PillButton({
 }
 
 /* ═══════════════════════════════════════════════════════
-   LOCATION FIELD — Select with smart label + sub-hint
+   LOCATION FIELD
    ═══════════════════════════════════════════════════════ */
 export function LocationField({
   label,
@@ -112,16 +111,12 @@ export function LocationField({
   onChange: (v: string) => void;
   options: { value: string; label: string; fee: number }[];
 }) {
-  /* Convert location options → SelectOption format.
-     Fee becomes a hint — the Select auto-detects KES/Free
-     patterns and renders them as copper pills. */
   const selectOptions: SelectOption[] = options.map((opt) => {
     let hint: string | undefined;
 
     if (opt.fee === -1) {
       hint = 'Quote';
     } else if (opt.fee === 0) {
-      /* Only show "Free" for the office itself, not "same-as-pickup" */
       hint = opt.value === 'same-as-pickup' ? undefined : 'Free';
     } else if (!opt.label.includes('KES')) {
       hint = `+ KES ${opt.fee.toLocaleString('en-KE')}`;
@@ -159,7 +154,7 @@ export function LocationField({
 }
 
 /* ═══════════════════════════════════════════════════════
-   CONCIERGE HEADER — live summary line
+   CONCIERGE HEADER
    ═══════════════════════════════════════════════════════ */
 export function ConciergeHeader({
   segments,
@@ -228,7 +223,7 @@ export function SubmitButton({
         ${
           ready
             ? 'text-obsidian-950 hover:-translate-y-0.5'
-            : 'text-ink-subtle bg-surface-sunken border border-border'
+            : 'text-ink-subtle bg-surface border border-border'
         }
       `}
       style={
@@ -279,6 +274,13 @@ export function SubmitButton({
 
 /* ═══════════════════════════════════════════════════════
    SUMMARY BAR
+   The bottom action strip.
+
+   NOTE: No background, no top border. The parent form body
+   (via CarHireTab / AirportTransferTab) provides a continuous
+   sunken surface that extends down through this bar. That
+   eliminates the awkward white gap between the refinements
+   panel and this action row.
    ═══════════════════════════════════════════════════════ */
 export function SummaryBar({
   label,
@@ -300,7 +302,7 @@ export function SummaryBar({
       : 'text-ink';
 
   return (
-    <div className="bg-surface-sunken border-t border-border px-6 lg:px-10 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="px-6 lg:px-10 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div className="flex items-center gap-4 text-[11px] uppercase tracking-widest text-ink-subtle">
         <span>{label}</span>
         <span
