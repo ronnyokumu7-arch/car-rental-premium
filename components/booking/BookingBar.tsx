@@ -157,14 +157,14 @@ export function BookingBar() {
                   expanded={expanded}
                   onClick={() => handleTabClick('car-hire')}
                   icon={<Car size={16} strokeWidth={2} />}
-                  label="Car Hire"
+                  label="Hire a Car"
                 />
                 <ServiceTile
                   active={expanded && !isCarHire}
                   expanded={expanded}
                   onClick={() => handleTabClick('airport-transfer')}
                   icon={<Plane size={16} strokeWidth={2} />}
-                  label="Airport Transfer"
+                  label="JKIA Pickup"
                 />
               </div>
 
